@@ -1,0 +1,36 @@
+generated: '2026-07-20'
+method: searched
+source:
+  - https://docs.moment.com/reference/getting-started-with-your-api
+  - https://docs.moment.com/reference/uat-testing-environment
+  - llms/moment-llms.txt
+summary:
+  types: [apiKey]
+  api_key_in: [header]
+  oauth2_flows: []
+schemes:
+  - name: MomentApiKey
+    type: apiKey
+    in: header
+    detail: >-
+      Requests authenticate with a Moment-issued API key. The caller's
+      organization is resolved server-side from the authenticated API key
+      (e.g. document uploads and organization-scoped reads/writes are keyed to
+      the org that owns the API key). Exact header name is not published in the
+      public docs index.
+    environments:
+      - name: production
+        detail: Production API keys operate against live venues and dealers.
+      - name: prod-paper-uat
+        detail: >-
+          Separate "Prod Paper" (UAT) API keys route to Moment's Simulation
+          engine sandbox with no real financial impact.
+network_controls:
+  fix_ip_allowlist: >-
+    Organizations connecting over FIX manage an IP allowlist via the API
+    (getfixipallowlist / addfixipallowlist / removefixipallowlist) plus a
+    general organization IP allowlist (updateorganizationipallowlist).
+notes: >-
+  No OpenAPI was published at a discoverable URL, so securityScheme details were
+  captured from the docs rather than derived. OAuth2 is not used; this is a
+  key-auth provider, so scopes/ is intentionally omitted.

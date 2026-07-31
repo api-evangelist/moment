@@ -1,0 +1,44 @@
+generated: '2026-07-20'
+method: searched
+source: https://docs.moment.com/reference/api-errors
+format: custom-json
+envelope:
+  description: >-
+    Errors on Moment's RESTful API are returned as JSON inside an error object.
+    Use error_type or the HTTP status code for programmatic handling. error and
+    error_details are human-readable and may change arbitrarily.
+  fields:
+    - name: error
+      description: Human-readable description of the error (subject to change).
+    - name: error_type
+      description: High-level machine classification of the error. Use for programmatic handling.
+    - name: error_details
+      description: >-
+        Optional array of human-readable field/message errors. Do NOT process
+        programmatically; structure and content may change arbitrarily.
+  example: |
+    {
+      "error": "Validation Error.",
+      "error_details": [{
+        "field": "status",
+        "message": "This field is required and cannot be empty."
+      }],
+      "error_type": "invalid_request"
+    }
+error_types:
+  - error_type: invalid_request
+    description: A request was invalid due to incorrect parameters or an authentication issue.
+  - error_type: server_error
+    description: An error occurred due to a problem on Moment's servers.
+  - error_type: not_found
+    description: The requested resource was not found.
+  - error_type: closed
+    description: The requested resource can only be called during a specific time interval.
+  - error_type: rate_limited
+    description: >-
+      The requested resource has a rate limit that has been breached. The HTTP
+      response carries X-RateLimit-* and Retry-After headers to diagnose why the
+      rate limit occurred and when to retry.
+notes: >-
+  Moment states additional error types will be introduced and documented over
+  time. Envelope is a custom object, not RFC 9457 application/problem+json.

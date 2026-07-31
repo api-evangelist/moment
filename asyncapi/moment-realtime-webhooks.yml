@@ -1,0 +1,39 @@
+generated: '2026-07-20'
+method: searched
+source:
+  - https://docs.moment.com/reference/getting-started-with-your-api
+  - https://docs.moment.com/reference/real-time-orders-api
+  - https://docs.moment.com/reference/real-time-prices-api
+  - llms/moment-llms.txt
+spec_type: Webhooks
+surface: websocket
+description: >-
+  Moment publishes no AsyncAPI document, but exposes a real-time event surface
+  over WebSockets (RFC 6455) that complements the REST API with low-latency
+  messaging and status updates. Not fabricated into an AsyncAPI spec; captured
+  as the documented event/streaming catalog.
+protocol:
+  transport: websocket
+  url_format: wss://moment-api.com/v{X}/...
+  message_format: JSON
+  envelope: '{"msg_type": "<message_type>", "<key>": "<value>", ...}'
+  control_message_types: [error, success, subscription, heartbeat]
+  keepalive: >-
+    RFC 6455 ping/pong every 10-15s plus optional application-level
+    {"msg_type":"heartbeat"} messages on trading streams.
+streams:
+  - name: Real-time Orders API
+    docs: https://docs.moment.com/reference/real-time-orders-api
+    delivers: >-
+      Real-time updates about order statuses (order_update / system_update
+      events, execution/cancel/reject lifecycle notifications).
+  - name: Real-time Prices API
+    docs: https://docs.moment.com/reference/real-time-prices-api
+    delivers: Real-time prices and yields for instruments.
+  - name: Real-time RFQ API
+    docs: https://docs.moment.com/reference/understanding-rfqs-guide
+    delivers: Real-time RFQ status and cancel-reject events.
+notes: >-
+  This is a push/streaming event surface (not HTTP callbacks). Wired as
+  type: Webhooks for the event-surface scoring family; no AsyncAPI spec exists
+  to save verbatim.

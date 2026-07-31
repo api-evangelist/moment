@@ -1,0 +1,94 @@
+generated: '2026-07-20'
+method: derived
+source: llms/moment-llms.txt
+description: >-
+  Entity-relationship graph DERIVED from Moment's documented API operations and
+  object names (no OpenAPI $ref graph was available). Relationships are inferred
+  from operation paths and id-reference fields; treat as a starting map.
+identifiers:
+  security_primary: ISIN
+  security_also: [CUSIP, ticker]
+  detail: >-
+    Instruments/securities are keyed on ISIN; many endpoints auto-detect other
+    symbol types (CUSIP, ticker) and resolve to the underlying ISIN.
+entities:
+  - name: Instrument
+    aka: [Security]
+    description: A fixed-income (or equity/ETF/fund) security with reference data, priced and traded.
+    key: isin
+  - name: Order
+    description: A trade request for an account, progressing through an execution lifecycle.
+    key: order_id
+    relationships:
+      - {type: belongs_to, target: Account, via: account}
+      - {type: references, target: Instrument, via: isin}
+      - {type: has_many, target: ExecutionOrder, via: order_id}
+      - {type: has_many, target: Allocation, via: order_id}
+  - name: ExecutionOrder
+    description: A child execution (LOB SOR, RFQ, manual, external, custodian) of a parent order.
+    key: execution_order_id
+    relationships:
+      - {type: belongs_to, target: Order, via: order_id}
+  - name: Allocation
+    description: Assignment of a block order's fills to one or more customer accounts.
+    relationships:
+      - {type: belongs_to, target: Order, via: order_id}
+      - {type: belongs_to, target: Account, via: account}
+  - name: RFQ
+    description: A request-for-quote against instruments, with events and list variants.
+    key: rfq_id
+    relationships:
+      - {type: references, target: Instrument, via: isin}
+  - name: Account
+    description: A managed portfolio account (by Moment or custodian id), holding lots and sleeves.
+    key: account_id
+    relationships:
+      - {type: has_many, target: Lot, via: account}
+      - {type: has_many, target: Sleeve, via: account}
+      - {type: belongs_to, target: Organization, via: organization}
+      - {type: has_many, target: CashRaise, via: account}
+  - name: Lot
+    description: A per-lot holding within an account, with optional field overrides.
+    relationships:
+      - {type: belongs_to, target: Account, via: account}
+      - {type: references, target: Instrument, via: isin}
+      - {type: belongs_to, target: Sleeve, via: sleeve}
+  - name: Sleeve
+    description: A subdivision of an account that can be assigned to a model.
+    relationships:
+      - {type: belongs_to, target: Account, via: account}
+      - {type: belongs_to, target: Model, via: model}
+  - name: Model
+    description: A strategy (security_list or fixed_income) used to optimize accounts/sleeves.
+    key: model_id
+    relationships:
+      - {type: has_many, target: Sleeve, via: model}
+  - name: AssetAllocationTemplate
+    description: A versioned, lineage-aware asset-allocation template (standalone or linked to a base).
+    key: template_id
+    relationships:
+      - {type: belongs_to, target: AssetAllocationTemplate, via: base_template_id}
+  - name: Organization
+    description: The authenticated entity (introducing broker / clearer / custodian) that owns API keys.
+    relationships:
+      - {type: has_many, target: RiskGroup, via: organization}
+      - {type: has_many, target: RiskControl, via: organization}
+      - {type: has_many, target: Account, via: organization}
+  - name: RiskGroup
+    description: A fee/markup risk group under an introducing broker used for pricing.
+    relationships:
+      - {type: belongs_to, target: Organization, via: introducing_broker}
+  - name: RiskControl
+    description: A configurable trading risk control owned by or assigned to an organization.
+    key: risk_control_id
+    relationships:
+      - {type: belongs_to, target: Organization, via: organization}
+  - name: CorporateAction
+    description: A corporate-action event (call, put, redemption, interest, tender, etc.) on instruments.
+    key: event_id
+    relationships:
+      - {type: references, target: Instrument, via: isin}
+  - name: CashRaise
+    description: A cash-raise request against an account with a pending/complete/canceled lifecycle.
+    relationships:
+      - {type: belongs_to, target: Account, via: account}

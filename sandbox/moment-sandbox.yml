@@ -1,0 +1,80 @@
+generated: '2026-07-20'
+method: searched
+source:
+  - https://docs.moment.com/reference/uat-testing-environment
+  - https://docs.moment.com/reference/mock-instruments
+name: Prod Paper (UAT)
+description: >-
+  Moment's Prod Paper (UAT) environment runs end-to-end tests against Moment's
+  Simulation engine, which mimics trading venues and dealers. Services are kept
+  at parity with production; the simulator generates market data and
+  fills/rejects orders with no real financial impact.
+environment_selection:
+  mechanism: separate Prod Paper (UAT) API key
+  detail: >-
+    Use a Prod Paper API key to route calls to the UAT/simulation environment.
+    The full set of in-scope instruments is retrievable via the ListInstruments
+    reference-data API when authenticated with a Prod Paper key.
+trading_window:
+  timezone: US/Eastern
+  detail: >-
+    Extended-hours-eligible instruments execute immediately from pre-regular
+    hours (00:07AM) through post-regular close (11:58PM); non-eligible
+    instruments queue before 9:30AM open and reject after 4PM. Orders before
+    00:07AM or after 11:58PM are rejected.
+mock_instruments:
+  note: >-
+    Trading mock bonds publish a constant offer price of 101, bid price of 100,
+    and max quantity of 500K (pre-fee; visible prices vary by fee schedule).
+    Trade size is always in dollars, never cents. Values below are published
+    verbatim by Moment for deterministic UAT testing.
+  fixed_income_market_data:
+    - cusips: [880591DM1, 38143C3G4]
+      behavior: No Quotes (simulate illiquid bonds)
+    - cusips: [3130A6RM1, 931142DB6]
+      behavior: Only Bids (simulate bid-side-only market)
+    - cusips: [3130A2UW4, 38143CFG1]
+      behavior: Only Offers (simulate ask-side-only market)
+    - cusips: [all other in-scope CUSIPs]
+      behavior: Bids and Offers (simulate two-sided market)
+  fixed_income_trading:
+    - cusip: 912810SX7
+      behavior: 1 fill after 1 second
+    - cusip: 912810SU3
+      behavior: 1 fill after 1 minute
+    - cusip: 912810SS8
+      behavior: 2 fills, each after 1 minute (partial fill when notional >= 2000)
+    - cusip: 912810RY6
+      behavior: Hang until market close, then expire
+    - cusip: 912810UK2
+      behavior: Unsolicited cancel by venue
+  fractionalized_bonds:
+    - cusip: 91282CJG7
+      behavior: Two-sided market / fill any quantity at Moment Markets
+    - cusip: 501044DM0
+      behavior: Fill fraction at Moment Markets, whole quantity at another venue
+    - cusip: 3130A6RM1
+      behavior: Only Bid quotes
+    - cusip: 3130A2UW4
+      behavior: Only Ask quotes
+  equities:
+    - {ticker: AAPL, cusip: '037833100', behavior: Always rejects}
+    - {ticker: MSFT, cusip: '594918104', behavior: 1 fill after 1 minute (limit); market fills immediately}
+    - {ticker: TSLA, cusip: 88160R101, behavior: 2 fills, second after 1 minute}
+    - {ticker: NVDA, cusip: 67066G104, behavior: Unsolicited cancel by venue after 1 minute}
+  etfs:
+    - {ticker: VXF, cusip: '922908652', behavior: 1 fill after 5 minutes (limit)}
+    - {ticker: VTV, cusip: '922908744', behavior: 1 fill after 5 minutes (limit)}
+    - {ticker: VOE, cusip: '922908512', behavior: 1 fill after 5 minutes (limit)}
+  mutual_funds:
+    - {ticker: SPAXX, cusip: 31617H102, behavior: Always rejects}
+    - {ticker: VTSAX, cusip: '922908728', behavior: Immediate fill at NAV}
+fill_conditions:
+  detail: >-
+    For a mock order to fill: (1) trade price must match the OrderBook quote,
+    (2) trade size <= the quantity offered for the matching quote, and (3) for
+    partial-fill instruments, all_or_none=true fully fills when order-book
+    liquidity exists. Otherwise the simulator sends a venue cancellation.
+rfq_uat:
+  source: https://docs.moment.com/reference/rfq-uat-testing-environment
+  detail: A parallel RFQ UAT environment and RFQ mock-instruments guide support RFQ-flow testing.

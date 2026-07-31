@@ -1,0 +1,27 @@
+generated: '2026-07-20'
+method: searched
+source:
+  - https://status.moment.com
+  - https://docs.moment.com/reference/getting-started-with-your-api
+  - llms/moment-llms.txt
+versioning:
+  scheme: uri-path
+  current: v1
+  detail: >-
+    REST endpoints are versioned in the URI path (e.g. /v1/...). WebSocket
+    stream URLs carry a protocol version segment (wss://moment-api.com/v{X}/...).
+status_page: https://status.moment.com
+sla:
+  published: false
+deprecation:
+  policy_published: false
+  detail: No formal deprecation/sunset policy located in the public docs.
+data_coverage_window:
+  trading_calendar: >-
+    The Trading Calendar API currently supports dates between 2023-08-01 and
+    2026-01-01 (inclusive).
+  historical_prices: Price/yield history available for roughly the last 5 years at up to 1-minute precision.
+deprecated_operations: []
+notes: >-
+  Status page verified reachable (HTTP 200). No deprecation policy or SLA
+  document was found, so only a StatusPage pointer is wired (no Deprecation).

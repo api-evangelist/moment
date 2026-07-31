@@ -1,0 +1,20 @@
+generated: '2026-07-20'
+method: probed
+source: live probe of /.well-known/ paths on Moment hosts
+hosts:
+  - host: https://moment.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+  - host: https://docs.moment.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+  - host: https://api.moment.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+notes: >-
+  No /.well-known discovery documents (security.txt, openid-configuration,
+  oauth-authorization-server, api-catalog, ai-plugin.json) were served on the
+  probed hosts as of the generated date. Absence recorded as valid data.

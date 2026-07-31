@@ -1,0 +1,64 @@
+generated: '2026-07-20'
+method: searched
+source:
+  - https://docs.moment.com/reference/getting-started-with-your-api
+  - https://docs.moment.com/reference/api-errors
+  - https://docs.moment.com/docs/getting-started
+  - llms/moment-llms.txt
+transport:
+  rest:
+    description: Simple REST API for reference data, pricing, analytics, and order/execution management.
+    versioning: uri-path
+    version: v1
+    base_path_example: /v1/data/instrument/
+  realtime:
+    description: >-
+      WebSocket (RFC 6455) streams complement the REST API for low-latency
+      messaging and status updates (Real-time Orders, Real-time Prices,
+      Real-time RFQ).
+    url_format: wss://moment-api.com/v{X}/...
+    message_envelope: '{"msg_type": "<message_type>", "<key>": "<value>", ...}'
+    control_message_types: [error, success, subscription, heartbeat]
+    keepalive: >-
+      Server sends WebSocket ping frames every 10-15 seconds; clients respond
+      with pong. Trading streams may also emit application-level
+      {"msg_type":"heartbeat"} messages.
+authentication:
+  style: api-key
+  detail: >-
+    Requests are made with an authenticated API key; the caller's organization
+    is resolved from the API key. Separate Prod Paper (UAT) API keys select the
+    sandbox environment. Exact header name is not published in the docs index.
+  see: authentication/moment-authentication.yml
+identifiers:
+  primary: ISIN
+  also_accepts: >-
+    Many endpoints auto-detect the symbol type (e.g. CUSIP, ticker) and resolve
+    it to the underlying ISIN.
+pagination:
+  style: present-on-list-endpoints
+  detail: >-
+    List endpoints (e.g. eligible/tradeable universe, advisor accounts, advisor
+    codes) are paginated. Cursor/parameter specifics per endpoint in the API
+    reference.
+error_handling:
+  envelope_fields: [error, error_type, error_details]
+  programmatic_key: error_type
+  see: errors/moment-error-codes.yml
+rate_limiting:
+  signaled: true
+  headers: [X-RateLimit-*, Retry-After]
+  error_type: rate_limited
+  detail: >-
+    When a rate limit is breached the API returns error_type rate_limited with
+    X-RateLimit-* and Retry-After response headers indicating why and when to
+    retry.
+response_formats:
+  - application/json
+  - application/x-ndjson  # snapshot endpoints emit newline-delimited JSON (NDJSON)
+idempotency:
+  supported: false
+  detail: No idempotency-key mechanism is documented in the public API reference.
+notes: >-
+  Cross-links: errors/moment-error-codes.yml, authentication/moment-authentication.yml,
+  lifecycle/moment-lifecycle.yml, sandbox/moment-sandbox.yml.

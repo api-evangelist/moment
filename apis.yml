@@ -1,8 +1,32 @@
 aid: moment
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/moment.png
 name: Moment
-description: Moment is a company surfaced as a portfolio company of a16z, lightspeed-venture-partners
-  and added to the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the
-  enrichment pipeline.
+description: >-
+  Moment is the AI operating system for investment management and the
+  fixed-income infrastructure that powers bond data, pricing, and trading for
+  digital wealth platforms, RIAs, and brokerages. Through simple REST and
+  WebSocket APIs it delivers institutional-grade reference data on 500,000+
+  (1M+ global) fixed-income securities — corporates, treasuries, agencies,
+  municipals, CDs, ABS/MBS and structured products — plus real-time and
+  historical evaluated pricing, live top-of-order-book and full order books,
+  and advanced analytics (yield conversion, markups, duration, spreads,
+  liquidity scores, implied default). Its execution management system covers
+  orders, RFQs, smart order routing, allocations, block trades, corporate
+  actions, portfolio optimization, model and asset-allocation management, and
+  account, risk-control, and cash-raise operations. Moment works with wealth
+  firms overseeing more than $10 trillion in assets across 60,000+ advisors.
 url: https://raw.githubusercontent.com/api-evangelist/moment/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -13,12 +37,81 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-20'
 tags:
 - Company
-apis: []
+- Fixed Income
+- Bonds
+- Trading
+- Market Data
+- Reference Data
+- Investment Management
+- Wealth Management
+- Brokerage
+- Financial Services
+- Fintech
+apis:
+- name: Moment Fixed Income API
+  description: >-
+    REST and WebSocket API for fixed-income reference data, evaluated pricing,
+    order books, analytics, order/RFQ execution, and portfolio optimization.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  properties:
+  - type: Documentation
+    url: https://docs.moment.com
+  - type: APIReference
+    url: https://docs.moment.com/reference/getting-started-with-your-api
+  - type: GettingStarted
+    url: https://docs.moment.com/docs/getting-started
+common:
+- type: DomainSecurity
+  url: security/moment-domain-security.yml
+- type: Website
+  url: https://moment.com
+- type: DeveloperPortal
+  url: https://docs.moment.com
+- type: Documentation
+  url: https://docs.moment.com
+- type: APIReference
+  url: https://docs.moment.com/reference/getting-started-with-your-api
+- type: GettingStarted
+  url: https://docs.moment.com/docs/getting-started
+- type: Support
+  url: mailto:support@withmoment.com
+- type: StatusPage
+  url: https://status.moment.com
+- type: LLMsTxt
+  url: llms/moment-llms.txt
+- type: Authentication
+  url: authentication/moment-authentication.yml
+- type: ErrorCatalog
+  url: errors/moment-error-codes.yml
+- type: Conventions
+  url: conventions/moment-conventions.yml
+- type: RateLimits
+  url: conventions/moment-conventions.yml
+- type: Sandbox
+  url: sandbox/moment-sandbox.yml
+- type: Webhooks
+  url: asyncapi/moment-realtime-webhooks.yml
+- type: MCPServer
+  url: mcp/moment-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DataModel
+  url: data-model/moment-data-model.yml
+- type: WellKnown
+  url: well-known/moment-well-known.yml
+- type: Lifecycle
+  url: lifecycle/moment-lifecycle.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+x-enrichment:
+  date: '2026-07-20'
+  status: enriched
+  artifacts_added: 15
+  pass: local-v1

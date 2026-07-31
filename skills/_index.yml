@@ -1,0 +1,19 @@
+generated: '2026-07-20'
+method: generated
+source: llms/moment-llms.txt
+skills:
+  - file: moment-lookup-and-price-a-bond.md
+    name: Look up and price a bond
+    api: Moment Fixed Income API
+    operations: [listinstruments, retrieveinstrument, getmarks, gettopoforderbook-1, gettradeprice-1, pricetoyield-1]
+  - file: moment-place-and-track-an-order.md
+    name: Place and track a bond order
+    api: Moment Fixed Income API
+    operations: [postorder-1, getorderbyorderid-1, getallorders-1, deleteorderbyorderid-1, getevents-1, allocateorderbyorderid]
+  - file: moment-optimize-a-portfolio.md
+    name: Optimize a portfolio
+    api: Moment Fixed Income API
+    operations: [postoptimization-1, getoptimizationstatus, getoptimizationsorders, postpreview, postportfoliostats]
+notes: >-
+  Skills generated from Moment's documented operations (ReadMe reference slugs
+  in llms/moment-llms.txt). No provider-published AGENTS.md/skills were found.
