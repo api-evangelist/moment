@@ -61,7 +61,7 @@ tags:
 - Investment Management
 - Wealth Management
 - Brokerage
-- Financial-Services
+- Financial Services
 - Fintech
 tags_raw:
 - Company
@@ -75,6 +75,7 @@ tags_raw:
 - Brokerage
 - Financial Services
 - Fintech
+- Financial-Services
 apis:
 - name: Moment Fixed Income API
   description: >-
