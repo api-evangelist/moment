@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-filter-list-short-schema.json",
+  "title": "FilterListShort",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-filter-lists-api-openapi.yml#/components/schemas/FilterListShort",
+  "type": "object",
+  "properties": {
+    "list_id": {
+      "type": "string",
+      "description": "The unique identifier of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "name": {
+      "type": "string",
+      "description": "The user defined name of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "created_at": {
+      "type": "string",
+      "description": "The date and time the filter list was created",
+      "format": "date-time",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "created_by": {
+      "type": "string",
+      "description": "The moment_user_id of the user who created the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "field": {
+      "type": "string",
+      "description": "The ref data field that the filter list is based on",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "version": {
+      "type": "integer",
+      "description": "The version of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    }
+  },
+  "required": [
+    "list_id",
+    "name",
+    "created_at",
+    "created_by",
+    "field",
+    "version"
+  ]
+}

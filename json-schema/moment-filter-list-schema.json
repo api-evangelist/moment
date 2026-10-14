@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-filter-list-schema.json",
+  "title": "FilterList",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-filter-lists-api-openapi.yml#/components/schemas/FilterList",
+  "type": "object",
+  "properties": {
+    "list_id": {
+      "type": "string",
+      "description": "The unique identifier of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "name": {
+      "type": "string",
+      "description": "The user defined name of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "organization_id": {
+      "type": "string",
+      "description": "The organization ID of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "field": {
+      "type": "string",
+      "description": "The ref data field that the filter list is based on",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "The date and time the filter list was updated",
+      "format": "date-time",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "updated_by": {
+      "type": "string",
+      "description": "The moment_user_id of the user who updated the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "version": {
+      "type": "integer",
+      "description": "The version of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether this version is the active version of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "values": {
+      "$ref": "#/$defs/ValueDict"
+    }
+  },
+  "required": [
+    "list_id",
+    "name",
+    "organization_id",
+    "field",
+    "updated_at",
+    "updated_by",
+    "version",
+    "active"
+  ],
+  "$defs": {
+    "ValueDict": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "added_at": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "added_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "value",
+        "added_at",
+        "added_by"
+      ]
+    }
+  }
+}

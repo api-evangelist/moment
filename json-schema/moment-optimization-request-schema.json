@@ -1,0 +1,3127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-optimization-request-schema.json",
+  "title": "OptimizationRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-portfolio-optimizer-api-openapi.yml#/components/schemas/OptimizationRequest",
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AccountOptimization"
+      },
+      "title": "Accounts"
+    },
+    "allow_sell_universe_constraint_violations": {
+      "description": "When true, the optimizer is allowed to keep existing holdings that violate sell-universe constraints (no forced sells purely to clear universe violations). Mirrored onto every account in the request.",
+      "type": "boolean",
+      "default": false,
+      "title": "Allow Sell Universe Constraint Violations",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "batch_id": {
+      "description": "An optional batch ID to group optimizations together. This can be used to easily identify optimizations that were submitted together. Must contain only alphanumeric characters, hyphens, and underscores.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "fixed_cost_per_trade": {
+      "$ref": "#/$defs/FixedCostPerTrade"
+    },
+    "limit_price_buffer": {
+      "description": "An optional limit price buffer to apply to the optimization. This is a percentage value that will be added to the limit price of all the orders.",
+      "$ref": "#/$defs/NonNegativeDecimal",
+      "title": "Limit Price Buffer"
+    },
+    "optimization_source": {
+      "description": "Origin tag for the request, recorded for audit and used by downstream filtering. Taken from the `Moment-Optimization-Source` request header, falling back to a per-route default when that header is absent or unrecognized; a value supplied in the request body is ignored.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/OptimizationSource"
+        }
+      ],
+      "nullable": true
+    },
+    "optimizer_params": {
+      "$ref": "#/$defs/OptionalOptimizerParams"
+    },
+    "organization_id": {
+      "description": "Organization identifier, taken from the authenticated `Moment-Organization` request header. A value supplied in the request body is ignored; responses that serve a stored request payload back report the header-derived value.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Organization ID"
+    },
+    "parent_organization_id": {
+      "description": "Parent organization identifier, taken from the authenticated `Moment-Parent-Organization` request header. A value supplied in the request body is ignored; responses that serve a stored request payload back report the header-derived value.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Parent Organization ID"
+    },
+    "timestamp": {
+      "description": "An optional historical timestamp at which to run the optimization. The timestamp's date must be between 2024-05-01 and the current date, and the timestamp's time must be between 09:35 AM and 4:00 PM Eastern Time.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "title": "Timestamp"
+    },
+    "valuation_config": {
+      "description": "Valuation configuration the caller resolved for the requesting org,\ntypically a proposal's. If absent, the optimizer resolves the org's\nconfiguration itself.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ValuationConfig"
+        }
+      ],
+      "nullable": true
+    }
+  },
+  "required": [
+    "accounts",
+    "optimizer_params"
+  ],
+  "$defs": {
+    "AccountOptimization": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "title": "Account ID"
+        },
+        "allow_rebalancing": {
+          "$ref": "#/$defs/AllowRebalancing",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "allow_sell_universe_constraint_violations": {
+          "$ref": "#/$defs/AllowSellUniverseConstraintViolations",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "assignment_date": {
+          "description": "The date on which the strategy was first deployed to the account.\nFor ladder policy constraints, this decides the starting date of the first bucket in the ladder.",
+          "type": "string",
+          "format": "date",
+          "title": "Assignment Date"
+        },
+        "blocking_group": {
+          "description": "Array of blocking group identifiers.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "title": "Blocking Group",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "buy_objective_terms": {
+          "description": "The objective terms scoring every trade leg, buy and sell.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectiveTerm"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "cash": {
+          "description": "Uninvested USD cash in the account. Shorthand for a USD holding of\nthe same quantity: the optimizer folds this amount into `holdings`\nas a USD position before solving. Mutually exclusive with an\nexplicit cash holding — requests that set `cash` and also include\na cash position in `holdings` are rejected.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Decimal"
+            }
+          ],
+          "title": "Cash"
+        },
+        "cash_raise_request": {
+          "$ref": "#/$defs/CashRaiseRequest"
+        },
+        "cashflow_targets": {
+          "description": "The cashflow targets for the account.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CashflowTarget"
+          },
+          "default": [],
+          "title": "Cashflow Targets",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "cashflow_target_priority": {
+          "description": "Priority of the account's cashflow target floors. Omitted defaults to 2.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ConstraintPriority"
+            }
+          ],
+          "default": 2
+        },
+        "custodian_account_id": {
+          "description": "The custodian-tracked account number (e.g. the Fidelity account\nnumber). Used to match risk controls whose entity_ids are keyed by\ncustodian account id rather than the Moment account id.",
+          "type": "string",
+          "title": "Custodian Account ID"
+        },
+        "customizations": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/schemas-Constraint"
+          },
+          "x-go-type-skip-optional-pointer": true
+        },
+        "desired_market_value": {
+          "description": "The sleeve target market value (target sleeve MV scaled by the account total MV). Null when DoD sleeve cash is enabled, in which case the consumer falls back to actual holdings + cash balance.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/NullDecimal"
+            }
+          ],
+          "title": "Desired Market Value",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "federal_tax_rate": {
+          "description": "The federal tax rate for the account.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxRate"
+            }
+          ],
+          "title": "Federal Tax Rate"
+        },
+        "fixed_cost_per_allocation": {
+          "description": "An optional fixed cost per allocation to apply to the optimization.",
+          "type": "number",
+          "minimum": 0,
+          "default": 0,
+          "title": "Fixed Cost Per Allocation"
+        },
+        "holdings": {
+          "description": "The holdings in the account.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Holding"
+          },
+          "title": "Holdings"
+        },
+        "is_eligible_to_participate_in_block_trades": {
+          "description": "Whether the account is eligible to participate in block trades.",
+          "type": "boolean",
+          "default": true,
+          "title": "Is Eligible To Participate In Block Trades",
+          "x-go-type-skip-optional-pointer": true,
+          "x-omitempty": false
+        },
+        "local_tax_rate": {
+          "description": "The local tax rate for the account.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxRate"
+            }
+          ],
+          "title": "Local Tax Rate"
+        },
+        "lot_targeting_asset_classes": {
+          "description": "Asset classes the account's custodian supports tax-lot targeting for. Absent means unknown, and every sell is lot-tagged as before; an empty list means none are supported.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LotTargetingAssetClass"
+          },
+          "title": "Lot Targeting Asset Classes"
+        },
+        "max_rebalance_buys": {
+          "description": "The max number of buys that can occur in a rebalance.",
+          "type": "integer",
+          "minimum": 0,
+          "title": "Max Rebalance Buys"
+        },
+        "max_rebalance_market_value_pct_buys": {
+          "description": "The max percentage of the portfolio market value that can be repurchased in a rebalance, as a decimal fraction in [0,1].",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Max Rebalance Market Value Percent Buys"
+        },
+        "max_rebalance_market_value_pct_sells": {
+          "description": "The max share of the portfolio's holdings plus cash that can be sold in a rebalance, as a decimal fraction in [0,1].",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Max Rebalance Market Value Percent Sells"
+        },
+        "max_rebalance_sells": {
+          "description": "The max number of sells that can occur in a rebalance.",
+          "type": "integer",
+          "minimum": 0,
+          "title": "Max Rebalance Sells"
+        },
+        "minimum_order_increment": {
+          "description": "Account-level minimum trade quantization in absolute units (face for FI, shares for equity).\nCombined with each instrument's own min_increment via LCM, so the effective per-trade\nincrement is LCM(instrument_min_increment, minimum_order_increment).",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "title": "Minimum Order Increment"
+        },
+        "objective_strategy": {
+          "description": "The objective strategy for the optimization.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ObjectiveStrategy"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "orders": {
+          "description": "Orders from a prior proposal to preserve. Orders with lock=true will be passed through unchanged; the optimizer adjusts holdings/cash accordingly.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Order"
+          },
+          "default": [],
+          "title": "Orders",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "overrides": {
+          "description": "Declarative overrides applied to the account optimization before the solver model is built (e.g. security replacements that rewrite the tracking-error benchmark and the buyable universe). Distinct from `customizations`, which are solver constraints on the built model.\n",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Override"
+          },
+          "default": [],
+          "title": "Overrides",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "proposal_action_targets": {
+          "description": "Per-lot or per-instrument LP variable targets derived from advisor proposal actions on this sleeve. Propman computes the target quantity per action; suboptimal fixes the corresponding LP variable via an equality constraint.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProposalActionTarget"
+          },
+          "default": [],
+          "title": "Proposal Action Targets",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "wash_sale_restrictions": {
+          "description": "Per-account wash-sale restrictions forwarded from the accounts service. Suboptimal expands each into buy/sell LP constraints at solve time (instrument buy-block; per-lot sell-block for older-than-trigger loss lots). Empty unless the org has wash-sale prevention enabled.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WashSaleRestriction"
+          },
+          "default": [],
+          "title": "Wash Sale Restrictions",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "short_term_realized_gain_loss": {
+          "description": "Net short-term realized capital gain/loss YTD in dollars (settled + intraday). The optimizer derives remaining short-term budget from this and short_term_tax_budget.",
+          "type": "number",
+          "title": "Short Term Realized Gain Loss"
+        },
+        "long_term_realized_gain_loss": {
+          "description": "Net long-term realized capital gain/loss YTD in dollars (settled + intraday). The optimizer derives remaining long-term budget from this and long_term_tax_budget.",
+          "type": "number",
+          "title": "Long Term Realized Gain Loss"
+        },
+        "short_term_tax_budget": {
+          "description": "Advisor-set short-term tax budget in dollars for realized capital gains this year.",
+          "type": "number",
+          "title": "Short Term Tax Budget"
+        },
+        "long_term_tax_budget": {
+          "description": "Advisor-set long-term tax budget in dollars for realized capital gains this year.",
+          "type": "number",
+          "title": "Long Term Tax Budget"
+        },
+        "estimated_tax_bill_budget": {
+          "description": "Advisor-set estimated tax bill budget in dollars (cap on estimated taxes paid this year, accounting for tax rates and short-term losses offsetting long-term gains).",
+          "type": "number",
+          "title": "Estimated Tax Bill Budget"
+        },
+        "total_gains_tax_budget": {
+          "description": "Advisor-set total gain/loss budget in dollars for realized capital gains this year. Independent of the short-term and long-term tax budgets (not their sum) — a single cap on total realized gains.",
+          "type": "number",
+          "title": "Total Gains Tax Budget"
+        },
+        "tax_sensitivity": {
+          "description": "Advisor-set tax sensitivity, an integer from 0 (ignore taxes, minimize tracking error) to 100 (fully prioritize taxes). Scales how heavily the optimizer weights tax cost against tracking error.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "title": "Tax Sensitivity"
+        },
+        "short_term_tax_rate": {
+          "description": "Combined effective short-term tax rate (federal + state + local) as a decimal fraction. Used to estimate the tax bill on short-term realized gains.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Short Term Tax Rate"
+        },
+        "long_term_tax_rate": {
+          "description": "Combined effective long-term tax rate (federal + state + local) as a decimal fraction. Used to estimate the tax bill on long-term realized gains.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Long Term Tax Rate"
+        },
+        "tax_budget_weight": {
+          "description": "This account entry's share of the parent account's tax budget, in [0,1]. Sleeves of one account are optimized as independent entries, so each gets a pro-rata slice (by market value) of the account-level tax headroom; the optimizer scales every derived tax-budget cap (short/long-term and estimated-tax-bill) by this weight. Defaults to 1.0 (the whole budget) for single-entry accounts and callers that don't split.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1,
+          "title": "Tax Budget Weight"
+        },
+        "risk_group_id": {
+          "description": "The account's risk group, selecting its venue connectivity. Optional — omit, null, or empty to fall back to the organization's default risk group.",
+          "type": "string",
+          "title": "Risk Group Id",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "state": {
+          "description": "The 2-letter US state code for the account holder. Optional —\nwhen null/absent, state-based tax math (cross-deductible-state\nlookups, US-territory checks, state-exempt-agency checks)\nfalls through to \"no state benefit\" and bonds are treated as\nfully taxable at the state level.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/State"
+            }
+          ],
+          "nullable": true,
+          "x-go-type-skip-optional-pointer": false
+        },
+        "state_tax_rate": {
+          "description": "The state tax rate for the account.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxRate"
+            }
+          ],
+          "title": "State Tax Rate"
+        },
+        "strategy": {
+          "$ref": "#/$defs/StrategyUnion"
+        },
+        "tax_profile": {
+          "description": "Tax profile classification for the account. Defaults to us_taxable.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxProfile"
+            }
+          ],
+          "default": "us_taxable",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "custom_income_tax": {
+          "description": "Custom income tax rate as a decimal between 0 and 1. Only meaningful\nwhen tax_profile is custom_taxable or uk_taxable.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxRate"
+            }
+          ],
+          "title": "Custom Income Tax",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "custom_capital_gains_tax": {
+          "description": "Custom capital gains tax rate as a decimal between 0 and 1. Only\nmeaningful when tax_profile is custom_taxable or uk_taxable. Under\nuk_taxable this rate is overridden to zero for Gilts and QCBs.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/TaxRate"
+            }
+          ],
+          "title": "Custom Capital Gains Tax",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "account_total_value": {
+          "description": "The whole account's value on every basis, with and without cash.\nRead only by validate-accounts, to build a `target` flavor's\ndenominator: `sleeve_target_allocation` times the entry matching\nthe flavor's `weight_basis` and `include_cash`. All three bases are\nrequired together so a flavor never divides a numerator on one\nbasis by a total on another.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/AccountTotalValue"
+            }
+          ],
+          "nullable": true,
+          "title": "Account Total Value"
+        },
+        "sleeve_target_allocation": {
+          "description": "This sleeve's target share of the account, as a fraction in [0,1].\nRead only by validate-accounts, to scale `account_total_value` into\na `target` flavor's denominator.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Sleeve Target Allocation"
+        }
+      },
+      "required": [
+        "account_id",
+        "federal_tax_rate",
+        "state_tax_rate",
+        "local_tax_rate",
+        "holdings",
+        "strategy",
+        "assignment_date"
+      ],
+      "title": "AccountOptimization"
+    },
+    "AccountTotalValue": {
+      "description": "An account's total value on each of the three valuation bases. Every\nbasis is required: a `target` flavor divides a numerator valued on its\nown basis by a total on the same basis.",
+      "type": "object",
+      "properties": {
+        "clean": {
+          "$ref": "#/$defs/BasisTotalValue"
+        },
+        "dirty": {
+          "$ref": "#/$defs/BasisTotalValue"
+        },
+        "par": {
+          "$ref": "#/$defs/BasisTotalValue"
+        }
+      },
+      "required": [
+        "clean",
+        "dirty",
+        "par"
+      ],
+      "title": "AccountTotalValue"
+    },
+    "AllocationConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "max_market_value": {
+          "description": "The maximum market value for the allocation constraint, which can be specified instead of max_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Market Value"
+        },
+        "max_weight": {
+          "description": "The maximum weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Max Weight"
+        },
+        "min_market_value": {
+          "description": "The minimum market value for the allocation constraint, which can be specified instead of min_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Market Value"
+        },
+        "min_weight": {
+          "description": "The minimum weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Min Weight"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "rel_buffer": {
+          "description": "Relative buffer applied around the target. Half-open [0, 1).",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMaximum": true,
+          "maximum": 1,
+          "default": 0.01,
+          "title": "Rel Buffer"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "target_market_value": {
+          "description": "The target market value for the allocation constraint, which can be specified instead of target_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Target Market Value"
+        },
+        "target_weight": {
+          "description": "The target weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Target Weight"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "allocation"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "filter",
+        "type"
+      ],
+      "title": "AllocationConstraint"
+    },
+    "AllowRebalancing": {
+      "description": "A boolean flag to indicate if rebalancing is allowed in the optimization.",
+      "type": "boolean",
+      "default": false,
+      "title": "Allow Rebalancing"
+    },
+    "AllowSellUniverseConstraintViolations": {
+      "description": "A boolean flag to indicate if sells are allowed in the optimization. This will enable selling of securities that invalidate any `Universe` constraints.",
+      "type": "boolean",
+      "default": false,
+      "title": "Allow Sell Universe Constraint Violations"
+    },
+    "ApplicableSide": {
+      "description": "Which side(s) of a trade a constraint or filter applies to. Distinct from `Side`, which labels real executable order direction (`buy` or `sell` only); `ApplicableSide` adds `both` for cases like a universe filter that restricts buys, sells, or both.",
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell",
+        "both"
+      ],
+      "x-enum-varnames": [
+        "ApplicableSideBuy",
+        "ApplicableSideSell",
+        "ApplicableSideBoth"
+      ],
+      "title": "ApplicableSide"
+    },
+    "AverageValueConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "field": {
+          "description": "The field to apply the average value constraint to.",
+          "type": "string",
+          "title": "Field"
+        },
+        "max_average_value": {
+          "description": "The maximum average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Max Average Value"
+        },
+        "min_average_value": {
+          "description": "The minimum average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Min Average Value"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "target_average_value": {
+          "description": "The target average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Target Average Value"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "average_value"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "AverageValueConstraint"
+    },
+    "BasisTotalValue": {
+      "description": "One valuation basis's total value, split by whether uninvested cash is\ncounted. A dollar of cash is one dollar of par, so only the securities\nterm moves between bases.",
+      "type": "object",
+      "properties": {
+        "with_cash": {
+          "description": "Total value including uninvested cash.",
+          "type": "number",
+          "format": "double",
+          "title": "With Cash"
+        },
+        "without_cash": {
+          "description": "Total value of held securities alone.",
+          "type": "number",
+          "format": "double",
+          "title": "Without Cash"
+        }
+      },
+      "required": [
+        "with_cash",
+        "without_cash"
+      ],
+      "title": "BasisTotalValue"
+    },
+    "BuyUniverseConstraint": {
+      "description": "The BuyUniverseConstraint is a constraint that specifies the universe of instruments that can be bought in the account. Within the filter field, you can specify filters based on reference data fields and live fields (this includes: `order_price`, `order_ytw`, `tax_effective_limit_ytw`, `post_tax_limit_ytw`, `fixed_transaction_cost_in_yield`, and `fixed_transaction_cost_in_price`).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "buy_universe"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filter"
+      ],
+      "title": "BuyUniverseConstraint"
+    },
+    "CashRaiseRequest": {
+      "type": "object",
+      "properties": {
+        "min_raise_amount": {
+          "description": "The minimum amount of cash to raise.",
+          "$ref": "#/$defs/NonNegativeDecimal"
+        },
+        "raise_strategy": {
+          "description": "The strategy to use to raise cash. `maintain_compliance` will raise cash to maintain compliance with the existing constraints.",
+          "type": "string",
+          "enum": [
+            "maintain_compliance"
+          ]
+        }
+      },
+      "required": [
+        "min_raise_amount",
+        "raise_strategy"
+      ],
+      "title": "CashRaiseRequest"
+    },
+    "CashflowBandConstraint": {
+      "description": "Levels the recurring cashflow targets of every account on the strategy:\neach live bucket of a recurring target is held within\n±max_deviation_ratio of that target's post-trade mean bucket cashflow,\nin raw dollars, while the objective is still maximized. Buckets with\nan amount override are left out of the band, as are one_time targets\nand targets with fewer than two remaining buckets. Assigned accounts\ninherit it; per-account customizations may override or remove it by\nid.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "description": "Same as ConstraintPriority, but omitted defaults to 1, so the band relaxes before the cashflow floors (tier 2).",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ConstraintPriority"
+            }
+          ],
+          "default": 1
+        },
+        "max_deviation_ratio": {
+          "description": "Half-width of the band as a fraction of the target's mean bucket, in (0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "maximum": 1,
+          "title": "Max Deviation Ratio"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "cashflow_band"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "max_deviation_ratio"
+      ],
+      "title": "CashflowBandConstraint"
+    },
+    "CashflowTarget": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "description": "The amount of cashflow to target for each bucket. Omit for no dollar floor (the maximize_cashflows input).",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "title": "Amount"
+        },
+        "call_assumption": {
+          "description": "The call assumption of the cashflow target.",
+          "type": "string",
+          "enum": [
+            "maturity_date",
+            "next_call_date",
+            "workout_date"
+          ],
+          "title": "Call Assumption"
+        },
+        "end_date": {
+          "description": "The end date of the cashflow target.",
+          "type": "string",
+          "format": "date",
+          "title": "End Date"
+        },
+        "frequency": {
+          "description": "The frequency of the cashflow target.",
+          "type": "string",
+          "enum": [
+            "monthly",
+            "bimonthly",
+            "quarterly",
+            "semiannually",
+            "annually",
+            "one_time"
+          ],
+          "title": "Frequency"
+        },
+        "granularity": {
+          "description": "How long each bucket stays open, anchored on each frequency start. Omit for a bucket spanning the whole frequency period. Must not be wider than frequency; not allowed on one_time targets.",
+          "type": "string",
+          "enum": [
+            "monthly",
+            "bimonthly",
+            "quarterly",
+            "semiannually",
+            "annually"
+          ],
+          "x-enum-varnames": [
+            "GranularityMonthly",
+            "GranularityBimonthly",
+            "GranularityQuarterly",
+            "GranularitySemiannually",
+            "GranularityAnnually"
+          ],
+          "title": "Granularity"
+        },
+        "overrides": {
+          "description": "Per-bucket amount overrides, keyed by the bucket's start date in `YYYYMMDD` format.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "title": "Overrides",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "source": {
+          "description": "The source of the cashflow target.",
+          "type": "string",
+          "enum": [
+            "coupon",
+            "principal",
+            "coupon_and_principal"
+          ],
+          "title": "Source"
+        },
+        "start_date": {
+          "description": "The start date of the cashflow target.",
+          "type": "string",
+          "format": "date",
+          "title": "Start Date"
+        }
+      },
+      "required": [
+        "end_date",
+        "frequency",
+        "source",
+        "call_assumption"
+      ],
+      "title": "CashflowTarget"
+    },
+    "ConcreteConstraint": {
+      "description": "Leaf-only discriminator union. Each variant carries its own `id`\nfield; no parent-level shared properties (so codegens emit a\nclean discriminator union, not intersection wrappers).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AllocationConstraint"
+        },
+        {
+          "$ref": "#/$defs/UniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/DiversificationConstraint"
+        },
+        {
+          "$ref": "#/$defs/AverageValueConstraint"
+        },
+        {
+          "$ref": "#/$defs/TradeConstraint"
+        },
+        {
+          "$ref": "#/$defs/BuyUniverseConstraint"
+        }
+      ],
+      "x-go-type-skip-optional-pointer": true
+    },
+    "ConcreteObjectiveTerm": {
+      "description": "A leaf or operation node in an objective term tree — either a field reference or an operation applied to other nodes.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/FieldTerm"
+        },
+        {
+          "$ref": "#/$defs/OperationTerm"
+        }
+      ],
+      "title": "ConcreteObjectiveTerm"
+    },
+    "ConstraintPriority": {
+      "description": "The priority of the constraint. Constraints with lower priority values will be relaxed first. Omitted defaults to 1 (lowest priority, relaxed first); -1 marks the constraint unrelaxable (never relaxed).",
+      "type": "number",
+      "format": "double",
+      "default": 1,
+      "title": "ConstraintPriority"
+    },
+    "Currency": {
+      "type": "string",
+      "enum": [
+        "USD",
+        "EUR",
+        "GBP",
+        "CAD",
+        "CHF",
+        "AUD"
+      ],
+      "title": "Currency"
+    },
+    "Decimal": {
+      "type": "number",
+      "format": "double",
+      "title": "Decimal",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal",
+        "name": "decimal"
+      }
+    },
+    "DiversificationConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "equal_weight_tolerance": {
+          "description": "Keeps every held group within ±tolerance of a common size the optimizer picks, relative to the other held groups rather than a fixed bound (0.1 = each within 10%). In [0, 1). Must be the only limit on its rule; pair it with other limits through separate rules on the same field.",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMaximum": true,
+          "maximum": 1,
+          "title": "Equal Weight Tolerance"
+        },
+        "field": {
+          "description": "The field to apply the diversification constraint to.",
+          "type": "string",
+          "title": "field"
+        },
+        "max_instruments_per_unique_value": {
+          "description": "The maximum number of instruments per unique value for the diversification constraint, which is optional to specify.",
+          "type": "integer",
+          "title": "Max Instruments Per Unique Value"
+        },
+        "max_market_value_per_unique_value": {
+          "description": "The maximum market value per unique value for the diversification constraint.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Market Value Per Unique Value"
+        },
+        "max_unique_fields": {
+          "description": "The maximum number of unique values of this field that are allowed to exist.",
+          "type": "integer",
+          "title": "Max Unique Fields"
+        },
+        "max_weight_per_unique_value": {
+          "description": "The maximum weight per unique value for the diversification constraint.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Weight Per Unique Value"
+        },
+        "min_instruments_per_unique_value": {
+          "description": "The minimum number of instruments per unique value for the diversification constraint, which is optional to specify.",
+          "type": "integer",
+          "title": "Min Instruments Per Unique Value"
+        },
+        "min_market_value_per_unique_value": {
+          "description": "The minimum market value per unique value for the diversification constraint, which is optional to specify.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Market Value Per Unique Value"
+        },
+        "min_unique_fields": {
+          "description": "The minimum number of unique values of this field that are allowed to exist, which is optional to specify.",
+          "type": "integer",
+          "title": "Min Unique Fields"
+        },
+        "min_weight_per_unique_value": {
+          "description": "The minimum weight per unique value for the diversification constraint, which is optional to specify.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Weight Per Unique Value"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "diversification"
+          ],
+          "title": "Type"
+        }
+      },
+      "x-moment-required-any-of": [
+        "min_market_value_per_unique_value",
+        "max_market_value_per_unique_value",
+        "min_weight_per_unique_value",
+        "max_weight_per_unique_value",
+        "min_unique_fields",
+        "max_unique_fields",
+        "min_instruments_per_unique_value",
+        "max_instruments_per_unique_value",
+        "equal_weight_tolerance"
+      ],
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "DiversificationConstraint"
+    },
+    "EvaluatedFieldTerm": {
+      "description": "A field term decorated with its evaluated value.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the field value.",
+          "type": "number",
+          "format": "double",
+          "default": 1
+        },
+        "field": {
+          "description": "The name of the field to reference.",
+          "type": "string"
+        },
+        "filter": {
+          "description": "Optional filter applied to the field.",
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "field"
+          ],
+          "default": "field"
+        },
+        "value": {
+          "description": "The evaluated value of this field term.",
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "type",
+        "field",
+        "value"
+      ],
+      "title": "EvaluatedFieldTerm"
+    },
+    "EvaluatedObjectiveTerm": {
+      "description": "An evaluated objective term with computed values at each node of the term tree.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/EvaluatedFieldTerm"
+        },
+        {
+          "$ref": "#/$defs/EvaluatedOperationTerm"
+        }
+      ],
+      "title": "EvaluatedObjectiveTerm"
+    },
+    "EvaluatedOperationTerm": {
+      "description": "An operation term decorated with its computed value and evaluated children.",
+      "type": "object",
+      "properties": {
+        "left": {
+          "$ref": "#/$defs/EvaluatedObjectiveTerm"
+        },
+        "operation": {
+          "description": "The operation to apply.",
+          "$ref": "#/$defs/ObjectiveTermOperation"
+        },
+        "right": {
+          "$ref": "#/$defs/EvaluatedObjectiveTerm"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "operation"
+          ],
+          "default": "operation"
+        },
+        "value": {
+          "description": "The computed result of applying the operation.",
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "type",
+        "operation",
+        "left",
+        "right",
+        "value"
+      ],
+      "title": "EvaluatedOperationTerm"
+    },
+    "FieldTerm": {
+      "description": "A term that references a field value from the instrument data.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the field value.",
+          "type": "number",
+          "format": "double",
+          "default": 1
+        },
+        "field": {
+          "description": "The name of the field to reference.",
+          "type": "string"
+        },
+        "filter": {
+          "description": "Optional filter applied to the field.",
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "field"
+          ],
+          "default": "field"
+        }
+      },
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "FieldTerm"
+    },
+    "Filter": {
+      "type": "object",
+      "properties": {
+        "equal_to": {
+          "description": "The value to be equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Equal To"
+        },
+        "greater_than": {
+          "description": "The value to be greater than.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Greater Than"
+        },
+        "greater_than_or_equal_to": {
+          "description": "The value to be greater than or equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Greater Than Or Equal To"
+        },
+        "in": {
+          "description": "The value to be in the list.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "In List"
+        },
+        "in_filter_list": {
+          "description": "The value to be in the filter list.",
+          "type": "string",
+          "title": "In Filter List"
+        },
+        "in_list": {
+          "description": "Alias for `in`. The value to be in the list. Supplying both `in` and `in_list` is an error.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "In List"
+        },
+        "includes": {
+          "description": "The value to include.",
+          "type": "string",
+          "title": "Includes"
+        },
+        "superset": {
+          "description": "Match a string-list column containing every element of this list. Elements match exactly and case-sensitively; leading and trailing whitespace is ignored. Null lists do not match.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Superset"
+        },
+        "subset": {
+          "description": "Match a string-list column whose every element is in this list. Elements match exactly and case-sensitively; leading and trailing whitespace is ignored. Empty lists match; null lists do not.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Subset"
+        },
+        "not_superset": {
+          "description": "Match a string-list column missing at least one element of this list. The negation of `superset`: null lists match.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Not Superset"
+        },
+        "not_subset": {
+          "description": "Match a string-list column with at least one element outside this list. The negation of `subset`: null lists match; empty lists do not.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Not Subset"
+        },
+        "is_null": {
+          "description": "Match values that are null.",
+          "type": "boolean",
+          "title": "Is Null"
+        },
+        "less_than": {
+          "description": "The value to be less than.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Less Than"
+        },
+        "less_than_or_equal_to": {
+          "description": "The value to be less than or equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Less Than Or Equal To"
+        },
+        "not_equal_to": {
+          "description": "The value to not be equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Not Equal To"
+        },
+        "not_in": {
+          "description": "The value to not be in the list.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Not In List"
+        },
+        "not_in_filter_list": {
+          "description": "The value to be not in the filter list.",
+          "type": "string",
+          "title": "Not In Filter List"
+        },
+        "not_in_list": {
+          "description": "Alias for `not_in`. The value to not be in the list. Supplying both `not_in` and `not_in_list` is an error.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Not In List"
+        },
+        "not_includes": {
+          "description": "The value to not include.",
+          "type": "string",
+          "title": "Not Includes"
+        },
+        "not_starts_with": {
+          "description": "The value to not start with.",
+          "type": "string",
+          "title": "Not Starts With"
+        },
+        "starts_with": {
+          "description": "The value to start with.",
+          "type": "string",
+          "title": "Starts With"
+        },
+        "ends_with": {
+          "description": "The value to end with.",
+          "type": "string",
+          "title": "Ends With"
+        }
+      },
+      "title": "Filter"
+    },
+    "FilterDictionary": {
+      "type": "object",
+      "properties": {
+        "and": {
+          "description": "A list of filters to be applied in an AND relationship.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "default": [],
+          "title": "And"
+        },
+        "and_list": {
+          "description": "Alias for `and`. A list of filters to be applied in an AND relationship. Supplying both `and` and `and_list` is an error.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "title": "And List"
+        },
+        "not": {
+          "description": "A filter to be applied in a NOT relationship.",
+          "$ref": "#/$defs/FilterDictionary",
+          "title": "Not"
+        },
+        "not_filter": {
+          "description": "Alias for `not`. A filter to be applied in a NOT relationship. Supplying both `not` and `not_filter` is an error.",
+          "$ref": "#/$defs/FilterDictionary",
+          "title": "Not Filter"
+        },
+        "or": {
+          "description": "A list of filters to be applied in an OR relationship.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "default": [],
+          "title": "Or"
+        },
+        "or_list": {
+          "description": "Alias for `or`. A list of filters to be applied in an OR relationship. Supplying both `or` and `or_list` is an error.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "title": "Or List"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/Filter"
+      },
+      "title": "FilterDictionary"
+    },
+    "FixedCostPerTrade": {
+      "description": "An optional fixed cost per trade to apply to the optimization.",
+      "type": "number",
+      "minimum": 0,
+      "title": "Fixed Cost Per Trade"
+    },
+    "Holding": {
+      "type": "object",
+      "properties": {
+        "basis_date": {
+          "description": "Acquisition date of the lot as a YYYYMMDD integer.",
+          "type": "integer",
+          "title": "Basis Date"
+        },
+        "basis_price": {
+          "description": "Cost basis price of the lot.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Decimal"
+            }
+          ],
+          "title": "Basis Price"
+        },
+        "instrument_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Currency"
+            },
+            {
+              "$ref": "#/$defs/InstrumentID"
+            }
+          ]
+        },
+        "limit_price": {
+          "description": "The limit price of the holding, used to override market data price.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Decimal"
+            }
+          ],
+          "title": "Limit Price"
+        },
+        "limit_ytw": {
+          "description": "The holding's yield to worst at its limit price — for a purchased lot, the yield\nlocked in at purchase. Feeds avg_purchase_ytw. Does NOT override market-data YTW:\navg_ytw stays on the eval yield so the two statistics remain distinct.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Decimal"
+            }
+          ],
+          "title": "Limit Yield to Worst"
+        },
+        "lock": {
+          "description": "If true, this holding is locked and will not be sold with optimization.",
+          "type": "boolean",
+          "title": "Lock"
+        },
+        "long_term": {
+          "description": "Whether the lot has been held for more than one year.",
+          "type": "boolean",
+          "title": "Long Term"
+        },
+        "lot_id": {
+          "description": "Unique identifier for the lot (moment_lot_id).",
+          "type": "string",
+          "title": "Lot ID"
+        },
+        "position_type": {
+          "description": "The direction this holding is held in, where it is a single lot\n(`lot_id` present). Read direction from here, never from the sign of\n`quantity`. An aggregate over lots states `unspecified`: it has no\none direction, and its `quantity` is signed instead.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/PositionType"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "quantity": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/Decimal"
+            }
+          ],
+          "description": "Signed where this holding aggregates lots (`lot_id` absent), so a\nshort reduces the instrument's total. Where it is a single lot\n(`lot_id` present) this is the custodian's stored magnitude and its\nsign is not a direction — read `position_type` instead.",
+          "title": "Quantity"
+        },
+        "sell": {
+          "description": "If true, this holding should be sold during optimization.",
+          "type": "boolean",
+          "title": "Sell"
+        },
+        "wash_sale": {
+          "description": "Whether the lot is subject to wash sale rules.",
+          "type": "boolean",
+          "title": "Wash Sale"
+        }
+      },
+      "required": [
+        "instrument_id",
+        "quantity"
+      ],
+      "title": "Holding"
+    },
+    "InstrumentID": {
+      "description": "Instrument ISIN",
+      "type": "string",
+      "title": "Instrument ID"
+    },
+    "LadderPolicyConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "end_period": {
+          "description": "The ending period of the ladder. Required unless `num_periods` is provided.",
+          "type": "integer",
+          "title": "End Period"
+        },
+        "grace_period_months": {
+          "description": "The length of the grace period in months. The grace period is the time period after the assignment date where a dynamic ladder policy constraint are not yet being adjusted.",
+          "type": "integer",
+          "default": 1,
+          "title": "Grace Period Months"
+        },
+        "market_value_tolerance": {
+          "description": "The maximum market value deviation allowed for each bucket in the ladder, which can be specified instead of weight_tolerance.",
+          "type": "number",
+          "format": "double",
+          "title": "Market Value Tolerance"
+        },
+        "maturity_option": {
+          "description": "Which date a ladder bucket measures against. Nullable because persisted payloads carry an explicit null, which readers already treat as the default.",
+          "default": "maturity_date",
+          "nullable": true,
+          "x-omitempty": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/MaturityOption"
+            }
+          ]
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "num_periods": {
+          "description": "Alternative to `end_period`; sets `end_period` to `start_period + num_periods`. May be sent with `end_period` only when they agree (`end_period == start_period + num_periods`); conflicting values are rejected.",
+          "type": "integer",
+          "title": "Num Periods"
+        },
+        "period_length": {
+          "description": "The length of one ladder period in months.",
+          "type": "integer",
+          "title": "Period Length"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "start_period": {
+          "description": "The starting period of the ladder.",
+          "type": "integer",
+          "default": 0,
+          "title": "Start Period"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ladder_policy"
+          ],
+          "title": "Type"
+        },
+        "use_call_adjusted_maturity": {
+          "description": "The call adjusted maturity date is the terminal date of the bond implied by its yield to worst. If set to true then the ladder policy constraint will use the call adjusted maturity date instead of the maturity date.",
+          "type": "boolean",
+          "default": false,
+          "title": "Use Call Adjusted Maturity"
+        },
+        "use_assignment_date": {
+          "description": "When true, the assignment date anchors the ladder policy time-line; when false, the time-to-maturity mode is used (rolling buckets relative to today). Defaults to true.",
+          "type": "boolean",
+          "default": true,
+          "title": "Use Assignment Date"
+        },
+        "weight_tolerance": {
+          "description": "The maximum weight deviation allowed for each bucket in the ladder.",
+          "type": "number",
+          "format": "double",
+          "title": "Weight Tolerance"
+        }
+      },
+      "required": [
+        "type",
+        "period_length"
+      ],
+      "title": "LadderPolicyConstraint"
+    },
+    "LotTargetingAssetClass": {
+      "description": "An asset class for custodian tax-lot targeting support. ETFs and ETCs count as equity.",
+      "type": "string",
+      "enum": [
+        "equity",
+        "fixed_income",
+        "fund"
+      ],
+      "x-enum-varnames": [
+        "LotTargetingAssetClassEquity",
+        "LotTargetingAssetClassFixedIncome",
+        "LotTargetingAssetClassFund"
+      ],
+      "title": "Lot Targeting Asset Class"
+    },
+    "MaturityOption": {
+      "description": "The maturity option for the ladder policy constraint.",
+      "type": "string",
+      "default": "maturity_date",
+      "enum": [
+        "maturity_date",
+        "workout_date",
+        "next_call_date"
+      ],
+      "title": "Maturity Option"
+    },
+    "NonNegativeDecimal": {
+      "description": "A decimal quantity that must not be negative.",
+      "type": "number",
+      "format": "double",
+      "minimum": 0,
+      "title": "NonNegativeDecimal",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal",
+        "name": "decimal"
+      }
+    },
+    "NormalizeObjectiveParams": {
+      "description": "Parameters controlling per-objective-term percentile normalization. The optimizer rescales each term's pre-normalization values into the [min_percentile, max_percentile] band of the empirical distribution and then offsets the result, so terms with very different magnitudes can be combined linearly.",
+      "type": "object",
+      "required": [
+        "max_percentile",
+        "min_percentile",
+        "offset"
+      ],
+      "properties": {
+        "max_percentile": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.95,
+          "title": "Max Percentile",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "min_percentile": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.05,
+          "title": "Min Percentile",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "offset": {
+          "type": "number",
+          "default": 0.1,
+          "title": "Offset",
+          "x-go-type-skip-optional-pointer": true
+        }
+      },
+      "title": "NormalizeObjectiveParams"
+    },
+    "NullDecimal": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double",
+      "title": "NullDecimal",
+      "x-go-type": "decimal.NullDecimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal",
+        "name": "decimal"
+      }
+    },
+    "ObjectiveComponentDetail": {
+      "description": "An enriched objective function component with a decorated term tree containing evaluated values at each node.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the term value.",
+          "type": "number",
+          "format": "double",
+          "title": "Factor"
+        },
+        "term": {
+          "description": "The evaluated term tree with computed values at each node.",
+          "$ref": "#/$defs/EvaluatedObjectiveTerm",
+          "title": "Term"
+        },
+        "value": {
+          "description": "The computed value of this component (factor * evaluated term value).",
+          "$ref": "#/$defs/Decimal",
+          "title": "Value"
+        }
+      },
+      "required": [
+        "factor",
+        "term",
+        "value"
+      ],
+      "title": "ObjectiveComponentDetail"
+    },
+    "ObjectiveStrategy": {
+      "description": "The objective strategy for the optimization.",
+      "type": "string",
+      "enum": [
+        "revenue",
+        "minimize_deployed_cash",
+        "maximize_cashflows"
+      ],
+      "title": "ObjectiveStrategy",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "ObjectiveTerm": {
+      "description": "Top-level wrapper for an objective function term with scaling factor.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the term value.",
+          "type": "number",
+          "format": "double",
+          "default": 1
+        },
+        "term": {
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        }
+      },
+      "required": [
+        "term"
+      ],
+      "title": "ObjectiveTerm"
+    },
+    "ObjectiveTermOperation": {
+      "description": "The operation to apply between objective terms.",
+      "type": "string",
+      "enum": [
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "max",
+        "min"
+      ],
+      "title": "ObjectiveTermOperation"
+    },
+    "OperationTerm": {
+      "description": "A term that applies an operation to other terms.",
+      "type": "object",
+      "properties": {
+        "left": {
+          "description": "The left operand.",
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        },
+        "operation": {
+          "description": "The operation to apply.",
+          "$ref": "#/$defs/ObjectiveTermOperation"
+        },
+        "right": {
+          "description": "The right operand.",
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "operation"
+          ],
+          "default": "operation"
+        }
+      },
+      "required": [
+        "type",
+        "operation",
+        "left",
+        "right"
+      ],
+      "title": "OperationTerm"
+    },
+    "OptimizationSource": {
+      "description": "Origin tag for an optimization request, used for audit and downstream filtering.",
+      "type": "string",
+      "enum": [
+        "proposal_builder",
+        "proposal_builder_agent",
+        "ai_chat",
+        "ai_chat_agent",
+        "model_builder",
+        "optimization_api",
+        "optimization_backtest",
+        "quant_sampling_dag"
+      ],
+      "title": "OptimizationSource"
+    },
+    "OptionalOptimizerParams": {
+      "description": "All-nullable variant of OptimizerParams used as request input — every field is omittable so callers can override only what they care about. The runtime merges the supplied values over the deployment defaults to produce the inner OptimizerParams.",
+      "type": "object",
+      "properties": {
+        "aggregate_account_orders_at_avg_price": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "average_value_constraint_target_diff_penalty_per_violation_distance": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "average_value_constraint_violation_amount_penalty_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "average_value_constraint_violation_indicator_penalty_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "debug": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "diversification_constraint_buffer": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "diversification_constraint_penalty_per_buffer_width": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "diversification_constraint_violation_amount_penalty_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "diversification_constraint_violation_indicator_penalty_ratio": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "enable_rebalancing": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "enable_uninvested_cash_constraint": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "heuristics_to_skip": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "include_direct_priced_instruments": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "limit_one_quote_per_isin": {
+          "description": "When true, the FI optimizer may trade at most one quote source per ISIN for each account. Per-lot sells split from the selected parent bid may trade together.",
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "minimize_deployed_cash_coefficient": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "maximum": 0
+        },
+        "normalize_objective": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/NormalizeObjectiveParams"
+            }
+          ],
+          "nullable": true
+        },
+        "preview_solver_ratio_gap": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "relaxation_objective_power": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 2
+        },
+        "solver_default_timeout": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "solver_preview_timeout": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "solver_relaxation_timeout": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "solver_ratio_gap": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "solver_threads": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "use_evals_as_orders": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "use_order_book_for_bid_quotes": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "title": "OptionalOptimizerParams"
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "description": "The account ID that the order belongs to. On account-based optimization this is the composite `{account_id}:{sleeve_id}`, not a bare account id.",
+          "type": "string",
+          "title": "Account ID"
+        },
+        "block_id": {
+          "description": "A unique ID for the block trade that the order belongs to. This can be used to easily group orders that can be submitted as part of a single block trade.",
+          "type": "integer",
+          "title": "Block ID"
+        },
+        "cusip": {
+          "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.",
+          "type": "string",
+          "title": "CUSIP"
+        },
+        "instrument_id": {
+          "$ref": "#/$defs/InstrumentID"
+        },
+        "is_full_liquidation": {
+          "description": "True when this sell order takes the whole position to zero. On notional (mutual fund) orders it also means `net_money` may carry a sub-dollar remainder, so consumers must use it as given rather than rounding it to whole dollars and re-deriving the share count. Absent or false on buys, on partial sells, and from optimizers that predate the field.",
+          "type": "boolean",
+          "title": "Is Full Liquidation"
+        },
+        "is_sale_violating_universe_constraint": {
+          "description": "A flag to indicate whether a sell order is due to a universe constraint violation. Will be left null for buy orders.",
+          "type": "boolean",
+          "title": "Is Sale Violating Universe Constraint"
+        },
+        "limit_price": {
+          "description": "The limit price of the order.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Limit Price"
+        },
+        "limit_ytm": {
+          "description": "The limit yield to maturity of the order.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Limit Yield to Maturity"
+        },
+        "limit_ytw": {
+          "description": "The limit yield to worst of the order.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Limit Yield to Worst"
+        },
+        "lock": {
+          "description": "If true, this order was locked from a prior proposal and passed through unchanged.",
+          "type": "boolean",
+          "title": "Lock"
+        },
+        "lot_id": {
+          "description": "Unique identifier for the lot (moment_lot_id). Present on sell orders when lot-level optimization is enabled.",
+          "type": "string",
+          "title": "Lot ID"
+        },
+        "net_money": {
+          "description": "The net money of the order in dollars. This is caclulated as quantity * (limit_price / 100) + (quantity / par_value) * accrued_interest.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Net Money"
+        },
+        "objective": {
+          "description": "The optimization objective value returned by the optimizer for this order.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Objective"
+        },
+        "objective_components": {
+          "description": "Enriched objective function decomposition with full term definitions, computed values, and individual leaf values for each component.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectiveComponentDetail"
+          },
+          "title": "Objective Components"
+        },
+        "par_value": {
+          "description": "The par value of the instrument.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Par Value"
+        },
+        "portfolio_id": {
+          "description": "The portfolio the order belongs to. Household optimization only.",
+          "type": "string",
+          "title": "Portfolio ID"
+        },
+        "quantity": {
+          "description": "The quantity of the instrument to be traded, in notional value.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Quantity"
+        },
+        "side": {
+          "$ref": "#/$defs/Side"
+        },
+        "size_type": {
+          "description": "The unit in which the optimizer decided this order's size. For notional orders (mutual funds), net_money carries the exact decided dollars and is the authoritative order size; quantity is the derived share count (net_money / NAV) and carries float-division error. For shares / par orders, quantity is authoritative.",
+          "$ref": "#/$defs/OrderSizeType",
+          "title": "Size Type"
+        },
+        "sleeve_id": {
+          "description": "The sleeve (the account-and-portfolio cell) the order belongs to. Household optimization only.",
+          "type": "string",
+          "title": "Sleeve ID"
+        },
+        "tax_effective_limit_ytw": {
+          "description": "The tax effective limit yield to worst of the order. Calculated as limit_ytw * (1 - tax_rate) / (1 - federal_tax_rate - state_tax_rate - local_tax_rate)",
+          "$ref": "#/$defs/Decimal",
+          "title": "Tax Effective Limit Yield to Worst"
+        },
+        "post_tax_limit_ytw": {
+          "description": "The post-tax limit yield to worst of the order.",
+          "$ref": "#/$defs/Decimal",
+          "title": "Post Tax Limit Yield to Worst"
+        },
+        "transaction_cost": {
+          "description": "The estimated transaction cost of the order.",
+          "type": "number",
+          "title": "Transaction Cost"
+        }
+      },
+      "required": [
+        "block_id",
+        "side",
+        "instrument_id",
+        "quantity",
+        "limit_price",
+        "account_id",
+        "net_money"
+      ],
+      "title": "Order"
+    },
+    "OrderLimitConstraint": {
+      "description": "Limits the number of unique securities traded in the account: the max_* fields cap, and the min_* fields floor, the count of distinct securities bought, sold, or traded in total. Helps control turnover and transaction costs.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "max_buy_orders": {
+          "description": "Maximum number of unique securities that may be bought.",
+          "type": "integer",
+          "title": "Max Buy Orders"
+        },
+        "max_sell_orders": {
+          "description": "Maximum number of unique securities that may be sold.",
+          "type": "integer",
+          "title": "Max Sell Orders"
+        },
+        "max_total_orders": {
+          "description": "Maximum number of unique securities that may be traded (bought or sold).",
+          "type": "integer",
+          "title": "Max Total Orders"
+        },
+        "min_buy_orders": {
+          "description": "Minimum number of unique securities that must be bought.",
+          "type": "integer",
+          "title": "Min Buy Orders"
+        },
+        "min_sell_orders": {
+          "description": "Minimum number of unique securities that must be sold.",
+          "type": "integer",
+          "title": "Min Sell Orders"
+        },
+        "min_total_orders": {
+          "description": "Minimum number of unique securities that must be traded (bought or sold).",
+          "type": "integer",
+          "title": "Min Total Orders"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "order_limit"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "OrderLimitConstraint"
+    },
+    "OrderSizeType": {
+      "description": "The unit in which the optimizer decided an order's size: share count (equity, ETF), par dollars (fixed income), or notional dollars (mutual funds). Mirrors the trading-system order size types.",
+      "type": "string",
+      "enum": [
+        "shares",
+        "par",
+        "notional"
+      ],
+      "x-enum-varnames": [
+        "OrderSizeTypeShares",
+        "OrderSizeTypePar",
+        "OrderSizeTypeNotional"
+      ],
+      "title": "Order Size Type"
+    },
+    "Override": {
+      "description": "Discriminator union of all account-optimization override variants. An\noverride rewrites a declarative input of the optimization (the\ntracking-error benchmark, the buyable universe, the risk model) before\nthe solver model is built — distinct from a Constraint, which restricts\nthe already-built model. The `type` field on each variant is the\ndiscriminator. System-derived overrides (e.g. treasury risk proxies) are\napplied server-side and are not part of this wire union.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SecurityReplacementOverride"
+        },
+        {
+          "$ref": "#/$defs/ProRataOverride"
+        }
+      ]
+    },
+    "Piece": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "description": "the filter that we will use for the piecewise constraint.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/PiecewiseCondition"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "constraints": {
+          "description": "the constraints that we will use for the piecewise constraint.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConcreteConstraint"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        }
+      }
+    },
+    "PiecewiseCondition": {
+      "type": "object",
+      "properties": {
+        "account_market_value": {
+          "description": "the account market value that we will use for the piecewise constraint.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Filter"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        }
+      }
+    },
+    "PiecewiseConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "pieces": {
+          "description": "the pieces that we will use for the piecewise constraint.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Piece"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "piecewise"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "PiecewiseConstraint"
+    },
+    "PositionType": {
+      "description": "Which direction a position is held in. This is the direction itself, not\nthe sign of `quantity`: most custodians store a short negative, Fidelity\nstores it positive, so the sign cannot be read as a direction.\n`unspecified` means the custodian never stated one — held-away feeds do\nnot — and reads as long.",
+      "type": "string",
+      "default": "unspecified",
+      "enum": [
+        "unspecified",
+        "long",
+        "short"
+      ],
+      "x-enum-varnames": [
+        "PositionTypeUnspecified",
+        "PositionTypeLong",
+        "PositionTypeShort"
+      ],
+      "title": "Position Type"
+    },
+    "ProRataOverride": {
+      "description": "Removes one or more equity strategy securities and redistributes their combined weight across the remaining ones in proportion to their existing weights; the sources leave the buyable universe. A SecurityReplacementOverride targeting CSH_USD parks the freed weight in cash instead. `asset_subtypes` and `includes_cash` narrow which remaining securities receive a share; an ineligible one keeps its own weight.\n",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Stable identifier preserved across edits and ignored by the optimizer.\npropman uses `account-security-replacement-pro-rata:<account_id>` for\naccount-derived overrides recorded on proposal snapshots; live solves\nrebuild them from Accounts.",
+          "type": "string",
+          "title": "ID"
+        },
+        "sources": {
+          "description": "Instrument IDs to remove; their combined weight is redistributed pro-rata across the remaining strategy securities.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Sources"
+        },
+        "asset_subtypes": {
+          "description": "Only remaining securities of these refdata `asset_subtype` values receive a share of the freed weight; omitted or empty means all of them do. Accepts Stock, DepositoryReceipt, PreferredShares, Units, ExchangeTradedFund, ExchangeTradedCommodity and Fund. The account fails if nothing matches.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Subtypes",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "includes_cash": {
+          "description": "Whether the cash position (CSH_USD) receives a share of the freed weight. Defaults to true, the behavior before this field existed.",
+          "type": "boolean",
+          "default": true,
+          "title": "Includes Cash"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "pro_rata"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "sources"
+      ],
+      "title": "ProRataOverride"
+    },
+    "ProposalActionTarget": {
+      "type": "object",
+      "description": "Target quantity for an LP variable, derived from an advisor proposal\naction (Lock, DNT, Liquidate, Edit). Suboptimal fixes the variable\nidentified by `(instrument_id, moment_lot_id?)` to `quantity` via\na Gurobi equality constraint at solve time.\n\nDistinct from the polymorphic strategy `Constraint` hierarchy (which\ncarries `type` discriminator, `id`, `priority`, etc.) — these are\nper-optimization directives, not strategy-level rules. Sell-side\ntargets carry `moment_lot_id`; buy-side targets omit it (buys are\nnot lot-keyed).",
+      "properties": {
+        "instrument_id": {
+          "$ref": "#/$defs/InstrumentID"
+        },
+        "moment_lot_id": {
+          "description": "Sell-side identifier. Absent for buy-side targets.",
+          "type": "string",
+          "title": "Moment Lot ID"
+        },
+        "quantity": {
+          "$ref": "#/$defs/Decimal",
+          "title": "Quantity"
+        }
+      },
+      "required": [
+        "instrument_id",
+        "quantity"
+      ],
+      "title": "ProposalActionTarget"
+    },
+    "SecurityListItem": {
+      "description": "A single entry in a SecurityListStrategy's securities list.",
+      "type": "object",
+      "properties": {
+        "instrument_id": {
+          "type": "string",
+          "title": "Instrument ID"
+        },
+        "ticker": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Ticker"
+        },
+        "weight": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "title": "Weight"
+        },
+        "shares": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "title": "Shares"
+        }
+      },
+      "required": [
+        "instrument_id"
+      ],
+      "title": "SecurityListItem"
+    },
+    "SecurityListStrategy": {
+      "description": "Strategy for security-list (equity) optimization. Carries the same constraint surface as a rules-based strategy plus an explicit list of target securities, an allocation type, and an optional notional basis.",
+      "type": "object",
+      "properties": {
+        "allow_odd_lots": {
+          "description": "If false, prevents creating positions below the asset's minimum trading denomination (issue minimum). Defaults to true for backward compatibility.",
+          "type": "boolean",
+          "default": true,
+          "title": "Allow Odd Lots"
+        },
+        "cash_buffer": {
+          "description": "The cash buffer to maintain in the account.",
+          "type": "number",
+          "default": 0,
+          "title": "Cash Buffer"
+        },
+        "constraints": {
+          "description": "The constraints to apply to the strategy. Defaults to an empty list when omitted — security-list / equity strategies carry constraints only via per-account `customizations`, so clients can leave this off the wire payload.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/schemas-Constraint"
+          },
+          "default": [],
+          "title": "Constraints"
+        },
+        "scope_relative_weights": {
+          "description": "If true, a min or max weight bound on a scoped allocation or diversification constraint is a share of the scope's post-trade market value instead of the account's. Defaults to false.",
+          "type": "boolean",
+          "default": false,
+          "title": "Scope Relative Weights"
+        },
+        "schema_version": {
+          "type": "integer",
+          "enum": [
+            1
+          ],
+          "title": "Schema Version"
+        },
+        "strategy_type": {
+          "description": "Discriminator literal identifying this as a security-list (equity) strategy.",
+          "type": "string",
+          "enum": [
+            "security_list"
+          ],
+          "title": "Strategy Type"
+        },
+        "securities": {
+          "description": "The list of target securities for the strategy.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SecurityListItem"
+          },
+          "title": "Securities"
+        },
+        "allocation_type": {
+          "description": "How the security list is interpreted: `static` allocates exactly the listed shares/weights; `dynamic` lets the optimizer adjust within constraint bounds.",
+          "type": "string",
+          "enum": [
+            "static",
+            "dynamic"
+          ],
+          "default": "static",
+          "title": "Allocation Type"
+        },
+        "notional_basis": {
+          "description": "Optional notional dollar basis the security list is sized against.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "title": "Notional Basis"
+        }
+      },
+      "required": [
+        "schema_version",
+        "strategy_type"
+      ],
+      "title": "SecurityListStrategy"
+    },
+    "SecurityReplacementOverride": {
+      "description": "Override that substitutes equity strategy securities 1:1 before optimization. The target replaces the source in both the tracking-error benchmark (inheriting the source's weight) and the buyable universe; a held source remains sellable. A target of CSH_USD leaves that weight as cash. `map` is keyed by source instrument_id with target instrument_id values.\n",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Stable identifier preserved across edits and ignored by the optimizer.\npropman uses `account-security-replacement:<account_id>` for\naccount-derived overrides recorded on proposal snapshots; live solves\nrebuild them from Accounts.",
+          "type": "string",
+          "title": "ID"
+        },
+        "map": {
+          "description": "Directional 1:1 substitution map, source instrument_id -> target instrument_id.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Map"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "security_replacement"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "map"
+      ],
+      "title": "SecurityReplacementOverride"
+    },
+    "SellPrecedenceConstraint": {
+      "description": "Enforces a trading-precedence ordering across an ordered list of security groups. Each entry in `filters` selects a group (the in-scope securities matching it); a group may only be traded once every higher-precedence (earlier) group has been fully consumed. Earlier filters are higher precedence. At least two filters are required — a single-group ordering is a no-op.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filters": {
+          "description": "Ordered list of group-membership filters. Index 0 is the highest-precedence group. At least two filters are required.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "minItems": 2,
+          "title": "Filters"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sell_precedence"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filters"
+      ],
+      "title": "SellPrecedenceConstraint"
+    },
+    "Side": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell"
+      ],
+      "title": "Side"
+    },
+    "State": {
+      "type": "string",
+      "enum": [
+        "AL",
+        "AK",
+        "AS",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "GU",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MP",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "PR",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VI",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY"
+      ],
+      "x-enum-varnames": [
+        "ALABAMA",
+        "ALASKA",
+        "AMERICAN_SAMOA",
+        "ARIZONA",
+        "ARKANSAS",
+        "CALIFORNIA",
+        "COLORADO",
+        "CONNECTICUT",
+        "WASHINGTON_DC",
+        "DELAWARE",
+        "FLORIDA",
+        "GEORGIA",
+        "GUAM",
+        "HAWAII",
+        "IDAHO",
+        "ILLINOIS",
+        "INDIANA",
+        "IOWA",
+        "KANSAS",
+        "KENTUCKY",
+        "LOUISIANA",
+        "MAINE",
+        "MARYLAND",
+        "MASSACHUSETTS",
+        "MICHIGAN",
+        "MINNESOTA",
+        "MISSISSIPPI",
+        "MISSOURI",
+        "NORTHERN_MARIANA_ISLANDS",
+        "MONTANA",
+        "NEBRASKA",
+        "NEVADA",
+        "NEW_HAMPSHIRE",
+        "NEW_JERSEY",
+        "NEW_MEXICO",
+        "NEW_YORK",
+        "NORTH_CAROLINA",
+        "NORTH_DAKOTA",
+        "OHIO",
+        "OKLAHOMA",
+        "OREGON",
+        "PENNSYLVANIA",
+        "PUERTO_RICO",
+        "RHODE_ISLAND",
+        "SOUTH_CAROLINA",
+        "SOUTH_DAKOTA",
+        "TENNESSEE",
+        "TEXAS",
+        "UTAH",
+        "VIRGIN_ISLANDS",
+        "VERMONT",
+        "VIRGINIA",
+        "WASHINGTON",
+        "WEST_VIRGINIA",
+        "WISCONSIN",
+        "WYOMING"
+      ],
+      "title": "State"
+    },
+    "Strategy": {
+      "description": "Rules-based (fixed-income) strategy. Used when an account is optimized via constraint rules rather than an explicit security list.",
+      "type": "object",
+      "properties": {
+        "allow_odd_lots": {
+          "description": "If false, prevents creating positions below the asset's minimum trading denomination (issue minimum). Defaults to true for backward compatibility.",
+          "type": "boolean",
+          "default": true,
+          "title": "Allow Odd Lots"
+        },
+        "cash_buffer": {
+          "description": "The cash buffer to maintain in the account.",
+          "type": "number",
+          "default": 0,
+          "title": "Cash Buffer"
+        },
+        "constraints": {
+          "description": "The constraints to apply to the strategy. Defaults to an empty list when omitted so security-list / equity strategies (which carry constraints only via customizations) can leave the field off the wire payload.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/schemas-Constraint"
+          },
+          "default": [],
+          "title": "Constraints"
+        },
+        "minimum_order_increment": {
+          "description": "The minimum order-size increment for trades in this strategy (face value). Takes precedence over the account-level value; a sleeve-level value takes precedence over this.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "title": "Minimum Order Increment"
+        },
+        "scope_relative_weights": {
+          "description": "If true, a min or max weight bound on a scoped allocation or diversification constraint is a share of the scope's post-trade market value instead of the account's. Defaults to false.",
+          "type": "boolean",
+          "default": false,
+          "title": "Scope Relative Weights"
+        },
+        "schema_version": {
+          "type": "integer",
+          "enum": [
+            1
+          ],
+          "title": "Schema Version"
+        },
+        "strategy_type": {
+          "description": "Discriminator literal identifying this as a rules-based (fixed-income) strategy.",
+          "type": "string",
+          "enum": [
+            "rules_based"
+          ],
+          "default": "rules_based",
+          "title": "Strategy Type",
+          "x-go-type-skip-optional-pointer": true
+        }
+      },
+      "required": [
+        "schema_version"
+      ],
+      "title": "Strategy"
+    },
+    "StrategyUnion": {
+      "description": "Discriminator union of all strategy variants. The `strategy_type`\nfield on each variant is the discriminator; consumers receive a\ntyped variant and do not need to duck-type extra fields.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Strategy"
+        },
+        {
+          "$ref": "#/$defs/SecurityListStrategy"
+        }
+      ]
+    },
+    "TaxProfile": {
+      "description": "Tax profile classification for the account. `us_taxable` (default)\nuses the federal/state/local tax rates. `custom_taxable` uses\n`custom_income_tax` and `custom_capital_gains_tax` instead.\n`uk_taxable` also uses `custom_income_tax` and `custom_capital_gains_tax`,\nbut forces the capital-gains rate to zero for instruments exempt from\nUK capital gains tax — Gilts (UK government bonds) and QCBs (Qualifying\nCorporate Bonds). `non_taxable` applies no tax adjustment at all and\nyields pre-tax numbers; it is distinct from `us_taxable` with zero rates.",
+      "type": "string",
+      "enum": [
+        "us_taxable",
+        "custom_taxable",
+        "uk_taxable",
+        "non_taxable"
+      ],
+      "title": "TaxProfile",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "TaxRate": {
+      "description": "A tax rate as a decimal fraction — 0.35 means 35%, bounded to [0,1].",
+      "type": "number",
+      "format": "double",
+      "minimum": 0,
+      "maximum": 1,
+      "title": "TaxRate",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal",
+        "name": "decimal"
+      }
+    },
+    "TradeConstraint": {
+      "description": "A trade constraint that limits trade sizes by notional value, par value, or portfolio weight. Exactly one minimum must be specified: either min_size or min_weight (not both). Max fields are optional, but max_size and max_weight cannot both be specified. Mutual exclusivity is per bound — you can mix across bounds (e.g., min_size with max_weight is valid). Weight fields must be in the range 0-1 (representing 0-100% of portfolio value).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "max_size": {
+          "description": "The maximum size of the trade, measured in the unit given by `size_basis` (market value or par). Cannot be specified together with max_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Size"
+        },
+        "max_weight": {
+          "description": "The maximum size of the trade as a percentage of the portfolio value (0-1). Cannot be specified together with max_size.",
+          "type": "number",
+          "format": "double",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Max Weight"
+        },
+        "min_size": {
+          "description": "The minimum size of the trade, measured in the unit given by `size_basis` (market value or par). Either min_size or min_weight must be specified. Cannot be specified together with min_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Size"
+        },
+        "min_weight": {
+          "description": "The minimum size of the trade as a percentage of the portfolio value (0-1). Either min_size or min_weight must be specified. Cannot be specified together with min_size.",
+          "type": "number",
+          "format": "double",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Weight"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "size_basis": {
+          "$ref": "#/$defs/TradeSizeBasis"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "trade"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "TradeConstraint"
+    },
+    "TradeSizeBasis": {
+      "description": "The field a trade constraint's `min_size`/`max_size` bounds are evaluated on.",
+      "type": "string",
+      "default": "market_value",
+      "enum": [
+        "market_value",
+        "par"
+      ],
+      "x-enum-varnames": [
+        "TradeSizeBasisMarketValue",
+        "TradeSizeBasisPar"
+      ],
+      "title": "Trade Size Basis"
+    },
+    "UniverseConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "force_close_violations": {
+          "type": "boolean",
+          "default": false,
+          "title": "Force Close Violations"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "penalty": {
+          "description": "Soft-constraint penalty weight applied per unit of violation. Bounded to [0, 100].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 10,
+          "title": "Penalty"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "side": {
+          "default": "buy",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApplicableSide"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "universe"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filter"
+      ],
+      "title": "UniverseConstraint"
+    },
+    "ValuationConfig": {
+      "description": "How statistics are computed: the valuation basis (clean, dirty or par),\nthe price they are computed on (eval or limit), and what portfolio weights\nare denominated against. Immutable after proposal creation.",
+      "type": "object",
+      "properties": {
+        "basis": {
+          "description": "Valuation basis to build market-value weight columns and\ntotals on. clean excludes accrued interest; dirty includes it;\npar values a position at its factor-adjusted (current) face —\nquantity × principal_factor — ignoring market price and accrued\ninterest, so a paid-down bond values at remaining face.\nInstruments with no par value (equities) continue to be valued\nat their quoted price on every basis, including par.\nIf absent, uses the org's configured default, falling back to clean",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "clean",
+            "dirty",
+            "par"
+          ]
+        },
+        "price_source": {
+          "description": "Price surface order-book quotes are valued on. `limit` values\neach quote at its raw quoted limit price; `eval` values quotes\nat the evaluated price. If absent, gets derived by proposal kind:\n`limit` for synthetic proposals, `eval` for real-account proposals,\nfalling back to eval",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "eval",
+            "limit"
+          ]
+        },
+        "weight_denominator_formulation": {
+          "description": "What portfolio-weight bounds are denominated against. `total_mv` is\nthe account's total market value (held securities plus cash);\n`invested_mv` is the post-trade market value of held securities\nalone, so uninvested cash does not dilute a weight. Affects only\nbounds expressed as weights — an explicit market-value bound is\nunchanged. If absent, gets derived by proposal kind: `invested_mv`\nfor synthetic proposals, `total_mv` for real-account proposals,\nfalling back to total_mv",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "total_mv",
+            "invested_mv"
+          ]
+        },
+        "hardcode_cash_as_fund": {
+          "description": "TEMPORARY stopgap — expect deletion, not extension. `true` scores\ncash at the top rank of a rating field's scale (0 on any other\nfield) into `average_value` constraints and the three rating\naverages (`avg_sp_rating`, `avg_moodys_rating`, `avg_lowest_rating`)\nonly, and is refused under `invested_mv`. The fixed-denominator\naverages still follow `weight_denominator_formulation` alone.\n`false` is a no-op. Cash never joins an `allocation` bucket, and\nthis field is not in this schema's immutable-after-creation set.",
+          "type": "boolean",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        }
+      },
+      "title": "ValuationConfig"
+    },
+    "WashSaleRestriction": {
+      "type": "object",
+      "description": "A forward-looking wash-sale trading block on the account, forwarded\nverbatim from the accounts service (populated only when the org has\nwash-sale prevention enabled). Suboptimal expands it into Gurobi\nconstraints at solve time: BUY_BLOCK pins the instrument's buy variable\nto 0; SELL_BLOCK pins the sell variable of each held lot older than\ntrigger_trade_date that would realize a loss. Instrument-level as\ndelivered; the lot-level expansion (which older lots, at a loss) is\ncomputed by suboptimal from lot basis / date / price.",
+      "properties": {
+        "instrument_id": {
+          "$ref": "#/$defs/InstrumentID"
+        },
+        "restriction_type": {
+          "description": "BUY_BLOCK or SELL_BLOCK.",
+          "type": "string",
+          "enum": [
+            "BUY_BLOCK",
+            "SELL_BLOCK"
+          ],
+          "title": "Restriction Type"
+        },
+        "trigger_trade_date": {
+          "description": "The trade that created the block, as a YYYYMMDD integer (matching\nHolding.basis_date). For SELL_BLOCK, only lots older than this are\ncovered. Accounts only forwards active, non-expired, enforced\nrestrictions, so no expiration is carried — every entry is live.",
+          "type": "integer",
+          "title": "Trigger Trade Date"
+        }
+      },
+      "required": [
+        "instrument_id",
+        "restriction_type",
+        "trigger_trade_date"
+      ],
+      "title": "WashSaleRestriction"
+    },
+    "schemas-Constraint": {
+      "description": "Discriminator union of all constraint variants. The `id` field on\neach variant is the shared identifier; consumers extract it from\nthe resolved variant. (Removing the redundant parent-level `id`\nproperty lets the OpenAPI codegens emit a clean discriminator\nunion instead of intersection wrappers.)",
+      "nullable": true,
+      "oneOf": [
+        {
+          "$ref": "#/$defs/UniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/AllocationConstraint"
+        },
+        {
+          "$ref": "#/$defs/DiversificationConstraint"
+        },
+        {
+          "$ref": "#/$defs/AverageValueConstraint"
+        },
+        {
+          "$ref": "#/$defs/LadderPolicyConstraint"
+        },
+        {
+          "$ref": "#/$defs/TradeConstraint"
+        },
+        {
+          "$ref": "#/$defs/BuyUniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/PiecewiseConstraint"
+        },
+        {
+          "$ref": "#/$defs/SellPrecedenceConstraint"
+        },
+        {
+          "$ref": "#/$defs/OrderLimitConstraint"
+        },
+        {
+          "$ref": "#/$defs/CashflowBandConstraint"
+        }
+      ]
+    }
+  }
+}

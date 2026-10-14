@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-backtest-result-schema.json",
+  "title": "BacktestResult",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-portfolio-optimizer-api-openapi.yml#/components/schemas/BacktestResult",
+  "type": "object",
+  "properties": {
+    "backtest_id": {
+      "type": "string",
+      "title": "Backtest ID"
+    },
+    "n_failed": {
+      "type": "integer",
+      "title": "Number of Failed Optimizations"
+    },
+    "n_queued": {
+      "type": "integer",
+      "title": "Number of Queued Optimizations"
+    },
+    "n_running": {
+      "type": "integer",
+      "title": "Number of Running Optimizations"
+    },
+    "n_success": {
+      "type": "integer",
+      "title": "Number of Successful Optimizations"
+    },
+    "n_unknown": {
+      "type": "integer",
+      "title": "Number of Unknown Status Optimizations"
+    },
+    "optimizations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/BacktestOptimizationResult"
+      },
+      "title": "Optimizations"
+    },
+    "status": {
+      "$ref": "#/$defs/BacktestStatus"
+    }
+  },
+  "required": [
+    "backtest_id",
+    "status",
+    "n_queued",
+    "n_running",
+    "n_success",
+    "n_failed",
+    "n_unknown",
+    "optimizations"
+  ],
+  "$defs": {
+    "BacktestOptimizationResult": {
+      "type": "object",
+      "properties": {
+        "optimization_id": {
+          "type": "string",
+          "title": "Optimization ID"
+        },
+        "status": {
+          "$ref": "#/$defs/OptimizationStatus"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Timestamp"
+        }
+      },
+      "required": [
+        "optimization_id",
+        "timestamp",
+        "status"
+      ],
+      "title": "BacktestOptimizationResult"
+    },
+    "BacktestStatus": {
+      "type": "string",
+      "enum": [
+        "running",
+        "complete"
+      ],
+      "title": "BacktestStatus"
+    },
+    "OptimizationStatus": {
+      "description": "Lifecycle state of a single optimization run.",
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "success",
+        "failed",
+        "unknown"
+      ],
+      "title": "OptimizationStatus"
+    }
+  }
+}

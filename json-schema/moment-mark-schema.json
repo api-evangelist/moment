@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-mark-schema.json",
+  "title": "Mark",
+  "description": "The mark for a given security, containing the most recent observed price for an instrument, used for marking a portfolios current value.\nIf the mark can be retrieved, the details field will be populated with the mark details and the error field will be null.\nIf the mark cannot be retrieved, the error field will be populated with an error message and the details field will be null.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-data-api-openapi.yml#/components/schemas/Mark",
+  "type": "object",
+  "properties": {
+    "isin": {
+      "$ref": "#/$defs/isin"
+    },
+    "cusip": {
+      "$ref": "#/$defs/cusip"
+    },
+    "details": {
+      "$ref": "#/$defs/MarkDetails"
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "An error message if the mark cannot be retrieved (not found, not tradable, not priced), null otherwise."
+    }
+  },
+  "required": [
+    "isin",
+    "timestamp",
+    "details",
+    "error"
+  ],
+  "$defs": {
+    "MarkDetails": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the most recent pricing estimate in RFC-3339 format with nanosecond precision.",
+          "format": "date-time"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price estimation for the current instrument as a percentage of par."
+        },
+        "dirty_price": {
+          "type": "number",
+          "description": "The \"dirty price\" for an instrument. Defined as price + accrued interest as a percentage of par."
+        },
+        "accrued_interest": {
+          "type": "number",
+          "description": "Accrued interest for the instrument represented as dollar-per-bond at par value."
+        },
+        "yield_to_worst": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The instrument's worst possible yield, which is the minimum of the yield to maturity and all yield to call values."
+        },
+        "yield_to_maturity": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "The yield to maturity is the annual rate of return that a bond has assuming it is held to maturity and does not default."
+        }
+      }
+    },
+    "cusip": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "CUSIP",
+      "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\n\nNote: Available to licensed users only.\nThe Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.\nCUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+      "minLength": 9,
+      "maxLength": 9
+    },
+    "isin": {
+      "type": "string",
+      "title": "ISIN",
+      "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+      "minLength": 12,
+      "maxLength": 12
+    }
+  }
+}

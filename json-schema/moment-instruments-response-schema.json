@@ -1,0 +1,1061 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-instruments-response-schema.json",
+  "title": "InstrumentsResponse",
+  "description": "A model representing the result of hitting the Instruments api.\n\nProvides refdata for each bond in Moment's current and historical universes.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-data-api-openapi.yml#/components/schemas/InstrumentsResponse",
+  "type": "object",
+  "properties": {
+    "count": {
+      "type": "integer",
+      "description": "The total number of instruments found that match the query"
+    },
+    "next": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "URL",
+      "description": "The URL to the next page of results (if any exist). Null if no more pages."
+    },
+    "prev": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "URL",
+      "description": "The URL to the previous page of results (if any exist). Null if no earlier pages."
+    },
+    "data": {
+      "type": "array",
+      "description": "Array of instruments",
+      "items": {
+        "$ref": "#/$defs/InstrumentInfo"
+      }
+    }
+  },
+  "required": [
+    "updated_at",
+    "instruments"
+  ],
+  "$defs": {
+    "144A": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the security was part of Rule 144A, an SEC rule that provides a safe harbor exemption from the registration requirements for certain private resales of restricted securities to qualified institutional buyers. 144A applies to securities that are not registered with the SEC and are typically sold through private placements. Note: only qualified institutional buyers, such as those with with at least $100 million in investable assets, are eligible to purchase 144A securities."
+    },
+    "AccruedInterest": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder."
+    },
+    "BankQualified": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the bond is bank qualified, which is a type of municipal bond specifically designated for purchase by commercial banks. Bank qualified bonds can offer specific tax benefits because they allow banks to deduct interest costs of carrying the bond. For example, they must be issued by a small issuer who expects to issue no more than $10 million in bonds during a calendar year. Banks can also deduct 80% of the interest expense they incur to buy and carry these bonds."
+    },
+    "BondStatus": {
+      "type": "string",
+      "description": "The status of the bond reflects many possible states a bond can be in.\n\n* called: The bond has been called by the issuer.\n* converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.\n* defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.\n* funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.\n* liquidated: The issuer has been liquidated.\n* matured: The bond has reached its maturity date and the bondholders have been repaid their principal.\n* outstanding: The bond is still active and has not reached its maturity date.\n* pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.\n* put: The bond has been put (sold back) to the issuer.\n* repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.\n* tendered: The bond has been tendered (offered for repurchase) by the issuer.\n* repurchased: The bond has been repurchased by the issuer.\n* restructured: The security has been restructured into a new security or into a security with materially different terms.\n* unknown: The status of the bond is unknown.",
+      "enum": [
+        "called",
+        "converted",
+        "defaulted",
+        "funged",
+        "liquidated",
+        "matured",
+        "outstanding",
+        "pre_issuance",
+        "put",
+        "repaid",
+        "tendered",
+        "repurchased",
+        "restructured",
+        "unknown"
+      ]
+    },
+    "BondType": {
+      "type": "string",
+      "description": "The type of fixed income security.",
+      "enum": [
+        "agency",
+        "cd",
+        "corporate",
+        "government",
+        "municipal",
+        "treasury"
+      ]
+    },
+    "BondWarrant": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A financial instrument that gives holder the right, but not the obligation, to purchase a certain number of shares of the issuer's stock at a specified price (the strike price) before the warrant expires."
+    },
+    "CallType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of call on the bond refers to one of a variety of circumstances under which a callable bond may be called. Null if the bond is not callable.\n* ordinary: The most common call type, which grants the issuer the ability to redeem the bond before its maturity date.\n* make_whole: A make whole call provision allows an issuer to redeem the bond before maturity at a price that is usually calculated based on the present value of future coupon payments and the redemption value, discounted at a specified rate.\n* regulatory: A regulatory call type gives the issuer the right to redeem the bond before its maturity due to changes in regulatory or tax laws that adversely affect the bond or its issuer.\n* special: A special call allows the issuer to call the bond before its maturity under specific circumstances, conditions, or events that are outside the typical operations of the issuer, as outlined in the bond's indenture.",
+      "enum": [
+        "ordinary",
+        "make_whole",
+        "regulatory",
+        "special"
+      ]
+    },
+    "Callable": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the bond is callable, meaning the issuer has the right but not the obligation to redeem the bond before its maturity date at a set price (the call price). This field only reflects regular call provisions; make-whole or other special call features are not captured."
+    },
+    "ClosePrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The close price, or “end of day price” is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only."
+    },
+    "ClosePriceAsOf": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The timestamp on which the close price and yield were recorded in RFC-3339 format. Note: available to users licensed for end-of-day prices only.",
+      "format": "date-time"
+    },
+    "CloseYTM": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only."
+    },
+    "CloseYTW": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only."
+    },
+    "ContingentConvertible": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the bond has loss-absorbing contingent convertible (CoCo) features, meaning it can be converted to equity or have its principal written down if a trigger event occurs. Most commonly applies to bank regulatory-capital instruments. False if the bond has no such features."
+    },
+    "Convertible": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A flag indicating whether the bond is convertible. If a bond is convertible, the investor has the right or the obligation to exchange the bond for a predetermined number of shares in the issuing company at certain times throughout a bond's lifetime. Only specified for corporate bonds issued by publicly traded companies."
+    },
+    "Convexity": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The convexity of a bond measures the degree to which the duration of a bond changes as interest rates change. While duration estimates a bond's price sensitivity to small interest rate movements, convexity accounts for the fact that this relationship is not linear—especially for larger rate changes. A bond with higher convexity will exhibit more price gain when interest rates fall and less price loss when rates rise, compared to a bond with lower convexity. Moment provides effective convexity, which approximates this curvature by comparing the bond's price change under small upward and downward shifts in yield. Note: this field is available to users licensed for pricing analytics only."
+    },
+    "CountryDomicile": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The country where the bond is domiciled (where it legally resides) in the 2-alpha country code format (e.g., US, CA). An example of where this differs from country_issue is if a Brazilian bond is issued in the US (country of issue) for a corporation in Brazil (country of domicile)."
+    },
+    "CountryIssue": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The country where the bond is issued in the 2-alpha country code format (e.g., US, CA)."
+    },
+    "Coupon": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds."
+    },
+    "CouponFrequency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The frequency, or how often, the coupon is paid to the bondholder. There are a few standard coupon frequencies:\n* annual: Paid out once per year.\n* semi_annual: Paid out twice per year.\n* quarterly: Paid out four times per year, every quarter.\n* monthly: Paid out twelve times per year, every month.\n* zero: No coupon payments.\n* at_maturity: Coupon paid out once, at maturity. Interest accrues over the life of the bond, and is repaid with the principal. Note: this typically only applies for bonds with a total life of less than 1 year.",
+      "enum": [
+        "annual",
+        "semi_annual",
+        "quarterly",
+        "monthly",
+        "zero",
+        "at_maturity"
+      ]
+    },
+    "CouponSubtype": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A more specific description of the coupon structure, refining coupon_type. Unlike coupon_type this is not a fixed set of values: it is a free-form descriptive string passed through from the data provider, so treat it as display text rather than matching against an enum. Null when the coupon data does not come with a subtype."
+    },
+    "CouponType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of coupon rate.\n* fixed: The coupon payment is a fixed percentage of the bond's par value.\n* floating: The coupon payment is pegged to some benchmark rate that frequently changes based off a benchmark, such as SOFR. Typically, the coupon payment is the benchmark rate plus a spread.\n* variable: The coupon payment changes over the life of the bond. Similar to a floating rate, but typically updates less frequently, such as once every coupon payment.\n* zero: Zero-coupon bonds do not pay a coupon over their lifetime.\n* complex: A coupon rate that does not belong in any of the above categories.\n\nSeveral distinct coupon structures share a single coupon_type — stepped-coupon bonds, for example, are reported as variable. See coupon_subtype for the finer-grained description.",
+      "enum": [
+        "fixed",
+        "floating",
+        "variable",
+        "zero",
+        "complex"
+      ]
+    },
+    "Currency": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The 3-alpha currency code of the currency the bond is denominated in (e.g., USD, CAD)."
+    },
+    "DatedDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The dated date marks the beginning of the period for which interest starts accruing on the bond.",
+      "format": "date"
+    },
+    "DayCount": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The day count convention used to calculate accrued interest.\n* A/360: calculates the daily interest using a 360-day year and then multiplies that by the actual number of days in each time period.\n* A/365: calculates the daily interest using a 365-day year and then multiplies that by the actual number of days in each time period.\n* 30/360: calculates the daily interest using a 360-day year and then multiplies that by 30 (standardized month).\n* 30/365: calculates the daily interest using a 365-day year and then multiplies that by 30 (standardized month).\n* A/A: calculates the daily interest using the actual number of days in the year and then multiplies that by the actual number of days in each time period.\n* 30E/360: number of days equals to the actual number of days (for February). If the start date or the end date of the period is the 31st of a month, that date is set to the 30th. The number of days in a year is 360.\n* B/252: calculates the daily interest using a 252-business-day year and then multiplies that by the actual number of days in each time period.\n* A/364: calculates the daily interest using a 364-day year and then multiplies that by the actual number of days in each time period.",
+      "enum": [
+        "A/360",
+        "A/365",
+        "30/360",
+        "30/365",
+        "A/A",
+        "30E/360",
+        "B/252",
+        "A/364"
+      ]
+    },
+    "Description": {
+      "type": "string",
+      "description": "Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]"
+    },
+    "DescriptionShort": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]"
+    },
+    "Duration": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond's price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only."
+    },
+    "Figi": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "FIGI",
+      "description": "The Financial Instrument Global Identifier (FIGI) is a 12-character alphanumeric open-standard identifier assigned at the instrument level.\n\nSourced from the Bloomberg Global Id in ICE reference data.",
+      "minLength": 12,
+      "maxLength": 12
+    },
+    "FirstCouponDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the first coupon payment on the bond. Null for zero-coupon bonds.",
+      "format": "date"
+    },
+    "InstrumentInfo": {
+      "title": "InstrumentInfo",
+      "type": "object",
+      "description": "Reference data base for bulk download and list",
+      "properties": {
+        "isin": {
+          "$ref": "#/$defs/isin"
+        },
+        "cusip": {
+          "$ref": "#/$defs/cusip"
+        },
+        "figi": {
+          "$ref": "#/$defs/Figi"
+        },
+        "type": {
+          "$ref": "#/$defs/BondType"
+        },
+        "treasury_subtype": {
+          "$ref": "#/$defs/TreasurySubtype"
+        },
+        "country_issue": {
+          "$ref": "#/$defs/CountryIssue"
+        },
+        "country_domicile": {
+          "$ref": "#/$defs/CountryDomicile"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "ticker": {
+          "$ref": "#/$defs/Ticker"
+        },
+        "seniority": {
+          "$ref": "#/$defs/Seniority"
+        },
+        "issuer": {
+          "$ref": "#/$defs/Issuer"
+        },
+        "sector": {
+          "$ref": "#/$defs/Sector"
+        },
+        "naics_sector": {
+          "$ref": "#/$defs/NaicsSector"
+        },
+        "naics_subsector": {
+          "$ref": "#/$defs/NaicsSubsector"
+        },
+        "treasury_benchmark": {
+          "$ref": "#/$defs/TreasuryBenchmark"
+        },
+        "description": {
+          "$ref": "#/$defs/Description"
+        },
+        "description_short": {
+          "$ref": "#/$defs/DescriptionShort"
+        },
+        "purpose": {
+          "$ref": "#/$defs/Purpose"
+        },
+        "maturity_date": {
+          "$ref": "#/$defs/MaturityDate"
+        },
+        "workout_date": {
+          "$ref": "#/$defs/WorkoutDate"
+        },
+        "coupon": {
+          "$ref": "#/$defs/Coupon"
+        },
+        "coupon_frequency": {
+          "$ref": "#/$defs/CouponFrequency"
+        },
+        "coupon_type": {
+          "$ref": "#/$defs/CouponType"
+        },
+        "coupon_subtype": {
+          "$ref": "#/$defs/CouponSubtype"
+        },
+        "first_coupon_date": {
+          "$ref": "#/$defs/FirstCouponDate"
+        },
+        "next_coupon_date": {
+          "$ref": "#/$defs/NextCouponDate"
+        },
+        "last_coupon_date": {
+          "$ref": "#/$defs/LastCouponDate"
+        },
+        "issue_size": {
+          "$ref": "#/$defs/IssueSize"
+        },
+        "issue_date": {
+          "$ref": "#/$defs/IssueDate"
+        },
+        "original_issue_date": {
+          "$ref": "#/$defs/OriginalIssueDate"
+        },
+        "original_issue_price": {
+          "$ref": "#/$defs/OriginalIssuePrice"
+        },
+        "original_issue_size": {
+          "$ref": "#/$defs/OriginalIssueSize"
+        },
+        "issue_price": {
+          "$ref": "#/$defs/IssuePrice"
+        },
+        "issue_minimum_denomination": {
+          "$ref": "#/$defs/IssueMinimumDenomination"
+        },
+        "par_value": {
+          "$ref": "#/$defs/ParValue"
+        },
+        "principal_factor": {
+          "$ref": "#/$defs/PrincipalFactor"
+        },
+        "accrued_interest": {
+          "$ref": "#/$defs/AccruedInterest"
+        },
+        "callable": {
+          "$ref": "#/$defs/Callable"
+        },
+        "call_type": {
+          "$ref": "#/$defs/CallType"
+        },
+        "next_call_date": {
+          "$ref": "#/$defs/NextCallDate"
+        },
+        "next_call_price": {
+          "$ref": "#/$defs/NextCallPrice"
+        },
+        "puttable": {
+          "$ref": "#/$defs/Puttable"
+        },
+        "convertible": {
+          "$ref": "#/$defs/Convertible"
+        },
+        "contingent_convertible": {
+          "$ref": "#/$defs/ContingentConvertible"
+        },
+        "trigger_event_type": {
+          "$ref": "#/$defs/TriggerEventType"
+        },
+        "trigger_type": {
+          "$ref": "#/$defs/TriggerType"
+        },
+        "trigger_action": {
+          "$ref": "#/$defs/TriggerAction"
+        },
+        "trigger_level_type": {
+          "$ref": "#/$defs/TriggerLevelType"
+        },
+        "trigger_level_value": {
+          "$ref": "#/$defs/TriggerLevelValue"
+        },
+        "bond_warrant": {
+          "$ref": "#/$defs/BondWarrant"
+        },
+        "is_structured_product": {
+          "$ref": "#/$defs/IsStructuredProduct"
+        },
+        "sinking_fund": {
+          "$ref": "#/$defs/SinkingFund"
+        },
+        "perpetual": {
+          "$ref": "#/$defs/Perpetual"
+        },
+        "insured": {
+          "$ref": "#/$defs/Insured"
+        },
+        "private_placement": {
+          "$ref": "#/$defs/PrivatePlacement"
+        },
+        "144a": {
+          "$ref": "#/$defs/144A"
+        },
+        "reg_s": {
+          "$ref": "#/$defs/RegS"
+        },
+        "trace_eligible": {
+          "$ref": "#/$defs/TraceEligible"
+        },
+        "daycount": {
+          "$ref": "#/$defs/DayCount"
+        },
+        "settlement_convention": {
+          "$ref": "#/$defs/SettlementConvention"
+        },
+        "dated_date": {
+          "$ref": "#/$defs/DatedDate"
+        },
+        "municipal_state": {
+          "$ref": "#/$defs/MunicipalState"
+        },
+        "municipal_type": {
+          "$ref": "#/$defs/MunicipalType"
+        },
+        "municipal_taxable_federal": {
+          "$ref": "#/$defs/MunicipalTaxableFederal"
+        },
+        "bank_qualified": {
+          "$ref": "#/$defs/BankQualified"
+        },
+        "is_amt_applicable": {
+          "$ref": "#/$defs/IsAMTApplicable"
+        },
+        "pre_refunded": {
+          "$ref": "#/$defs/PreRefunded"
+        },
+        "original_maturity_date": {
+          "$ref": "#/$defs/OriginalMaturityDate"
+        },
+        "sp_rating": {
+          "$ref": "#/$defs/SpRating"
+        },
+        "sp_rating_date": {
+          "$ref": "#/$defs/SpRatingDate"
+        },
+        "sp_creditwatch": {
+          "$ref": "#/$defs/SpCreditwatch"
+        },
+        "sp_creditwatch_date": {
+          "$ref": "#/$defs/SpCreditwatchDate"
+        },
+        "sp_outlook": {
+          "$ref": "#/$defs/SpOutlook"
+        },
+        "sp_outlook_date": {
+          "$ref": "#/$defs/SpOutlookDate"
+        },
+        "moodys_rating": {
+          "$ref": "#/$defs/MoodysRating"
+        },
+        "moodys_rating_date": {
+          "$ref": "#/$defs/MoodysRatingDate"
+        },
+        "duration": {
+          "$ref": "#/$defs/Duration"
+        },
+        "convexity": {
+          "$ref": "#/$defs/Convexity"
+        },
+        "liquidity_micro_buy": {
+          "$ref": "#/$defs/LiquidityMicroBuy"
+        },
+        "liquidity_micro_sell": {
+          "$ref": "#/$defs/LiquidityMicroSell"
+        },
+        "liquidity_micro_aggregate": {
+          "$ref": "#/$defs/LiquidityMicroAggregate"
+        },
+        "liquidity_retail_buy": {
+          "$ref": "#/$defs/LiquidityRetailBuy"
+        },
+        "liquidity_retail_sell": {
+          "$ref": "#/$defs/LiquidityRetailSell"
+        },
+        "liquidity_retail_aggregate": {
+          "$ref": "#/$defs/LiquidityRetailAggregate"
+        },
+        "liquidity_institutional_buy": {
+          "$ref": "#/$defs/LiquidityInstitutionalBuy"
+        },
+        "liquidity_institutional_sell": {
+          "$ref": "#/$defs/LiquidityInstitutionalSell"
+        },
+        "liquidity_institutional_aggregate": {
+          "$ref": "#/$defs/LiquidityInstitutionalAggregate"
+        },
+        "close_price": {
+          "$ref": "#/$defs/ClosePrice"
+        },
+        "close_ytw": {
+          "$ref": "#/$defs/CloseYTW"
+        },
+        "close_ytm": {
+          "$ref": "#/$defs/CloseYTM"
+        },
+        "close_price_asof": {
+          "$ref": "#/$defs/ClosePriceAsOf"
+        },
+        "status": {
+          "$ref": "#/$defs/BondStatus"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/UpdatedAt"
+        }
+      }
+    },
+    "Insured": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the bond is insured, meaning a third-party insurance company will guarantee the payment of principal and interest in case the issuer defaults."
+    },
+    "IsAMTApplicable": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A flag representing whether a bond is AMT (Alternative Minimum Tax) applicable, which means that the bond's interest may be subject to the alternative minimum tax. Only specified for municipal bonds."
+    },
+    "IsStructuredProduct": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the bond is a structured product, which is a security derived from or linked to a pool of underlying assets, such as indices or derivatives."
+    },
+    "IssueDate": {
+      "type": "string",
+      "description": "The date on which the bond was issued. In case of a reissue, this will be the latest issuance date.",
+      "format": "date"
+    },
+    "IssueMinimumDenomination": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The smallest unit of the bond that can be purchased at its initial offering."
+    },
+    "IssuePrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The price at which the bond was originally issued as a percentage of par value. In case of a reissue, this will be the latest issuance price."
+    },
+    "IssueSize": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The total size amount of the bond issue in the issuing currency."
+    },
+    "Issuer": {
+      "type": "string",
+      "description": "Name of the bond issuer"
+    },
+    "LastCouponDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the last coupon payment on the bond. Null for zero-coupon bonds.",
+      "format": "date"
+    },
+    "LiquidityInstitutionalAggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell (no minimum trading sizes). A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityInstitutionalBuy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy (no minimum trading sizes). A higher score means that an order to buy will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityInstitutionalSell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell (no minimum trading sizes). A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityMicroAggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityMicroBuy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 if the bond is priced, or null if the bond is not tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have  offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityMicroSell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityRetailAggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityRetailBuy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $10,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "LiquidityRetailSell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment."
+    },
+    "MaturityDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds. For fully pre-refunded municipal bonds (see pre_refunded), this holds the refund (redemption) date rather than the original stated maturity, since the bond is redeemed from escrowed funds on that date; the stated maturity is available in original_maturity_date.",
+      "format": "date"
+    },
+    "MoodysRating": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Moody's rating for the bond in the standard Aaa - C format. NR if marked as not rated by the agency. Null if there is no rating (Aaa - C or NR) provided by the agency. Note: available to Moody's licensed users only. This data includes Moody's ratings and related financial information. Moody's ratings and data are proprietary to Moody's Investors Service, Inc. The information is used under license and is subject to copyright and other intellectual property rights held by Moody's or its affiliates."
+    },
+    "MoodysRatingDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date in the timezone of the issuing country of the most recent Moody's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to Moody's licensed users only.",
+      "format": "date"
+    },
+    "MunicipalState": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds."
+    },
+    "MunicipalTaxableFederal": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds."
+    },
+    "MunicipalType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of revenue backing. General obligation bonds are not tied to any particular revenue-generating project. Revenue bonds, in contrast are repaid from the income generated by specific projects, enterprises, or sources, rather than from general taxation. Only specified for municipal bonds.",
+      "enum": [
+        "general_obligation",
+        "revenue"
+      ]
+    },
+    "NaicsSector": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "North American Industry Classification System (NAICS) standard classification of the bond"
+    },
+    "NaicsSubsector": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "North American Industry Classification System (NAICS) standard sub-classification of the bond"
+    },
+    "NextCallDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the next possible call on the bond. Null if the bond is not callable.",
+      "format": "date"
+    },
+    "NextCallPrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable."
+    },
+    "NextCouponDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the next upcoming coupon payment. Null for zero-coupon bonds. Please note that this date may not be when the actual coupon is paid; most coupons will be paid on the following business day if the coupon date falls on a holiday or a weekend.",
+      "format": "date"
+    },
+    "OriginalIssueDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The initial date of issuance for treasury bonds, used to differentiate between original and re-issued bonds.",
+      "format": "date"
+    },
+    "OriginalIssuePrice": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The price at which the bond was originally issued as a percentage of par value. This is populated for treasury bonds that were reissued."
+    },
+    "OriginalIssueSize": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The size of the bond when it was originally issued. This is populated for treasury bonds that were reissued."
+    },
+    "OriginalMaturityDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The stated maturity date of the bond, for bonds whose maturity_date has been overridden with the refund (redemption) date (see pre_refunded). Null when maturity_date already holds the stated maturity.",
+      "format": "date"
+    },
+    "ParValue": {
+      "type": "number",
+      "description": "The amount that the issuer of the bond will pay back to the bondholder upon maturity. Also known as face value or nominal value."
+    },
+    "Perpetual": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A flag representing whether a bond is perpetual, meaning it does not have a maturity date, and pays interest indefinitely. If this is set, the bond's maturity date will be null."
+    },
+    "PreRefunded": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the bond is pre-refunded or escrowed to maturity (ETM), meaning the issuer has set aside funds in an escrow account to redeem the bond. For fully pre-refunded bonds, maturity_date holds the refund (redemption) date rather than the original stated maturity (see original_maturity_date). Only specified for municipal bonds."
+    },
+    "PrincipalFactor": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "The principal factor represents the remaining principal balance as a percentage of the original principal amount. Used primarily for mortgage-backed securities and other amortizing bonds."
+    },
+    "PrivatePlacement": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the security was part of private placement, or issued directly to a limited pool of investors rather than through a public offering. These bonds are unregistered with the SEC and are not part of the open market. Note: retail investors may not be eligible to participate in bonds offered via private placement — please consult an attorney for more information."
+    },
+    "Purpose": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus."
+    },
+    "Puttable": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether the bond is puttable, meaning the bondholder has the right, but not the obligation, to sell the security back to the issuer at a predetermined price and date."
+    },
+    "RegS": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the security falls under Regulation S, a rule that provides an exemption from the registration requirements for securities offerings made outside the United States. This regulation allows U.S. and foreign issuers to sell securities in non-U.S. markets without the need to register these securities with SEC."
+    },
+    "Sector": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)"
+    },
+    "Seniority": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The order of priority in which bondholders are repaid in the event of a default by the issuing corporation such as bankruptcy or liquidation. This field is only populated for corporate bonds."
+    },
+    "SettlementConvention": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The standard process through which the legal transfer of bonds from the seller to the buyer is completed, and payment is made by the buyer, including details like the timing and the specific procedures involved in the settlement of a trade."
+    },
+    "SinkingFund": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "A sinking fund is a pool of money a bond issuer sets aside to repay the bond, typically through periodic buybacks, offering added security to bondholders. For bonds with a sinking fund provision, the bond issuer is obligated to retire or pay down a portion of the principal at specified intervals throughout the bond's lifetime. This means bondholders receive both periodic coupon payments and portions of the principal before maturity, rather than receiving the entire principal amount solely at maturity."
+    },
+    "SpCreditwatch": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "S&P's CreditWatch highlights S&P's opinion regarding the potential direction of a short-term or long-term rating. Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "enum": [
+        "positive",
+        "negative",
+        "developing",
+        "not_meaningful"
+      ]
+    },
+    "SpCreditwatchDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the most recent Standard & Poor's CreditWatch for the bond in YYYY-MM-DD format. This field will be null if no information about outlook is available or CreditWatch date not available. Note: available to S&P licensed users only.",
+      "format": "date"
+    },
+    "SpOutlook": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A Standard & Poor's rating outlook indicates S&P's view regarding the potential direction of a long-term credit rating over the intermediate term (2 years for investment grade, 1 year for speculative grade). Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "enum": [
+        "positive",
+        "negative",
+        "developing",
+        "stable",
+        "not_rated",
+        "not_meaningful"
+      ]
+    },
+    "SpOutlookDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date of the most recent Standard & Poor's outlook for the bond in YYYY-MM-DD format. Null if no information about outlook is available or outlook date not available. Note: available to S&P licensed users only.",
+      "format": "date"
+    },
+    "SpRating": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Standard & Poor's rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor's (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor's Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor's or its affiliates."
+    },
+    "SpRatingDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The date in the timezone of the issuing country of the most recent Standard & Poor's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to S&P licensed users only.",
+      "format": "date"
+    },
+    "Ticker": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The stock ticker for publicly traded companies, or a similar styled abbreviation for securities issued by a company that is not publicly traded. This field is only populated for corporate bonds."
+    },
+    "TraceEligible": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Indicates whether the security is TRACE eligible, meaning it is subject to the Trade Reporting and Compliance Engine (TRACE) reporting requirements. Trades on these instruments must be reported to FINRA within 15 minutes of execution."
+    },
+    "TreasuryBenchmark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "ISIN that represents the reference U.S. Treasury security used as a benchmark for pricing and evaluating the fixed income instrument. Typically, this is the closest-maturity Treasury bond or note that serves as a basis for determining relative yield and spread."
+    },
+    "TreasurySubtype": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The subtype of a treasury. Possible values include:\n* bond: long term i.e. 20, 30 years\n* note: intermediate term i.e. 2, 3, 5, 7, and 10 years\n* bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)\n* tips: treasury inflation-protected securities\n* strips: separate trading of registered interest and principal of securities\n* floating: floating rate notes",
+      "enum": [
+        "bond",
+        "bill",
+        "note",
+        "strips",
+        "tips",
+        "floating"
+      ]
+    },
+    "TriggerAction": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The action taken when the trigger event occurs, such as conversion to equity or a principal write-down. Null if the bond has no trigger event."
+    },
+    "TriggerEventType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of event that would cause conversion or write-down. Null if the bond has no trigger event."
+    },
+    "TriggerLevelType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of threshold used to define the trigger level (for example, a regulatory capital ratio). Null if the bond has no trigger event."
+    },
+    "TriggerLevelValue": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "For a trigger event, the threshold value at which conversion or write-down is activated, expressed in the units implied by trigger_level_type (for example, a percentage for a capital ratio). Null if the bond has no conversion trigger."
+    },
+    "TriggerType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The type of trigger for a conversion or write-down event. Null if the bond has no trigger event."
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp at which the bond was last updated in Moment's system in RFC-3339 format with nanosecond precision.",
+      "format": "date-time"
+    },
+    "WorkoutDate": {
+      "type": "string",
+      "description": "Workout date, also know as the \"call adjusted maturity date\", is the terminal date of the bond implied by its yield to worst.\n\nIf a bond's yield to worst is equal to its yield to maturity, that means the market believes that it will not be redeemed until maturity. Hence, the workout date is the maturity date.\n\nIf a bond's yield to worst is less than the yield to maturity, that means that the market believes it will get called, and are evaluating the bond's yield according to that predicted call date. Hence, the workout date is the date the market believes the bond will be called."
+    },
+    "cusip": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "CUSIP",
+      "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\n\nNote: Available to licensed users only.\nThe Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.\nCUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+      "minLength": 9,
+      "maxLength": 9
+    },
+    "isin": {
+      "type": "string",
+      "title": "ISIN",
+      "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+      "minLength": 12,
+      "maxLength": 12
+    }
+  }
+}

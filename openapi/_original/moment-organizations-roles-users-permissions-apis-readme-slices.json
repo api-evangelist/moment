@@ -1,0 +1,697 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/updateorganizationipallowlist.md",
+  "definition": {
+   "openapi": "3.0.3",
+   "info": {
+    "title": "Organizations, Roles, Users, Permissions APIs",
+    "version": "0.1.0",
+    "description": "API for managing users, roles, and permissions within the Moment platform.",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com",
+     "description": "Production server"
+    },
+    {
+     "url": "https://paper.moment-api.com",
+     "description": "UAT server"
+    }
+   ],
+   "security": [
+    {
+     "BearerAuth": []
+    }
+   ],
+   "components": {
+    "securitySchemes": {
+     "BearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT",
+      "description": "JWT token for API authentication"
+     }
+    },
+    "schemas": {
+     "OrganizationDomain": {
+      "type": "string",
+      "description": "A domain that is associated with an organization",
+      "example": "example.com"
+     },
+     "Organization": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "Organization ID"
+       },
+       "name": {
+        "type": "string",
+        "description": "Organization name"
+       },
+       "client_id": {
+        "type": "string",
+        "nullable": true,
+        "description": "Optional client identifier"
+       },
+       "parent_id": {
+        "type": "string",
+        "nullable": true,
+        "description": "Parent organization ID for introducing brokers. Note: clearer_id database field serves the same purpose (legacy naming)."
+       },
+       "domains": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/OrganizationDomain"
+        }
+       },
+       "allowed_ips": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        },
+        "description": "List of IP addresses that are allowed to connect to the organization's FIX sessions."
+       }
+      },
+      "required": [
+       "id",
+       "name",
+       "client_id"
+      ]
+     }
+    }
+   },
+   "paths": {
+    "/v1/org/{org_id}/ip-allowlist/": {
+     "put": {
+      "summary": "Update organization IP allowlist",
+      "description": "Update the list of IP addresses that are allowed to connect for the organization",
+      "operationId": "updateOrganizationIPAllowlist",
+      "tags": [
+       "IP Allowlist"
+      ],
+      "parameters": [
+       {
+        "name": "org_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "type": "object",
+          "properties": {
+           "ip_addresses": {
+            "type": "array",
+            "description": "Array of IP addresses to set as allowed IPs for the organization",
+            "items": {
+             "type": "string"
+            }
+           }
+          },
+          "required": [
+           "ip_addresses"
+          ]
+         }
+        }
+       }
+      },
+      "responses": {
+       "200": {
+        "description": "IP allowlist updated successfully",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/Organization"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1org~1ip~1/post/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "404": {
+        "description": "Not Found",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1org~1ip~1/post/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/org/ip/": {
+     "post": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Add IP to FIX IP Allowlist",
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/AddFIXIPAllowlistRequest"
+         }
+        }
+       }
+      },
+      "description": "Add a new IP address to the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "AddFIXIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/IPAllowlistResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getfixipallowlist.md",
+  "definition": {
+   "openapi": "3.0.3",
+   "info": {
+    "title": "Organizations, Roles, Users, Permissions APIs",
+    "version": "0.1.0",
+    "description": "API for managing users, roles, and permissions within the Moment platform.",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com",
+     "description": "Production server"
+    },
+    {
+     "url": "https://paper.moment-api.com",
+     "description": "UAT server"
+    }
+   ],
+   "security": [
+    {
+     "BearerAuth": []
+    }
+   ],
+   "components": {
+    "securitySchemes": {
+     "BearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT",
+      "description": "JWT token for API authentication"
+     }
+    },
+    "schemas": {
+     "IPAllowlistResponse": {
+      "type": "object",
+      "properties": {
+       "ip_addresses": {
+        "type": "array",
+        "description": "A list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+        "items": {
+         "type": "string"
+        }
+       }
+      },
+      "required": [
+       "ip_addresses"
+      ],
+      "example": {
+       "ip_addresses": [
+        "74.125.200.100",
+        "74.125.200.113"
+       ]
+      }
+     }
+    }
+   },
+   "paths": {
+    "/v1/org/ip/": {
+     "get": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Get FIX IP Allowlist",
+      "description": "Retrieve the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "GetFIXIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/IPAllowlistResponse"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/addfixipallowlist.md",
+  "definition": {
+   "openapi": "3.0.3",
+   "info": {
+    "title": "Organizations, Roles, Users, Permissions APIs",
+    "version": "0.1.0",
+    "description": "API for managing users, roles, and permissions within the Moment platform.",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com",
+     "description": "Production server"
+    },
+    {
+     "url": "https://paper.moment-api.com",
+     "description": "UAT server"
+    }
+   ],
+   "security": [
+    {
+     "BearerAuth": []
+    }
+   ],
+   "components": {
+    "securitySchemes": {
+     "BearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT",
+      "description": "JWT token for API authentication"
+     }
+    },
+    "schemas": {
+     "IPAllowlistResponse": {
+      "type": "object",
+      "properties": {
+       "ip_addresses": {
+        "type": "array",
+        "description": "A list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+        "items": {
+         "type": "string"
+        }
+       }
+      },
+      "required": [
+       "ip_addresses"
+      ],
+      "example": {
+       "ip_addresses": [
+        "74.125.200.100",
+        "74.125.200.113"
+       ]
+      }
+     },
+     "AddFIXIPAllowlistRequest": {
+      "type": "object",
+      "properties": {
+       "ip_address": {
+        "type": "string",
+        "description": "The IP address to add to the allowed IP addresses for the organization."
+       }
+      },
+      "required": [
+       "ip_address"
+      ]
+     }
+    }
+   },
+   "paths": {
+    "/v1/org/ip/": {
+     "post": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Add IP to FIX IP Allowlist",
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/AddFIXIPAllowlistRequest"
+         }
+        }
+       }
+      },
+      "description": "Add a new IP address to the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "AddFIXIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/IPAllowlistResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/removefixipallowlist.md",
+  "definition": {
+   "openapi": "3.0.3",
+   "info": {
+    "title": "Organizations, Roles, Users, Permissions APIs",
+    "version": "0.1.0",
+    "description": "API for managing users, roles, and permissions within the Moment platform.",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com",
+     "description": "Production server"
+    },
+    {
+     "url": "https://paper.moment-api.com",
+     "description": "UAT server"
+    }
+   ],
+   "security": [
+    {
+     "BearerAuth": []
+    }
+   ],
+   "components": {
+    "securitySchemes": {
+     "BearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT",
+      "description": "JWT token for API authentication"
+     }
+    },
+    "schemas": {
+     "IPAllowlistResponse": {
+      "type": "object",
+      "properties": {
+       "ip_addresses": {
+        "type": "array",
+        "description": "A list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+        "items": {
+         "type": "string"
+        }
+       }
+      },
+      "required": [
+       "ip_addresses"
+      ],
+      "example": {
+       "ip_addresses": [
+        "74.125.200.100",
+        "74.125.200.113"
+       ]
+      }
+     }
+    }
+   },
+   "paths": {
+    "/v1/org/ip/": {
+     "post": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Add IP to FIX IP Allowlist",
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/AddFIXIPAllowlistRequest"
+         }
+        }
+       }
+      },
+      "description": "Add a new IP address to the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "AddFIXIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/IPAllowlistResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/org/ip/{ip_address}/": {
+     "delete": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Remove IP from FIX IP Allowlist",
+      "parameters": [
+       {
+        "name": "ip_address",
+        "in": "path",
+        "description": "The IP address to remove from the allowed IP addresses for the organization.",
+        "required": true,
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "description": "Remove an IP address from the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "RemoveFIXIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/IPAllowlistResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1org~1ip~1/post/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+]

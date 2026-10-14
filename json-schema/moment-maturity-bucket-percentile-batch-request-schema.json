@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-maturity-bucket-percentile-batch-request-schema.json",
+  "title": "MaturityBucketPercentileBatchRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-live-inventory-api-openapi.yml#/components/schemas/MaturityBucketPercentileBatchRequest",
+  "type": "object",
+  "properties": {
+    "bucket_selection": {
+      "description": "The date field to use for maturity bucket selection, applied to every\nseries. Defaults to 'maturity_date'.\n- 'maturity_date': Group bonds by their maturity date\n- 'workout_date': Group bonds by their workout date (call adjusted maturity date)",
+      "type": "string",
+      "default": "maturity_date",
+      "enum": [
+        "maturity_date",
+        "workout_date"
+      ]
+    },
+    "buckets": {
+      "description": "Comma-separated list of specific maturity buckets to include in every\nseries. If not specified, all buckets with data will be returned.\nAvailable buckets: 1-3 mo, 3-6 mo, 6-9 mo, 9-12 mo, 1-1.5 yr, 1.5-2.5 yr, 2.5-3.5 yr, 3.5-4.5 yr, 4.5-5.5 yr, 5.5-6.5 yr, 6.5-7.5 yr, 7.5-8.5 yr, 8.5-9.5 yr, 9.5-10.5 yr, 10.5-11.5 yr, 11.5-12.5 yr, 12.5-13.5 yr, 13.5-14.5 yr, 14.5-15.5 yr, 15.5-16.5 yr, 16.5-17.5 yr, 17.5-18.5 yr, 18.5-19.5 yr, 19.5-20.5 yr, 20.5-21.5 yr, 21.5-22.5 yr, 22.5-23.5 yr, 23.5-24.5 yr, 24.5-25.5 yr, 25.5-26.5 yr, 26.5-27.5 yr, 27.5-28.5 yr, 28.5-29.5 yr, 29.5+ yr",
+      "type": "string"
+    },
+    "percentile": {
+      "description": "The percentile value to calculate for each maturity bucket (0-100),\napplied to every series. Required: omitting it, or sending an\nexplicit null, is rejected with a 400. The schema marks it nullable\nonly so code generation can tell an omitted value apart from 0,\nwhich is itself a valid percentile.",
+      "type": [
+        "number",
+        "null"
+      ],
+      "maximum": 100,
+      "minimum": 0
+    },
+    "risk_group_id": {
+      "description": "The risk group ID to filter for tradable inventory, applied to every\nseries. If left null, and a single risk group exists for the\norganization, it will be used as the default risk group. If left\nnull, and more than one risk group exists, the request will fail.",
+      "type": "string"
+    },
+    "series": {
+      "description": "The series to compute. Each entry supplies its own filters and a key\nthe result is returned under. Keys must be non-empty and unique.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/MaturityBucketPercentileBatchSeries"
+      },
+      "maxItems": 16,
+      "minItems": 1
+    }
+  },
+  "required": [
+    "percentile",
+    "series"
+  ],
+  "$defs": {
+    "InventoryFilter": {
+      "description": "In a filter object, each key is either a field to filter on or an operator.\nEach value is either a filter condition object or, in the case of certain\noperators, an array of filter objects.\n\nSome of the fields which can be filtered on are explicitly defined on this schema.\nAny of the other fields in the reference data model can be used as an\nInventoryFilter key.",
+      "type": "object",
+      "properties": {
+        "and": {
+          "description": "Filter operator key with array value of filter objects to be combined with AND.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryFilter"
+          }
+        },
+        "country_issue": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "country_of_risk": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "coupon": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "currency": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "cusip": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "description": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "emerging_status": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "isin": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "issue_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "issuer": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "lowest_rating": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "maturity_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "min_trade_market_value": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "naics_sector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "naics_subsector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "not": {
+          "description": "Filter operator key with a filter object to be negated.",
+          "$ref": "#/$defs/InventoryFilter"
+        },
+        "objective_score": {
+          "description": "Filter on the computed objective score. Requires an\n`objective_function` in the request — the score is computed from\nit per bond. Supports only the numeric comparison operators\n(equal_to, not_equal_to, greater_than, greater_than_or_equal_to,\nless_than, less_than_or_equal_to) and is_null, with numeric\nvalues. Combine with `sort_by: [\"objective_score.desc\"]` to rank\nand threshold in one query.",
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "or": {
+          "description": "Filter operator key with array value of filter objects to be combined with OR.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryFilter"
+          }
+        },
+        "pre_fee_price": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "pre_fee_yield_to_maturity": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "pre_fee_yield_to_worst": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "price": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "sector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "sp_rating": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "treasury_benchmark": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "type": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "workout_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "yield_to_maturity": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "yield_to_worst": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/InventoryFilterCondition"
+      }
+    },
+    "InventoryFilterCondition": {
+      "type": "object",
+      "properties": {
+        "ends_with": {
+          "description": "String to end with in the filter.",
+          "type": "string"
+        },
+        "equal_to": {
+          "description": "Exact value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "greater_than": {
+          "description": "Greater than value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "greater_than_or_equal_to": {
+          "description": "Greater than or equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "in": {
+          "description": "Array of values for the filter.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "in_filter_list": {
+          "description": "Filter by values from a named filter list. The value is the filter list ID (e.g., \"list_01ABC123\").",
+          "type": "string"
+        },
+        "includes": {
+          "description": "String to include in the filter.",
+          "type": "string"
+        },
+        "is_null": {
+          "description": "Boolean to filter for null / not-null values.",
+          "type": "boolean"
+        },
+        "less_than": {
+          "description": "Less than value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "less_than_or_equal_to": {
+          "description": "Less than or equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "not_equal_to": {
+          "description": "Not equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "not_in": {
+          "description": "Array of values not to include in the filter.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "not_in_filter_list": {
+          "description": "Exclude values that are in a named filter list. The value is the filter list ID (e.g., \"list_01ABC123\").",
+          "type": "string"
+        },
+        "not_includes": {
+          "description": "String not to include in the filter.",
+          "type": "string"
+        },
+        "starts_with": {
+          "description": "String to start with in the filter.",
+          "type": "string"
+        }
+      }
+    },
+    "MaturityBucketPercentileBatchSeries": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "description": "The filters selecting this series' instruments, as a JSON object whose keys are\nfields to filter on or operators. Send the object itself, not a JSON-encoded\nstring.\nExample: {\"cusip\": {\"in\": [\"035240AQ3\"]}, \"maturity_date\": {\"lt\": \"2030-01-01\"}}",
+          "$ref": "#/$defs/InventoryFilter"
+        },
+        "key": {
+          "description": "The key this series' result is returned under. Must be non-empty and unique within the request.",
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "key",
+        "filters"
+      ],
+      "title": "MaturityBucketPercentileBatchSeries"
+    }
+  }
+}

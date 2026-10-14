@@ -1,0 +1,253 @@
+openapi: 3.0.0
+info:
+  title: Risk API
+  description: Moment's Risk API allows clients to configure and retrieve risk policies for pre-trade checks.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+security:
+- bearerAuth: []
+paths:
+  /v1/risk/{ib_id}/group/:
+    get:
+      tags:
+      - Risk Groups
+      summary: All Risk Groups
+      description: 'List all risk groups for the specified introducing broker.
+
+        '
+      operationId: listRiskGroups
+      parameters:
+      - name: ib_id
+        in: path
+        description: The introducing broker's ID.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RiskGroupSummary'
+  /v1/risk/{ib_id}/group/{group_id}/universe/:
+    get:
+      tags:
+      - Instruments
+      summary: Eligible Universe
+      description: 'Get the tradable universe for the specified risk group. This endpoint is paginated.
+
+        '
+      operationId: getTradeableUniverse
+      parameters:
+      - name: ib_id
+        in: path
+        description: The introducing broker's ID.
+        required: true
+        schema:
+          type: string
+      - name: group_id
+        in: path
+        description: The risk group's ID.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/page_size'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedTradableUniverse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: Page number of results to return. Defaults to 1.
+    page_size:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+      description: Number of items to return. Must be in range 1-1000, defaults to 100.
+  schemas:
+    TradableInstrument:
+      type: object
+      properties:
+        CUSIP:
+          type: string
+          description: The instrument's CUSIP.
+        ISIN:
+          type: string
+          description: The instrument's ISIN.
+    TradableUniverse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TradableInstrument'
+    PaginatedTradableUniverse:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: The total number of items in the universe.
+        next:
+          type: string
+          description: The URL for the next page of results. Null if there is no next page.
+        previous:
+          type: string
+          description: The URL for the previous page of results. Null if there is no previous page.
+        data:
+          $ref: '#/components/schemas/TradableUniverse'
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The user's ID.
+        email:
+          type: string
+          description: The user's email address.
+    AssetPolicy:
+      type: object
+      properties:
+        enforce_allowlist:
+          type: boolean
+          description: Whether or not to enforce the allowlist.
+        max_trade_size:
+          type: number
+          description: The maximum trade size.
+        max_daily_volume:
+          type: number
+          description: The maximum daily volume.
+        upper_price_band:
+          type: number
+          description: The upper price band, expressed as a percentage above the current market price.
+        lower_price_band:
+          type: number
+          description: The lower price band, expressed as a percentage below the current market price.
+        min_sp_rating:
+          type: string
+          description: The minimum S&P rating. Null if no minimum.
+        min_days_to_maturity:
+          type: number
+          description: The minimum days to maturity.
+        min_trade_size:
+          type: number
+          description: The minimum trade size.
+        enable_floating_rate_bonds:
+          type: boolean
+          description: Whether floating rate bonds are enabled.
+        enabled_treasury_subtypes:
+          type: array
+          items:
+            type: string
+          description: The enabled treasury subtypes. Null if this asset is not a treasury.
+        min_yield:
+          type: number
+          description: The minimum yield. Null if no minimum.
+        max_yield:
+          type: number
+          description: The maximum yield. Null if no maximum.
+        enable_fractionalization:
+          type: boolean
+          description: Whether fractionalization is enabled for this asset class.
+        min_denomination:
+          type: number
+          description: The notional minimum denomination for orders in this asset class.
+        allow_sinking_fund:
+          type: boolean
+          description: Whether sinking funds are allowed for this asset class.
+    RiskGroupSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The risk group's ID.
+        client_id:
+          type: string
+          description: The risk group's client ID.
+        name:
+          type: string
+          description: The risk group's name.
+        max_daily_volume:
+          type: number
+          description: The risk group's maximum daily volume.
+        account_id_validation:
+          type: string
+          description: The risk group's account ID validation.
+        enabled_currencies:
+          type: array
+          items:
+            type: string
+          description: The risk group's enabled currencies.
+        enabled_reg_s:
+          type: boolean
+          description: Whether regulation S debt offerings are enabled for the risk group.
+        enable_144a:
+          type: boolean
+          description: Whether rule 144A debt offerings are enabled for the risk group.
+        enable_private_placement:
+          type: boolean
+          description: Whether private placements are enabled for the risk group.
+        agency:
+          $ref: '#/components/schemas/AssetPolicy'
+        cd:
+          $ref: '#/components/schemas/AssetPolicy'
+        corporate:
+          $ref: '#/components/schemas/AssetPolicy'
+        government:
+          $ref: '#/components/schemas/AssetPolicy'
+        municipal:
+          $ref: '#/components/schemas/AssetPolicy'
+        treasury:
+          $ref: '#/components/schemas/AssetPolicy'
+        block_trading_enabled:
+          type: boolean
+          description: Whether block trading is enabled for the risk group.
+        rfq_enabled:
+          type: boolean
+          description: Whether RFQ trading is enabled for the risk group.
+        last_updated_at:
+          type: string
+          format: date-time
+          description: The date and time the risk group was last updated.
+        last_updated_by:
+          $ref: '#/components/schemas/UserInfo'
+tags:
+- name: Instruments
+- name: Risk Groups
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/gettradeableuniverse-1.md
+  - https://docs.moment.com/reference/listriskgroups-1.md
+  merge:
+    pages: 2
+    deduped: 1
+    conflicts_kept_first: 0

@@ -1,0 +1,350 @@
+openapi: 3.0.0
+info:
+  title: Filter Lists API
+  description: Moment's Filter Lists API allows Clients to manage their filter lists.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+paths:
+  /v1/list/:
+    get:
+      tags:
+      - Filter Lists
+      summary: List all Filter Lists
+      operationId: listLists
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FilterListShort'
+    post:
+      tags:
+      - Filter Lists
+      summary: Create a Filter List
+      operationId: createList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFilterListRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterList'
+  /v1/list/{list_id}/:
+    post:
+      tags:
+      - Filter Lists
+      summary: Create a new version of a Filter List
+      operationId: createVersion
+      parameters:
+      - $ref: '#/components/parameters/list_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFilterListRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterList'
+    delete:
+      tags:
+      - Filter Lists
+      summary: Delete a Filter List
+      operationId: deleteList
+      parameters:
+      - $ref: '#/components/parameters/list_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+                description: The unique identifier of the deleted filter list
+  /v1/list/{list_id}/version/:
+    get:
+      tags:
+      - Filter Lists
+      summary: Get version history of a Filter List
+      operationId: listVersions
+      parameters:
+      - $ref: '#/components/parameters/list_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FilterListVersionShort'
+  /v1/list/{list_id}/version/{version_id}/:
+    get:
+      tags:
+      - Filter Lists
+      summary: Get a specific version of a Filter List
+      operationId: getVersion
+      parameters:
+      - $ref: '#/components/parameters/list_id'
+      - $ref: '#/components/parameters/version_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterList'
+components:
+  schemas:
+    FilterListShort:
+      type: object
+      properties:
+        list_id:
+          type: string
+          description: The unique identifier of the filter list
+          x-go-type-skip-optional-pointer: true
+        name:
+          type: string
+          description: The user defined name of the filter list
+          x-go-type-skip-optional-pointer: true
+        created_at:
+          type: string
+          description: The date and time the filter list was created
+          format: date-time
+          x-go-type-skip-optional-pointer: true
+        created_by:
+          type: string
+          description: The moment_user_id of the user who created the filter list
+          x-go-type-skip-optional-pointer: true
+        field:
+          type: string
+          description: The ref data field that the filter list is based on
+          x-go-type-skip-optional-pointer: true
+        version:
+          type: integer
+          description: The version of the filter list
+          x-go-type-skip-optional-pointer: true
+      required:
+      - list_id
+      - name
+      - created_at
+      - created_by
+      - field
+      - version
+    FilterList:
+      type: object
+      properties:
+        list_id:
+          type: string
+          description: The unique identifier of the filter list
+          x-go-type-skip-optional-pointer: true
+        name:
+          type: string
+          description: The user defined name of the filter list
+          x-go-type-skip-optional-pointer: true
+        organization_id:
+          type: string
+          description: The organization ID of the filter list
+          x-go-type-skip-optional-pointer: true
+        field:
+          type: string
+          description: The ref data field that the filter list is based on
+          x-go-type-skip-optional-pointer: true
+        updated_at:
+          type: string
+          description: The date and time the filter list was updated
+          format: date-time
+          x-go-type-skip-optional-pointer: true
+        updated_by:
+          type: string
+          description: The moment_user_id of the user who updated the filter list
+          x-go-type-skip-optional-pointer: true
+        version:
+          type: integer
+          description: The version of the filter list
+          x-go-type-skip-optional-pointer: true
+        active:
+          type: boolean
+          description: Whether this version is the active version of the filter list
+          x-go-type-skip-optional-pointer: true
+        values:
+          $ref: '#/components/schemas/ValueDict'
+      required:
+      - list_id
+      - name
+      - organization_id
+      - field
+      - updated_at
+      - updated_by
+      - version
+      - active
+    CreateFilterListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The user defined name of the filter list
+          x-go-type-skip-optional-pointer: true
+        field:
+          type: string
+          description: The ref data field that the filter list is based on
+          x-go-type-skip-optional-pointer: true
+      required:
+      - name
+      - field
+    ValueDict:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: string
+        added_at:
+          type: array
+          items:
+            type: string
+            format: date-time
+        added_by:
+          type: array
+          items:
+            type: string
+      required:
+      - value
+      - added_at
+      - added_by
+    UpdateFilterListRequest:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterListOperationRequest'
+          description: The operations to perform on the filter list
+          x-go-type-skip-optional-pointer: true
+    FilterListOperationRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/FilterListOperationAction'
+        values:
+          type: array
+          items:
+            type: string
+            description: The values to add, remove, or replace
+          description: The values for the operation (required for add/remove/replace actions)
+          x-go-type-skip-optional-pointer: true
+        source:
+          type: string
+          description: The source file name for the operation
+          x-go-type-skip-optional-pointer: true
+      required:
+      - action
+      - values
+    FilterListOperationAction:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      description: The action to perform on filter list values
+      x-go-type-skip-optional-pointer: true
+    FilterListVersionShort:
+      type: object
+      properties:
+        version:
+          type: integer
+          description: The version of the filter list
+          x-go-type-skip-optional-pointer: true
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterListOperationResponse'
+          description: The operations that were performed in this version
+        updated_at:
+          type: string
+          description: The date and time the filter list was updated
+          format: date-time
+          x-go-type-skip-optional-pointer: true
+        updated_by:
+          type: string
+          description: The moment_user_id of the user who updated the filter list
+          x-go-type-skip-optional-pointer: true
+      required:
+      - version
+      - operations
+    FilterListOperationResponse:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/FilterListOperationAction'
+        num_values:
+          type: integer
+          description: The number of values in the specificed operation action
+          x-go-type-skip-optional-pointer: true
+        prev_num_values:
+          type: integer
+          description: The number of values in the previous version of the filter list
+          x-go-type-skip-optional-pointer: true
+        source:
+          type: string
+          description: The source file name for the operation
+          x-go-type-skip-optional-pointer: true
+      required:
+      - action
+      - num_values
+  parameters:
+    list_id:
+      name: list_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The unique identifier of the filter list
+    version_id:
+      name: version_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: The version of the filter list
+tags:
+- name: Filter Lists
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/createlist.md
+  - https://docs.moment.com/reference/createversion.md
+  - https://docs.moment.com/reference/deletelist.md
+  - https://docs.moment.com/reference/getversion.md
+  - https://docs.moment.com/reference/listlists.md
+  - https://docs.moment.com/reference/listversions.md
+  merge:
+    pages: 6
+    deduped: 8
+    conflicts_kept_first: 0

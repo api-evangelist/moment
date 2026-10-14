@@ -1,0 +1,4706 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/deleterfq.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/{id}/": {
+     "delete": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "Cancel RFQ",
+      "description": "Attempts to cancel an open RFQ. If the RFQ is no longer cancelable, a subsequent cancel reject event will be sent to the client via the Real-Time RFQ API.",
+      "operationId": "deleteRfq",
+      "parameters": [
+       {
+        "name": "id",
+        "in": "path",
+        "description": "The id of the RFQ you wish to cancel.",
+        "required": true,
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "204": {
+        "description": "Successful response"
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getrfq.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/{id}/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "Get RFQ",
+      "description": "Retrieves an RFQ by its id.",
+      "operationId": "getRFQ",
+      "parameters": [
+       {
+        "name": "id",
+        "in": "path",
+        "description": "The id of the RFQ you wish to retrieve.",
+        "required": true,
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/GetRFQResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "404": {
+        "description": "Not Found",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "RFQ": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteIDNullable"
+       },
+       "created_at": {
+        "$ref": "#/components/schemas/CreatedAtNullable"
+       },
+       "disclosure": {
+        "$ref": "#/components/schemas/Disclosure"
+       },
+       "due_time": {
+        "$ref": "#/components/schemas/DueTimeNullable"
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "ib_id": {
+        "$ref": "#/components/schemas/IntroducingBrokerID"
+       },
+       "id": {
+        "$ref": "#/components/schemas/RFQID"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/ISIN"
+       },
+       "list_id": {
+        "description": "The ID of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List id"
+       },
+       "list_name": {
+        "description": "The name of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List name"
+       },
+       "quote_responses": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuoteResponse"
+        }
+       },
+       "quotes": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuote"
+        }
+       },
+       "risk_group_id": {
+        "$ref": "#/components/schemas/RiskGroupID"
+       },
+       "settlement_date": {
+        "description": "The date on which the trade for this RFQ is to be settled.",
+        "type": "string",
+        "format": "date",
+        "nullable": true,
+        "x-go-type": "date.Date",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/core-api/pkg/date"
+        }
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "skip_fees": {
+        "description": "Whether to skip fees for this RFQ. If true, the quotes will not include fees.",
+        "type": "boolean"
+       },
+       "status": {
+        "$ref": "#/components/schemas/Status"
+       },
+       "type": {
+        "$ref": "#/components/schemas/Type"
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_trader_info": {
+        "$ref": "#/components/schemas/VenueTraderInfo"
+       }
+      },
+      "required": [
+       "id",
+       "client_rfq_id",
+       "contra_quote_id",
+       "ib_id",
+       "risk_group_id",
+       "isin",
+       "type",
+       "side",
+       "amount",
+       "venue_mpid",
+       "disclosure",
+       "expire_time",
+       "due_time",
+       "firm_until_time",
+       "settlement_date",
+       "created_at",
+       "status",
+       "quotes",
+       "quote_responses",
+       "skip_fees"
+      ]
+     },
+     "GetRFQResponse": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQ"
+       },
+       {
+        "type": "object",
+        "required": [
+         "latest_msg_num"
+        ],
+        "properties": {
+         "latest_msg_num": {
+          "description": "The `msg_number` for the most recent RFQ event corresponding to this RFQ. This is a string representation of a 64-bit unsigned integer `YYYYMMDDxxxxxxxxxx`.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuote": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "counter_history": {
+        "description": "History of counter offers for this quote.",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CounterHistory"
+        },
+        "nullable": true
+       },
+       "counterable": {
+        "description": "Whether the quote is counterable.",
+        "type": "boolean",
+        "nullable": true
+       },
+       "counterparty": {
+        "description": "The Market Participant Identifier (MPID) of the counterparty providing the quote.",
+        "type": "string",
+        "nullable": true
+       },
+       "created_at": {
+        "description": "The time at which the quote was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "is_subject": {
+        "description": "Whether the quote is subject rather than firm.",
+        "type": "boolean"
+       },
+       "price": {
+        "$ref": "#/components/schemas/Price"
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "spread_price": {
+        "$ref": "#/components/schemas/SpreadPrice"
+       },
+       "updated_at": {
+        "description": "The time at which the quote was last updated in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_price_type": {
+        "$ref": "#/components/schemas/PriceValueType"
+       },
+       "venue_quote_id": {
+        "description": "The quote ID as provided by the venue.",
+        "type": "string"
+       },
+       "ytm": {
+        "description": "The yield to maturity of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "ytw": {
+        "description": "The yield to worst of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       }
+      },
+      "required": [
+       "venue_quote_id",
+       "side",
+       "amount",
+       "price",
+       "ytw",
+       "ytm",
+       "firm_until_time",
+       "expire_time",
+       "counterparty",
+       "is_subject",
+       "venue_mpid",
+       "created_at",
+       "updated_at"
+      ]
+     },
+     "RFQQuoteResponse": {
+      "type": "object",
+      "properties": {
+       "client_order_id": {
+        "$ref": "#/components/schemas/ClientOrderID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       },
+       "created_at": {
+        "description": "The time at which the quote response was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "id": {
+        "$ref": "#/components/schemas/OrderID"
+       },
+       "status": {
+        "$ref": "#/components/schemas/RFQQuoteResponseStatus"
+       }
+      },
+      "required": [
+       "id",
+       "client_order_id",
+       "contra_quote_id",
+       "status",
+       "created_at"
+      ]
+     },
+     "ClientRFQID": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+     },
+     "ClientOrderID": {
+      "description": "Client-provided unique ID for the order.",
+      "type": "string",
+      "title": "Client Order ID"
+     },
+     "ContraQuoteID": {
+      "description": "The ID of the quote that is being traded against.",
+      "type": "string",
+      "title": "Contra Quote ID"
+     },
+     "ContraQuoteIDNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       }
+      ],
+      "nullable": true
+     },
+     "CreatedAt": {
+      "description": "The time the RFQ was created in RFC-3339 format.",
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "CreatedAtNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/CreatedAt"
+       }
+      ],
+      "nullable": true
+     },
+     "Disclosure": {
+      "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+      "type": "string",
+      "enum": [
+       "disclosed",
+       "anonymous"
+      ],
+      "x-go-type": "rfq.Disclosure",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "DueTime": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "DueTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/DueTime"
+       }
+      ],
+      "nullable": true
+     },
+     "ExpireTime": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ExpireTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ExpireTime"
+       }
+      ],
+      "nullable": true
+     },
+     "FirmUntilTime": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "FirmUntilTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/FirmUntilTime"
+       }
+      ],
+      "nullable": true
+     },
+     "IntroducingBrokerID": {
+      "description": "The ID of the introducing broker placing the RFQ.",
+      "type": "string",
+      "title": "Introducing Broker ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RiskGroupID": {
+      "description": "The ID of the risk group placing the RFQ.",
+      "type": "string",
+      "title": "Risk Group ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "ISIN": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+     },
+     "OrderID": {
+      "description": "Unique, Moment-generated ID for the order.",
+      "type": "string",
+      "example": "01JBFQZXMWZ08XDMTG08P2Z4XT",
+      "title": "Order ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQID": {
+      "description": "Unique, Moment-generated identifier for the RFQ.",
+      "type": "string",
+      "example": "01JGEVEGS2X0EGYP1JK2X16AHV",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQQuoteResponseStatus": {
+      "description": "The status of the quote response.",
+      "type": "string",
+      "enum": [
+       "open",
+       "filled",
+       "canceled",
+       "rejected",
+       "approved"
+      ],
+      "x-go-type": "rfq.QuoteResponseStatus",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Price": {
+      "description": "The price of the RFQ represented as a percentage of par.",
+      "type": "number",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+       "path": "github.com/shopspring/decimal"
+      }
+     },
+     "SpreadPrice": {
+      "description": "The spread price of the RFQ represented as a percentage of par.",
+      "type": "object",
+      "x-go-type": "prices.SpreadPrice",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+      }
+     },
+     "Size": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "description": "The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.",
+        "type": "string",
+        "default": "par",
+        "enum": [
+         "par",
+         "notional"
+        ]
+       },
+       "value": {
+        "description": "The size of the RFQ.",
+        "type": "integer"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ],
+      "x-go-type": "parentorder.Size",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Side": {
+      "description": "Represents which side this RFQ is on:\n- buy (offers wanted)\n- sell (bids wanted)",
+      "type": "string",
+      "enum": [
+       "buy",
+       "sell"
+      ],
+      "x-go-type": "parentorder.Side",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Status": {
+      "type": "string",
+      "enum": [
+       "open",
+       "validating",
+       "order_placed",
+       "rejected",
+       "expired",
+       "canceled",
+       "filled"
+      ],
+      "x-go-type": "rfq.Status",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Type": {
+      "description": "The type of the RFQ.",
+      "type": "string",
+      "enum": [
+       "bin",
+       "asap"
+      ],
+      "x-go-type": "rfq.Type",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "VenueMPID": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+     },
+     "VenueTraderInfo": {
+      "description": "Trader information for a venue.",
+      "x-go-type": "parentorder.VenueTraderInfo",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "CounterType": {
+      "description": "The current status of the counter.\nquoted: original quoted price\ninitiated: counter offer initiated by the client\nnegotiated: counter offer negotiated by dealer to client",
+      "type": "string",
+      "enum": [
+       "quoted",
+       "initiated",
+       "negotiated"
+      ],
+      "x-enum-varnames": [
+       "CounterTypeQuoted",
+       "CounterTypeInitiated",
+       "CounterTypeNegotiated"
+      ]
+     },
+     "CounterHistory": {
+      "description": "History of counter offers for an RFQ quote response.",
+      "type": "object",
+      "properties": {
+       "counter_type": {
+        "$ref": "#/components/schemas/CounterType"
+       },
+       "created_at": {
+        "description": "The time at which the counter was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expires_at": {
+        "description": "The time at which the counter expires in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "price": {
+        "description": "The price of the counter offer represented as a percentage of par.",
+        "type": "number",
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "price_value": {
+        "description": "An object to represent the price value. This can be a percent price, spread price, discount yield, money market yield.",
+        "type": "object",
+        "x-go-type": "prices.Price",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+        }
+       },
+       "quantity": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "quote_response_id": {
+        "description": "The ID of the quote response this counter is associated with.",
+        "type": "string"
+       },
+       "settlement_date": {
+        "description": "The settlement date of the counter quote as a Unix timestamp.",
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+       },
+       "venue_price_type": {
+        "description": "The type of price used by the venue for this quote.",
+        "$ref": "#/components/schemas/PriceValueType"
+       }
+      }
+     },
+     "PriceValueType": {
+      "description": "The method used to represent the price value.",
+      "type": "string",
+      "default": "percent",
+      "enum": [
+       "percent",
+       "discount_yield",
+       "spread",
+       "money_market_yield"
+      ],
+      "title": "Price Value Type",
+      "x-enumNames": [
+       "PriceValueTypePercent",
+       "PriceValueTypeDiscountYield",
+       "PriceValueTypeSpread",
+       "PriceValueTypeMMYield"
+      ]
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/listrfqs.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "RFQ": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteIDNullable"
+       },
+       "created_at": {
+        "$ref": "#/components/schemas/CreatedAtNullable"
+       },
+       "disclosure": {
+        "$ref": "#/components/schemas/Disclosure"
+       },
+       "due_time": {
+        "$ref": "#/components/schemas/DueTimeNullable"
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "ib_id": {
+        "$ref": "#/components/schemas/IntroducingBrokerID"
+       },
+       "id": {
+        "$ref": "#/components/schemas/RFQID"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/ISIN"
+       },
+       "list_id": {
+        "description": "The ID of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List id"
+       },
+       "list_name": {
+        "description": "The name of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List name"
+       },
+       "quote_responses": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuoteResponse"
+        }
+       },
+       "quotes": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuote"
+        }
+       },
+       "risk_group_id": {
+        "$ref": "#/components/schemas/RiskGroupID"
+       },
+       "settlement_date": {
+        "description": "The date on which the trade for this RFQ is to be settled.",
+        "type": "string",
+        "format": "date",
+        "nullable": true,
+        "x-go-type": "date.Date",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/core-api/pkg/date"
+        }
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "skip_fees": {
+        "description": "Whether to skip fees for this RFQ. If true, the quotes will not include fees.",
+        "type": "boolean"
+       },
+       "status": {
+        "$ref": "#/components/schemas/Status"
+       },
+       "type": {
+        "$ref": "#/components/schemas/Type"
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_trader_info": {
+        "$ref": "#/components/schemas/VenueTraderInfo"
+       }
+      },
+      "required": [
+       "id",
+       "client_rfq_id",
+       "contra_quote_id",
+       "ib_id",
+       "risk_group_id",
+       "isin",
+       "type",
+       "side",
+       "amount",
+       "venue_mpid",
+       "disclosure",
+       "expire_time",
+       "due_time",
+       "firm_until_time",
+       "settlement_date",
+       "created_at",
+       "status",
+       "quotes",
+       "quote_responses",
+       "skip_fees"
+      ]
+     },
+     "ListResponse": {
+      "type": "object",
+      "properties": {
+       "data": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/GetRFQResponse"
+        }
+       }
+      },
+      "required": [
+       "data"
+      ]
+     },
+     "GetRFQResponse": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQ"
+       },
+       {
+        "type": "object",
+        "required": [
+         "latest_msg_num"
+        ],
+        "properties": {
+         "latest_msg_num": {
+          "description": "The `msg_number` for the most recent RFQ event corresponding to this RFQ. This is a string representation of a 64-bit unsigned integer `YYYYMMDDxxxxxxxxxx`.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuote": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "counter_history": {
+        "description": "History of counter offers for this quote.",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CounterHistory"
+        },
+        "nullable": true
+       },
+       "counterable": {
+        "description": "Whether the quote is counterable.",
+        "type": "boolean",
+        "nullable": true
+       },
+       "counterparty": {
+        "description": "The Market Participant Identifier (MPID) of the counterparty providing the quote.",
+        "type": "string",
+        "nullable": true
+       },
+       "created_at": {
+        "description": "The time at which the quote was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "is_subject": {
+        "description": "Whether the quote is subject rather than firm.",
+        "type": "boolean"
+       },
+       "price": {
+        "$ref": "#/components/schemas/Price"
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "spread_price": {
+        "$ref": "#/components/schemas/SpreadPrice"
+       },
+       "updated_at": {
+        "description": "The time at which the quote was last updated in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_price_type": {
+        "$ref": "#/components/schemas/PriceValueType"
+       },
+       "venue_quote_id": {
+        "description": "The quote ID as provided by the venue.",
+        "type": "string"
+       },
+       "ytm": {
+        "description": "The yield to maturity of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "ytw": {
+        "description": "The yield to worst of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       }
+      },
+      "required": [
+       "venue_quote_id",
+       "side",
+       "amount",
+       "price",
+       "ytw",
+       "ytm",
+       "firm_until_time",
+       "expire_time",
+       "counterparty",
+       "is_subject",
+       "venue_mpid",
+       "created_at",
+       "updated_at"
+      ]
+     },
+     "RFQQuoteResponse": {
+      "type": "object",
+      "properties": {
+       "client_order_id": {
+        "$ref": "#/components/schemas/ClientOrderID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       },
+       "created_at": {
+        "description": "The time at which the quote response was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "id": {
+        "$ref": "#/components/schemas/OrderID"
+       },
+       "status": {
+        "$ref": "#/components/schemas/RFQQuoteResponseStatus"
+       }
+      },
+      "required": [
+       "id",
+       "client_order_id",
+       "contra_quote_id",
+       "status",
+       "created_at"
+      ]
+     },
+     "ClientRFQID": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+     },
+     "ClientOrderID": {
+      "description": "Client-provided unique ID for the order.",
+      "type": "string",
+      "title": "Client Order ID"
+     },
+     "ContraQuoteID": {
+      "description": "The ID of the quote that is being traded against.",
+      "type": "string",
+      "title": "Contra Quote ID"
+     },
+     "ContraQuoteIDNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       }
+      ],
+      "nullable": true
+     },
+     "CreatedAt": {
+      "description": "The time the RFQ was created in RFC-3339 format.",
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "CreatedAtNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/CreatedAt"
+       }
+      ],
+      "nullable": true
+     },
+     "Disclosure": {
+      "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+      "type": "string",
+      "enum": [
+       "disclosed",
+       "anonymous"
+      ],
+      "x-go-type": "rfq.Disclosure",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "DueTime": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "DueTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/DueTime"
+       }
+      ],
+      "nullable": true
+     },
+     "ExpireTime": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ExpireTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ExpireTime"
+       }
+      ],
+      "nullable": true
+     },
+     "FirmUntilTime": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "FirmUntilTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/FirmUntilTime"
+       }
+      ],
+      "nullable": true
+     },
+     "IntroducingBrokerID": {
+      "description": "The ID of the introducing broker placing the RFQ.",
+      "type": "string",
+      "title": "Introducing Broker ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RiskGroupID": {
+      "description": "The ID of the risk group placing the RFQ.",
+      "type": "string",
+      "title": "Risk Group ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "ISIN": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+     },
+     "OrderID": {
+      "description": "Unique, Moment-generated ID for the order.",
+      "type": "string",
+      "example": "01JBFQZXMWZ08XDMTG08P2Z4XT",
+      "title": "Order ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQID": {
+      "description": "Unique, Moment-generated identifier for the RFQ.",
+      "type": "string",
+      "example": "01JGEVEGS2X0EGYP1JK2X16AHV",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQQuoteResponseStatus": {
+      "description": "The status of the quote response.",
+      "type": "string",
+      "enum": [
+       "open",
+       "filled",
+       "canceled",
+       "rejected",
+       "approved"
+      ],
+      "x-go-type": "rfq.QuoteResponseStatus",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Price": {
+      "description": "The price of the RFQ represented as a percentage of par.",
+      "type": "number",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+       "path": "github.com/shopspring/decimal"
+      }
+     },
+     "SpreadPrice": {
+      "description": "The spread price of the RFQ represented as a percentage of par.",
+      "type": "object",
+      "x-go-type": "prices.SpreadPrice",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+      }
+     },
+     "Size": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "description": "The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.",
+        "type": "string",
+        "default": "par",
+        "enum": [
+         "par",
+         "notional"
+        ]
+       },
+       "value": {
+        "description": "The size of the RFQ.",
+        "type": "integer"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ],
+      "x-go-type": "parentorder.Size",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Side": {
+      "description": "Represents which side this RFQ is on:\n- buy (offers wanted)\n- sell (bids wanted)",
+      "type": "string",
+      "enum": [
+       "buy",
+       "sell"
+      ],
+      "x-go-type": "parentorder.Side",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Status": {
+      "type": "string",
+      "enum": [
+       "open",
+       "validating",
+       "order_placed",
+       "rejected",
+       "expired",
+       "canceled",
+       "filled"
+      ],
+      "x-go-type": "rfq.Status",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Type": {
+      "description": "The type of the RFQ.",
+      "type": "string",
+      "enum": [
+       "bin",
+       "asap"
+      ],
+      "x-go-type": "rfq.Type",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "VenueMPID": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+     },
+     "VenueTraderInfo": {
+      "description": "Trader information for a venue.",
+      "x-go-type": "parentorder.VenueTraderInfo",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "CounterType": {
+      "description": "The current status of the counter.\nquoted: original quoted price\ninitiated: counter offer initiated by the client\nnegotiated: counter offer negotiated by dealer to client",
+      "type": "string",
+      "enum": [
+       "quoted",
+       "initiated",
+       "negotiated"
+      ],
+      "x-enum-varnames": [
+       "CounterTypeQuoted",
+       "CounterTypeInitiated",
+       "CounterTypeNegotiated"
+      ]
+     },
+     "CounterHistory": {
+      "description": "History of counter offers for an RFQ quote response.",
+      "type": "object",
+      "properties": {
+       "counter_type": {
+        "$ref": "#/components/schemas/CounterType"
+       },
+       "created_at": {
+        "description": "The time at which the counter was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expires_at": {
+        "description": "The time at which the counter expires in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "price": {
+        "description": "The price of the counter offer represented as a percentage of par.",
+        "type": "number",
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "price_value": {
+        "description": "An object to represent the price value. This can be a percent price, spread price, discount yield, money market yield.",
+        "type": "object",
+        "x-go-type": "prices.Price",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+        }
+       },
+       "quantity": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "quote_response_id": {
+        "description": "The ID of the quote response this counter is associated with.",
+        "type": "string"
+       },
+       "settlement_date": {
+        "description": "The settlement date of the counter quote as a Unix timestamp.",
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+       },
+       "venue_price_type": {
+        "description": "The type of price used by the venue for this quote.",
+        "$ref": "#/components/schemas/PriceValueType"
+       }
+      }
+     },
+     "PriceValueType": {
+      "description": "The method used to represent the price value.",
+      "type": "string",
+      "default": "percent",
+      "enum": [
+       "percent",
+       "discount_yield",
+       "spread",
+       "money_market_yield"
+      ],
+      "title": "Price Value Type",
+      "x-enumNames": [
+       "PriceValueTypePercent",
+       "PriceValueTypeDiscountYield",
+       "PriceValueTypeSpread",
+       "PriceValueTypeMMYield"
+      ]
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/createrfq.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     },
+     "post": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "Create RFQ",
+      "description": "Creates a new RFQ.",
+      "operationId": "createRFQ",
+      "requestBody": {
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/CreateRFQ"
+         }
+        }
+       },
+       "required": true
+      },
+      "responses": {
+       "201": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/CreateRFQResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "CreateRFQ": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "disclosure": {
+        "$ref": "#/components/schemas/Disclosure"
+       },
+       "due_time": {
+        "$ref": "#/components/schemas/DueTime"
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTime"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTime"
+       },
+       "ib_id": {
+        "description": "The ID of the introducing broker placing the RFQ.",
+        "type": "string",
+        "title": "Introducing Broker ID"
+       },
+       "instrument_id": {
+        "$ref": "#/components/schemas/ISIN"
+       },
+       "moment_order_id": {
+        "description": "When creating an RFQ to trade against an existing order, the identifier of the corresponding order.",
+        "type": "string",
+        "example": "01FJ4B9B2D3H5Y8N0R0X3FQ1Z5",
+        "title": "Moment Order ID",
+        "x-go-type": "ulid.ULID",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+        }
+       },
+       "risk_group_id": {
+        "description": "The ID of the risk group placing the RFQ.",
+        "type": "string",
+        "title": "Risk Group ID"
+       },
+       "settlement_date": {
+        "description": "The date on which the trade for this RFQ is to be settled.",
+        "type": "string",
+        "format": "date",
+        "nullable": true,
+        "x-go-type": "date.Date",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/core-api/pkg/date"
+        }
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "skip_fees": {
+        "description": "Whether to skip fees for this RFQ. If true, the quotes will not include fees.",
+        "type": "boolean"
+       },
+       "type": {
+        "$ref": "#/components/schemas/Type"
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_trader_info": {
+        "$ref": "#/components/schemas/VenueTraderInfo"
+       }
+      },
+      "required": [
+       "ib_id",
+       "risk_group_id",
+       "instrument_id",
+       "type",
+       "side",
+       "amount",
+       "venue_mpid",
+       "disclosure"
+      ]
+     },
+     "CreateRFQResponse": {
+      "type": "object",
+      "properties": {
+       "rfq_id": {
+        "$ref": "#/components/schemas/RFQID"
+       }
+      },
+      "required": [
+       "rfq_id"
+      ]
+     },
+     "ClientRFQID": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+     },
+     "Disclosure": {
+      "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+      "type": "string",
+      "enum": [
+       "disclosed",
+       "anonymous"
+      ],
+      "x-go-type": "rfq.Disclosure",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "DueTime": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ExpireTime": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "FirmUntilTime": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ISIN": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+     },
+     "RFQID": {
+      "description": "Unique, Moment-generated identifier for the RFQ.",
+      "type": "string",
+      "example": "01JGEVEGS2X0EGYP1JK2X16AHV",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "Size": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "description": "The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.",
+        "type": "string",
+        "default": "par",
+        "enum": [
+         "par",
+         "notional"
+        ]
+       },
+       "value": {
+        "description": "The size of the RFQ.",
+        "type": "integer"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ],
+      "x-go-type": "parentorder.Size",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Side": {
+      "description": "Represents which side this RFQ is on:\n- buy (offers wanted)\n- sell (bids wanted)",
+      "type": "string",
+      "enum": [
+       "buy",
+       "sell"
+      ],
+      "x-go-type": "parentorder.Side",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Type": {
+      "description": "The type of the RFQ.",
+      "type": "string",
+      "enum": [
+       "bin",
+       "asap"
+      ],
+      "x-go-type": "rfq.Type",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "VenueMPID": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+     },
+     "VenueTraderInfo": {
+      "description": "Trader information for a venue.",
+      "x-go-type": "parentorder.VenueTraderInfo",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getrfqevents.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/trading/rfq/event/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQ Events",
+      "description": "Retrieves RFQ events for the authenticated organization.",
+      "operationId": "getRFQEvents",
+      "parameters": [
+       {
+        "name": "rfq_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the RFQ to retrieve events for.",
+         "type": "string"
+        }
+       },
+       {
+        "name": "start",
+        "in": "query",
+        "schema": {
+         "description": "The message number to start from (inclusive).",
+         "type": "integer"
+        }
+       },
+       {
+        "name": "end",
+        "in": "query",
+        "schema": {
+         "description": "The message number to end with (inclusive).",
+         "type": "integer"
+        }
+       },
+       {
+        "name": "event_type",
+        "in": "query",
+        "schema": {
+         "description": "Filter events by type.",
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/RFQEventType"
+         }
+        },
+        "explode": false,
+        "style": "form"
+       },
+       {
+        "name": "start_time",
+        "in": "query",
+        "description": "The time from which to start fetching RFQ updates in RFC-3339 format",
+        "required": false,
+        "schema": {
+         "type": "string",
+         "format": "date-time"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/EventsResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "EventsResponse": {
+      "type": "object",
+      "properties": {
+       "data": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/EventResponse"
+        }
+       }
+      },
+      "required": [
+       "data"
+      ]
+     },
+     "EventResponse": {
+      "type": "object",
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/RFQAck"
+       },
+       {
+        "$ref": "#/components/schemas/RFQApprove"
+       },
+       {
+        "$ref": "#/components/schemas/RFQReject"
+       },
+       {
+        "$ref": "#/components/schemas/RFQCancel"
+       },
+       {
+        "$ref": "#/components/schemas/RFQCancelReject"
+       },
+       {
+        "$ref": "#/components/schemas/RFQQuoteUpdate"
+       },
+       {
+        "$ref": "#/components/schemas/RFQExpire"
+       },
+       {
+        "$ref": "#/components/schemas/RFQFill"
+       },
+       {
+        "$ref": "#/components/schemas/RFQQuoteResponseReceive"
+       },
+       {
+        "$ref": "#/components/schemas/RFQQuoteResponseApprove"
+       },
+       {
+        "$ref": "#/components/schemas/RFQQuoteResponseReject"
+       },
+       {
+        "$ref": "#/components/schemas/RFQQuoteResponseCancel"
+       },
+       {
+        "$ref": "#/components/schemas/RFQDueTime"
+       },
+       {
+        "$ref": "#/components/schemas/RFQFirmUntilTime"
+       }
+      ]
+     },
+     "RFQEvent": {
+      "type": "object",
+      "properties": {
+       "event_id": {
+        "$ref": "#/components/schemas/EventID"
+       },
+       "msg_number": {
+        "description": "The msg_number for the event. This is a string representation of a 64-bit unsigned integer YYYYMMDDxxxxxxxxxx where the x's are an incrementing index starting at 0000000000.",
+        "type": "string"
+       }
+      },
+      "required": [
+       "event_id",
+       "msg_number"
+      ]
+     },
+     "RFQEventSummary": {
+      "type": "object",
+      "properties": {
+       "summary": {
+        "$ref": "#/components/schemas/RFQ"
+       }
+      },
+      "required": [
+       "summary"
+      ]
+     },
+     "RFQAck": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQAckEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Ack Event"
+     },
+     "RFQApprove": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQApproveEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Approve Event"
+     },
+     "RFQReject": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQRejectEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Reject Event"
+     },
+     "RFQCancel": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQCancelEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Cancel Event"
+     },
+     "RFQCancelReject": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQCancelRejectEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "system_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Cancel Reject Event"
+     },
+     "RFQQuoteUpdate": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQQuoteUpdateEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Quote Update Event"
+     },
+     "RFQExpire": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQExpireEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Expire Event"
+     },
+     "RFQFill": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQFillEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Fill Event"
+     },
+     "RFQQuoteResponseReceive": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQQuoteResponseReceiveEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Quote Response Receive Event"
+     },
+     "RFQQuoteResponseApprove": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQQuoteResponseApproveEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Quote Response Approve Event"
+     },
+     "RFQQuoteResponseReject": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQQuoteResponseRejectEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Quote Response Reject Event"
+     },
+     "RFQQuoteResponseCancel": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQQuoteResponseCancelEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Quote Response Cancel Event"
+     },
+     "RFQDueTime": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQDueTimeEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Due Time Event"
+     },
+     "RFQFirmUntilTime": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEvent"
+       },
+       {
+        "$ref": "#/components/schemas/RFQEventSummary"
+       },
+       {
+        "type": "object",
+        "required": [
+         "msg_type",
+         "event"
+        ],
+        "properties": {
+         "event": {
+          "$ref": "#/components/schemas/RFQFirmUntilTimeEvent"
+         },
+         "msg_type": {
+          "type": "string",
+          "enum": [
+           "rfq_update"
+          ]
+         }
+        }
+       }
+      ],
+      "title": "RFQ Firm Until Time Event"
+     },
+     "RFQ": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteIDNullable"
+       },
+       "created_at": {
+        "$ref": "#/components/schemas/CreatedAtNullable"
+       },
+       "disclosure": {
+        "$ref": "#/components/schemas/Disclosure"
+       },
+       "due_time": {
+        "$ref": "#/components/schemas/DueTimeNullable"
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "ib_id": {
+        "$ref": "#/components/schemas/IntroducingBrokerID"
+       },
+       "id": {
+        "$ref": "#/components/schemas/RFQID"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/ISIN"
+       },
+       "list_id": {
+        "description": "The ID of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List id"
+       },
+       "list_name": {
+        "description": "The name of the list this RFQ belongs to, if any.",
+        "type": "string",
+        "title": "List name"
+       },
+       "quote_responses": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuoteResponse"
+        }
+       },
+       "quotes": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/RFQQuote"
+        }
+       },
+       "risk_group_id": {
+        "$ref": "#/components/schemas/RiskGroupID"
+       },
+       "settlement_date": {
+        "description": "The date on which the trade for this RFQ is to be settled.",
+        "type": "string",
+        "format": "date",
+        "nullable": true,
+        "x-go-type": "date.Date",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/core-api/pkg/date"
+        }
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "skip_fees": {
+        "description": "Whether to skip fees for this RFQ. If true, the quotes will not include fees.",
+        "type": "boolean"
+       },
+       "status": {
+        "$ref": "#/components/schemas/Status"
+       },
+       "type": {
+        "$ref": "#/components/schemas/Type"
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_trader_info": {
+        "$ref": "#/components/schemas/VenueTraderInfo"
+       }
+      },
+      "required": [
+       "id",
+       "client_rfq_id",
+       "contra_quote_id",
+       "ib_id",
+       "risk_group_id",
+       "isin",
+       "type",
+       "side",
+       "amount",
+       "venue_mpid",
+       "disclosure",
+       "expire_time",
+       "due_time",
+       "firm_until_time",
+       "settlement_date",
+       "created_at",
+       "status",
+       "quotes",
+       "quote_responses",
+       "skip_fees"
+      ]
+     },
+     "RFQQuote": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "counter_history": {
+        "description": "History of counter offers for this quote.",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CounterHistory"
+        },
+        "nullable": true
+       },
+       "counterable": {
+        "description": "Whether the quote is counterable.",
+        "type": "boolean",
+        "nullable": true
+       },
+       "counterparty": {
+        "description": "The Market Participant Identifier (MPID) of the counterparty providing the quote.",
+        "type": "string",
+        "nullable": true
+       },
+       "created_at": {
+        "description": "The time at which the quote was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTimeNullable"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTimeNullable"
+       },
+       "is_subject": {
+        "description": "Whether the quote is subject rather than firm.",
+        "type": "boolean"
+       },
+       "price": {
+        "$ref": "#/components/schemas/Price"
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       },
+       "spread_price": {
+        "$ref": "#/components/schemas/SpreadPrice"
+       },
+       "updated_at": {
+        "description": "The time at which the quote was last updated in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_price_type": {
+        "$ref": "#/components/schemas/PriceValueType"
+       },
+       "venue_quote_id": {
+        "description": "The quote ID as provided by the venue.",
+        "type": "string"
+       },
+       "ytm": {
+        "description": "The yield to maturity of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "ytw": {
+        "description": "The yield to worst of the quote.",
+        "type": "number",
+        "nullable": true,
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       }
+      },
+      "required": [
+       "venue_quote_id",
+       "side",
+       "amount",
+       "price",
+       "ytw",
+       "ytm",
+       "firm_until_time",
+       "expire_time",
+       "counterparty",
+       "is_subject",
+       "venue_mpid",
+       "created_at",
+       "updated_at"
+      ]
+     },
+     "RFQQuoteResponse": {
+      "type": "object",
+      "properties": {
+       "client_order_id": {
+        "$ref": "#/components/schemas/ClientOrderID"
+       },
+       "contra_quote_id": {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       },
+       "created_at": {
+        "description": "The time at which the quote response was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "id": {
+        "$ref": "#/components/schemas/OrderID"
+       },
+       "status": {
+        "$ref": "#/components/schemas/RFQQuoteResponseStatus"
+       }
+      },
+      "required": [
+       "id",
+       "client_order_id",
+       "contra_quote_id",
+       "status",
+       "created_at"
+      ]
+     },
+     "RFQQuoteResponseNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQQuoteResponse"
+       }
+      ],
+      "nullable": true
+     },
+     "EventID": {
+      "description": "A unique identifier for the event.",
+      "type": "string"
+     },
+     "BaseRFQEvent": {
+      "type": "object",
+      "properties": {
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "rfq_id": {
+        "$ref": "#/components/schemas/RFQID"
+       },
+       "time": {
+        "description": "The time at which the event occurred in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time"
+       }
+      },
+      "required": [
+       "time",
+       "rfq_id",
+       "client_rfq_id"
+      ]
+     },
+     "RFQAckEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "ack"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQApproveEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "approve"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQRejectEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "reason"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "reject"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         },
+         "reason": {
+          "description": "The reason for the rejection.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQCancelEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "reason",
+         "cancel_request_id"
+        ],
+        "properties": {
+         "cancel_request_id": {
+          "$ref": "#/components/schemas/CancelRequestID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "cancel"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         },
+         "reason": {
+          "description": "The reason for the cancellation.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQCancelRejectEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "reason",
+         "cancel_request_id"
+        ],
+        "properties": {
+         "cancel_request_id": {
+          "$ref": "#/components/schemas/CancelRequestID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "cancel_reject"
+            ]
+           }
+          ]
+         },
+         "reason": {
+          "description": "The reason for the rejection.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuoteUpdateEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "quote_update"
+            ]
+           }
+          ]
+         },
+         "quotes": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/RFQQuote"
+          }
+         },
+         "venue_update_id": {
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQExpireEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "rfq_expired_at"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "expire"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         },
+         "rfq_expired_at": {
+          "description": "The time at which the RFQ expired in RFC-3339 format.",
+          "type": "string",
+          "format": "date-time"
+         }
+        }
+       }
+      ]
+     },
+     "RFQFillEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "contra_quote_id",
+         "order_id",
+         "client_order_id",
+         "filled_amount",
+         "accrued_interest_cents"
+        ],
+        "properties": {
+         "accrued_interest_cents": {
+          "description": "The cumulative pro-rated coupon payment, including the pro-rated coupon payments of all partial fills, that will be either paid or received when the trade is settled.",
+          "type": "integer"
+         },
+         "client_order_id": {
+          "$ref": "#/components/schemas/ClientOrderID"
+         },
+         "contra_quote_id": {
+          "$ref": "#/components/schemas/ContraQuoteID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "fill"
+            ]
+           }
+          ]
+         },
+         "filled_amount": {
+          "$ref": "#/components/schemas/Size"
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         },
+         "order_id": {
+          "$ref": "#/components/schemas/OrderID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuoteResponseReceiveEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "order_id",
+         "client_order_id",
+         "isin",
+         "price",
+         "amount",
+         "side",
+         "is_counter"
+        ],
+        "properties": {
+         "amount": {
+          "$ref": "#/components/schemas/Size"
+         },
+         "client_order_id": {
+          "$ref": "#/components/schemas/ClientOrderID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "quote_response_receive"
+            ]
+           }
+          ]
+         },
+         "is_counter": {
+          "description": "Indicates whether this is a counter quote response.",
+          "type": "boolean"
+         },
+         "isin": {
+          "$ref": "#/components/schemas/ISIN"
+         },
+         "order_id": {
+          "$ref": "#/components/schemas/OrderID"
+         },
+         "price": {
+          "$ref": "#/components/schemas/Price"
+         },
+         "side": {
+          "$ref": "#/components/schemas/Side"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuoteResponseApproveEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "order_id",
+         "contra_quote_id"
+        ],
+        "properties": {
+         "contra_quote_id": {
+          "$ref": "#/components/schemas/ContraQuoteID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "quote_response_approve"
+            ]
+           }
+          ]
+         },
+         "order_id": {
+          "$ref": "#/components/schemas/OrderID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuoteResponseRejectEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "order_id",
+         "contra_quote_id",
+         "active_quotes",
+         "reason",
+         "active_order"
+        ],
+        "properties": {
+         "active_order": {
+          "$ref": "#/components/schemas/RFQQuoteResponseNullable"
+         },
+         "active_quotes": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/RFQQuote"
+          }
+         },
+         "contra_quote_id": {
+          "$ref": "#/components/schemas/ContraQuoteID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "quote_response_reject"
+            ]
+           }
+          ]
+         },
+         "order_id": {
+          "$ref": "#/components/schemas/OrderID"
+         },
+         "reason": {
+          "description": "The reason for the rejection.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQQuoteResponseCancelEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "order_id",
+         "contra_quote_id",
+         "client_order_id",
+         "reason"
+        ],
+        "properties": {
+         "client_order_id": {
+          "$ref": "#/components/schemas/ClientOrderID"
+         },
+         "contra_quote_id": {
+          "$ref": "#/components/schemas/ContraQuoteID"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "quote_response_cancel"
+            ]
+           }
+          ]
+         },
+         "order_id": {
+          "$ref": "#/components/schemas/OrderID"
+         },
+         "reason": {
+          "description": "The reason for the cancellation.",
+          "type": "string"
+         }
+        }
+       }
+      ]
+     },
+     "RFQDueTimeEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "due_time"
+        ],
+        "properties": {
+         "due_time": {
+          "$ref": "#/components/schemas/DueTime"
+         },
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "due_time"
+            ]
+           }
+          ]
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQFirmUntilTimeEvent": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/BaseRFQEvent"
+       },
+       {
+        "type": "object",
+        "required": [
+         "event_type",
+         "ib_id",
+         "firm_until_time"
+        ],
+        "properties": {
+         "event_type": {
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/RFQEventTypeBase"
+           },
+           {
+            "enum": [
+             "firm_until_time"
+            ]
+           }
+          ]
+         },
+         "firm_until_time": {
+          "$ref": "#/components/schemas/FirmUntilTime"
+         },
+         "ib_id": {
+          "$ref": "#/components/schemas/IntroducingBrokerID"
+         }
+        }
+       }
+      ]
+     },
+     "RFQEventTypeBase": {
+      "description": "The type of the RFQ event.",
+      "type": "string"
+     },
+     "RFQEventType": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/RFQEventTypeBase"
+       },
+       {
+        "enum": [
+         "ack",
+         "approve",
+         "reject",
+         "cancel",
+         "cancel_reject",
+         "quote_update",
+         "expire",
+         "fill",
+         "quote_response_receive",
+         "quote_response_approve",
+         "quote_response_reject",
+         "quote_response_cancel",
+         "due_time",
+         "firm_until_time"
+        ]
+       }
+      ]
+     },
+     "CancelRequestID": {
+      "description": "The ID of the cancel request.",
+      "type": "string",
+      "title": "Cancel Request ID"
+     },
+     "ClientRFQID": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+     },
+     "ClientOrderID": {
+      "description": "Client-provided unique ID for the order.",
+      "type": "string",
+      "title": "Client Order ID"
+     },
+     "ContraQuoteID": {
+      "description": "The ID of the quote that is being traded against.",
+      "type": "string",
+      "title": "Contra Quote ID"
+     },
+     "ContraQuoteIDNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ContraQuoteID"
+       }
+      ],
+      "nullable": true
+     },
+     "CreatedAt": {
+      "description": "The time the RFQ was created in RFC-3339 format.",
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     },
+     "CreatedAtNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/CreatedAt"
+       }
+      ],
+      "nullable": true
+     },
+     "Disclosure": {
+      "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+      "type": "string",
+      "enum": [
+       "disclosed",
+       "anonymous"
+      ],
+      "x-go-type": "rfq.Disclosure",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "DueTime": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "DueTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/DueTime"
+       }
+      ],
+      "nullable": true
+     },
+     "ExpireTime": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ExpireTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ExpireTime"
+       }
+      ],
+      "nullable": true
+     },
+     "FirmUntilTime": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "FirmUntilTimeNullable": {
+      "type": "object",
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/FirmUntilTime"
+       }
+      ],
+      "nullable": true
+     },
+     "IntroducingBrokerID": {
+      "description": "The ID of the introducing broker placing the RFQ.",
+      "type": "string",
+      "title": "Introducing Broker ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RiskGroupID": {
+      "description": "The ID of the risk group placing the RFQ.",
+      "type": "string",
+      "title": "Risk Group ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "ISIN": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+     },
+     "OrderID": {
+      "description": "Unique, Moment-generated ID for the order.",
+      "type": "string",
+      "example": "01JBFQZXMWZ08XDMTG08P2Z4XT",
+      "title": "Order ID",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQID": {
+      "description": "Unique, Moment-generated identifier for the RFQ.",
+      "type": "string",
+      "example": "01JGEVEGS2X0EGYP1JK2X16AHV",
+      "x-go-type": "ulid.ULID",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+      }
+     },
+     "RFQQuoteResponseStatus": {
+      "description": "The status of the quote response.",
+      "type": "string",
+      "enum": [
+       "open",
+       "filled",
+       "canceled",
+       "rejected",
+       "approved"
+      ],
+      "x-go-type": "rfq.QuoteResponseStatus",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Price": {
+      "description": "The price of the RFQ represented as a percentage of par.",
+      "type": "number",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+       "path": "github.com/shopspring/decimal"
+      }
+     },
+     "SpreadPrice": {
+      "description": "The spread price of the RFQ represented as a percentage of par.",
+      "type": "object",
+      "x-go-type": "prices.SpreadPrice",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+      }
+     },
+     "Size": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "description": "The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.",
+        "type": "string",
+        "default": "par",
+        "enum": [
+         "par",
+         "notional"
+        ]
+       },
+       "value": {
+        "description": "The size of the RFQ.",
+        "type": "integer"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ],
+      "x-go-type": "parentorder.Size",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Side": {
+      "description": "Represents which side this RFQ is on:\n- buy (offers wanted)\n- sell (bids wanted)",
+      "type": "string",
+      "enum": [
+       "buy",
+       "sell"
+      ],
+      "x-go-type": "parentorder.Side",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Status": {
+      "type": "string",
+      "enum": [
+       "open",
+       "validating",
+       "order_placed",
+       "rejected",
+       "expired",
+       "canceled",
+       "filled"
+      ],
+      "x-go-type": "rfq.Status",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "Type": {
+      "description": "The type of the RFQ.",
+      "type": "string",
+      "enum": [
+       "bin",
+       "asap"
+      ],
+      "x-go-type": "rfq.Type",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "VenueMPID": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+     },
+     "VenueTraderInfo": {
+      "description": "Trader information for a venue.",
+      "x-go-type": "parentorder.VenueTraderInfo",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "CounterType": {
+      "description": "The current status of the counter.\nquoted: original quoted price\ninitiated: counter offer initiated by the client\nnegotiated: counter offer negotiated by dealer to client",
+      "type": "string",
+      "enum": [
+       "quoted",
+       "initiated",
+       "negotiated"
+      ],
+      "x-enum-varnames": [
+       "CounterTypeQuoted",
+       "CounterTypeInitiated",
+       "CounterTypeNegotiated"
+      ]
+     },
+     "CounterHistory": {
+      "description": "History of counter offers for an RFQ quote response.",
+      "type": "object",
+      "properties": {
+       "counter_type": {
+        "$ref": "#/components/schemas/CounterType"
+       },
+       "created_at": {
+        "description": "The time at which the counter was created in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "expires_at": {
+        "description": "The time at which the counter expires in RFC-3339 format.",
+        "type": "string",
+        "format": "date-time",
+        "nullable": true
+       },
+       "price": {
+        "description": "The price of the counter offer represented as a percentage of par.",
+        "type": "number",
+        "x-go-type": "decimal.Decimal",
+        "x-go-type-import": {
+         "path": "github.com/shopspring/decimal"
+        }
+       },
+       "price_value": {
+        "description": "An object to represent the price value. This can be a percent price, spread price, discount yield, money market yield.",
+        "type": "object",
+        "x-go-type": "prices.Price",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/warren-protobuffett/types/go/prices"
+        }
+       },
+       "quantity": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "quote_response_id": {
+        "description": "The ID of the quote response this counter is associated with.",
+        "type": "string"
+       },
+       "settlement_date": {
+        "description": "The settlement date of the counter quote as a Unix timestamp.",
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+       },
+       "venue_price_type": {
+        "description": "The type of price used by the venue for this quote.",
+        "$ref": "#/components/schemas/PriceValueType"
+       }
+      }
+     },
+     "PriceValueType": {
+      "description": "The method used to represent the price value.",
+      "type": "string",
+      "default": "percent",
+      "enum": [
+       "percent",
+       "discount_yield",
+       "spread",
+       "money_market_yield"
+      ],
+      "title": "Price Value Type",
+      "x-enumNames": [
+       "PriceValueTypePercent",
+       "PriceValueTypeDiscountYield",
+       "PriceValueTypeSpread",
+       "PriceValueTypeMMYield"
+      ]
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/createlistrfq.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "RFQ API",
+    "description": "Moment's RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).\n\nFor complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/trading/rfq/": {
+     "get": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "List RFQs",
+      "description": "Retrieves a list of RFQs for the authenticated organization.",
+      "operationId": "listRFQs",
+      "parameters": [
+       {
+        "name": "client_rfq_id",
+        "in": "query",
+        "schema": {
+         "$ref": "#/components/schemas/ClientRFQID"
+        }
+       },
+       {
+        "name": "ib_id",
+        "in": "query",
+        "schema": {
+         "description": "The ID of the introducing broker placing the RFQ.",
+         "type": "string",
+         "title": "Introducing Broker ID"
+        }
+       },
+       {
+        "name": "status",
+        "in": "query",
+        "description": "A comma-separated list of statuses to filter by.",
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/Status"
+         }
+        },
+        "explode": false,
+        "style": "form",
+        "x-go-name": "Statuses"
+       },
+       {
+        "name": "created_at_start",
+        "in": "query",
+        "description": "The inclusive start of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "created_at_end",
+        "in": "query",
+        "description": "The inclusive end of the created_at time range to filter by.",
+        "schema": {
+         "$ref": "#/components/schemas/CreatedAt"
+        }
+       },
+       {
+        "name": "list_id",
+        "in": "query",
+        "description": "The ID of the list to filter by.",
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/ListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "description": "Standard error response format returned by all API endpoints.",
+           "properties": {
+            "error": {
+             "type": "string",
+             "description": "Human-readable error message describing what went wrong."
+            },
+            "error_details": {
+             "description": "Additional structured information about the error.",
+             "x-go-type": "any",
+             "x-go-type-skip-optional-pointer": true,
+             "x-oapi-codegen-extra-tags": {
+              "exhaustruct": "optional"
+             }
+            },
+            "error_type": {
+             "type": "string",
+             "description": "High-level error category for programmatic error handling.",
+             "enum": [
+              "invalid_request",
+              "not_found",
+              "server_error",
+              "unauthorized",
+              "rate_limited",
+              "forbidden",
+              "closed",
+              "not_implemented"
+             ],
+             "x-enum-varnames": [
+              "ErrorTypeInvalidRequest",
+              "ErrorTypeNotFound",
+              "ErrorTypeServerError",
+              "ErrorTypeUnauthorized",
+              "ErrorTypeRateLimited",
+              "ErrorTypeForbidden",
+              "ErrorTypeNeedsMarketState",
+              "ErrorTypeNotImplemented"
+             ]
+            }
+           },
+           "required": [
+            "error",
+            "error_type"
+           ]
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "/v1/trading/rfq/list/": {
+     "post": {
+      "tags": [
+       "RFQ"
+      ],
+      "summary": "Create List RFQ",
+      "description": "Creates a new list of RFQs.",
+      "operationId": "createListRFQ",
+      "requestBody": {
+       "content": {
+        "application/json": {
+         "schema": {
+          "$ref": "#/components/schemas/CreateRFQList"
+         }
+        }
+       },
+       "required": true
+      },
+      "responses": {
+       "201": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/CreateRFQListResponse"
+          }
+         }
+        }
+       },
+       "400": {
+        "description": "Bad Request",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       },
+       "401": {
+        "description": "Unauthorized",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "CreateRFQListItem": {
+      "type": "object",
+      "properties": {
+       "amount": {
+        "$ref": "#/components/schemas/Size"
+       },
+       "client_rfq_id": {
+        "$ref": "#/components/schemas/ClientRFQID"
+       },
+       "instrument_id": {
+        "$ref": "#/components/schemas/ISIN"
+       },
+       "moment_order_id": {
+        "description": "When creating an RFQ to trade against an existing order, the identifier of the corresponding order.",
+        "type": "string",
+        "example": "01FJ4B9B2D3H5Y8N0R0X3FQ1Z5",
+        "title": "Moment Order ID",
+        "x-go-type": "ulid.ULID",
+        "x-go-type-import": {
+         "path": "github.com/moment-technology/go-shiny/pkg/ulid"
+        }
+       },
+       "side": {
+        "$ref": "#/components/schemas/Side"
+       }
+      },
+      "required": [
+       "client_rfq_id",
+       "instrument_id",
+       "side",
+       "amount"
+      ]
+     },
+     "CreateRFQList": {
+      "type": "object",
+      "properties": {
+       "disclosure": {
+        "$ref": "#/components/schemas/Disclosure"
+       },
+       "due_time": {
+        "$ref": "#/components/schemas/DueTime"
+       },
+       "expire_time": {
+        "$ref": "#/components/schemas/ExpireTime"
+       },
+       "firm_until_time": {
+        "$ref": "#/components/schemas/FirmUntilTime"
+       },
+       "ib_id": {
+        "description": "The ID of the introducing broker placing the RFQ list.",
+        "type": "string",
+        "title": "Introducing Broker ID"
+       },
+       "items": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CreateRFQListItem"
+        }
+       },
+       "list_name": {
+        "description": "The name of this list of RFQs.",
+        "type": "string",
+        "title": "List Name"
+       },
+       "risk_group_id": {
+        "description": "The ID of the risk group placing the RFQ list.",
+        "type": "string",
+        "title": "Risk Group ID"
+       },
+       "skip_fees": {
+        "description": "Whether to skip fees for this RFQ list. If true, the quotes will not include fees.",
+        "type": "boolean"
+       },
+       "type": {
+        "$ref": "#/components/schemas/Type"
+       },
+       "venue_mpid": {
+        "$ref": "#/components/schemas/VenueMPID"
+       },
+       "venue_trader_info": {
+        "$ref": "#/components/schemas/VenueTraderInfo"
+       }
+      },
+      "required": [
+       "list_name",
+       "ib_id",
+       "risk_group_id",
+       "venue_mpid",
+       "type",
+       "disclosure",
+       "items"
+      ]
+     },
+     "CreateRFQListResponse": {
+      "type": "object",
+      "properties": {
+       "list_id": {
+        "description": "The unique identifier for the created list of RFQs.",
+        "type": "string",
+        "title": "List ID"
+       },
+       "list_name": {
+        "description": "The name of the created list of RFQs.",
+        "type": "string",
+        "title": "List Name"
+       }
+      },
+      "required": [
+       "list_id",
+       "list_name"
+      ]
+     },
+     "ClientRFQID": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+     },
+     "Disclosure": {
+      "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+      "type": "string",
+      "enum": [
+       "disclosed",
+       "anonymous"
+      ],
+      "x-go-type": "rfq.Disclosure",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "DueTime": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ExpireTime": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "FirmUntilTime": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+     },
+     "ISIN": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+     },
+     "Size": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "description": "The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.",
+        "type": "string",
+        "default": "par",
+        "enum": [
+         "par",
+         "notional"
+        ]
+       },
+       "value": {
+        "description": "The size of the RFQ.",
+        "type": "integer"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ],
+      "x-go-type": "parentorder.Size",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Side": {
+      "description": "Represents which side this RFQ is on:\n- buy (offers wanted)\n- sell (bids wanted)",
+      "type": "string",
+      "enum": [
+       "buy",
+       "sell"
+      ],
+      "x-go-type": "parentorder.Side",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     },
+     "Type": {
+      "description": "The type of the RFQ.",
+      "type": "string",
+      "enum": [
+       "bin",
+       "asap"
+      ],
+      "x-go-type": "rfq.Type",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/rfq"
+      }
+     },
+     "VenueMPID": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+     },
+     "VenueTraderInfo": {
+      "description": "Trader information for a venue.",
+      "x-go-type": "parentorder.VenueTraderInfo",
+      "x-go-type-import": {
+       "path": "github.com/moment-technology/core-api/pkg/parentorder"
+      }
+     }
+    }
+   },
+   "tags": [
+    {
+     "name": "RFQ"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ }
+]

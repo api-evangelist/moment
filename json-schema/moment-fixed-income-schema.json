@@ -1,0 +1,681 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-fixed-income-schema.json",
+  "title": "FixedIncome",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-refdata-service-api-openapi.yml#/components/schemas/FixedIncome",
+  "type": "object",
+  "properties": {
+    "isin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cusip": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "currency": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sector": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bond_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "issue_size": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "issue_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "issue_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "maturity_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "sp_rating": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "duration": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "coupon": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "coupon_frequency": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_coupon_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "callable": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_call_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "next_call_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "convertible": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "par_value": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "insured": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "accrued_interest": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "municipal_state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "municipal_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "purpose": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "municipal_taxable_federal": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "bank_qualified": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "treasury_subtype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ticker": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "coupon_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "description_short": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sp_rating_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "sinking_fund": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_notification_min": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "call_notification_max": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "call_notification_convention": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "call_frequency": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "is_144a": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "reg_s": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "private_placement": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "daycount": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "first_coupon_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "last_coupon_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "perpetual": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "fdic_insured": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "country_issue": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "country_domicile": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sp_creditwatch": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sp_outlook": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sp_creditwatch_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "sp_outlook_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "close_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "close_ytw": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "close_price_asof": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "liquidity_micro_buy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_micro_sell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_micro_aggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_retail_buy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_retail_sell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_retail_aggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_institutional_buy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_institutional_sell": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "liquidity_institutional_aggregate": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "issue_minimum": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "seniority": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bond_warrant": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "puttable": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "dated_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "settlement_convention": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trace_eligible": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "continuously_callable_flag": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "security_code": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "use_of_proceeds": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "has_extraordinary_call": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "is_amt_applicable": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "is_state_tax_applicable": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "odd_first_coupon": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "odd_last_coupon": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "is_structured_product": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "muni_sector": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "close_ytm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "accrued_interest_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "original_issue_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "original_issue_price": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "original_issue_size": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "workout_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "treasury_benchmark": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "duration_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "naics_sector": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "naics_subsector": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "principal_factor": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "convexity": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "moodys_rating": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "moodys_rating_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "coupon_subtype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "is_pre_refunded": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "amount_outstanding": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "amount_outstanding_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "next_sink_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "issuer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_subtype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

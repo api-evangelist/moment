@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-allocation-template-summary-schema.json",
+  "title": "AllocationTemplateSummary",
+  "description": "Summary representation used by list rows and lineage entries",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-models-api-openapi.yml#/components/schemas/AllocationTemplateSummary",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The ID of the template",
+      "type": "string"
+    },
+    "name": {
+      "description": "The name of the template",
+      "type": "string"
+    },
+    "description": {
+      "description": "The description of the template",
+      "type": "string"
+    },
+    "template_type": {
+      "description": "Whether the template owns its tree or inherits from a base",
+      "type": "string",
+      "enum": [
+        "standalone",
+        "linked"
+      ]
+    },
+    "base_template_id": {
+      "description": "The base template a linked template inherits from",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "base_template_name": {
+      "description": "The base template's name",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "description": "The template's lifecycle status",
+      "type": "string",
+      "enum": [
+        "published",
+        "needs_resolution",
+        "archived"
+      ]
+    },
+    "needs_resolution": {
+      "description": "True when the published overrides no longer validate against the base's current published version",
+      "type": "boolean"
+    },
+    "is_incomplete": {
+      "description": "True when at least one category or strategy in the template has no weight set. An incomplete template can still be the base for linked templates, but it cannot be assigned to accounts until every weight is filled in.",
+      "type": "boolean"
+    },
+    "direct_descendant_count": {
+      "description": "Number of live templates directly linked to this one",
+      "type": "integer"
+    },
+    "current_version_id": {
+      "description": "The ID of the currently published version",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "description": "The user who created the template",
+      "nullable": true,
+      "allOf": [
+        {
+          "$ref": "#/$defs/User"
+        }
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "description": "The user who last updated the template",
+      "nullable": true,
+      "allOf": [
+        {
+          "$ref": "#/$defs/User"
+        }
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "template_type",
+    "base_template_id",
+    "base_template_name",
+    "status",
+    "needs_resolution",
+    "is_incomplete",
+    "direct_descendant_count",
+    "current_version_id",
+    "created_at",
+    "created_by",
+    "updated_at",
+    "updated_by"
+  ],
+  "$defs": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "description": "The display name of the user",
+          "type": "string"
+        },
+        "id": {
+          "description": "The ID of the user",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "display_name"
+      ]
+    }
+  }
+}

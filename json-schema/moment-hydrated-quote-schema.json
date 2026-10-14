@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-hydrated-quote-schema.json",
+  "title": "HydratedQuote",
+  "description": "A hydrated quote with yields and spread prices.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-quotes-api-openapi.yml#/components/schemas/HydratedQuote",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The ID of the quote.",
+      "type": "string"
+    },
+    "percent_price": {
+      "description": "The percent price of the quote.",
+      "type": "number"
+    },
+    "pre_fee_price": {
+      "description": "The pre fee price of the quote.",
+      "type": "number"
+    },
+    "side": {
+      "description": "The side of the quote.",
+      "type": "string",
+      "enum": [
+        "ask",
+        "bid"
+      ]
+    },
+    "spread_benchmark_isin": {
+      "description": "The ISIN of the spread benchmark.",
+      "type": "string"
+    },
+    "spread_to_benchmark_bps": {
+      "description": "The spread to the benchmark in basis points.",
+      "type": "string"
+    },
+    "yield_to_maturity": {
+      "description": "The yield to maturity of the quote.",
+      "type": "number"
+    },
+    "yield_to_worst": {
+      "description": "The yield to worst of the quote.",
+      "type": "number"
+    }
+  },
+  "required": [
+    "id",
+    "percent_price",
+    "side"
+  ]
+}

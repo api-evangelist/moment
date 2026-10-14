@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-customizations-schema.json",
+  "title": "Customizations",
+  "description": "Sleeve customizations, keyed by asset class. Entries live under an asset-class bucket: fixed-income constraints under `fixed_income`. A bare map of entries at the top level (no asset-class bucket) is a legacy shape that is still accepted but is normalized into `fixed_income` on write; new integrations should send the container shape.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-account-management-api-openapi.yml#/components/schemas/Customizations",
+  "type": "object",
+  "additionalProperties": true,
+  "x-go-type": "json.RawMessage",
+  "properties": {
+    "fixed_income": {
+      "type": "object",
+      "description": "Fixed-income constraints, keyed by a caller-supplied entry id (e.g. \"allocation_20260609\"). Each entry is a universe filter or an allocation target.",
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,95 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/moment-account-management-api-openapi.yml
+- openapi/moment-account-management-extended-api-openapi.yml
+- openapi/moment-analytics-api-openapi.yml
+- openapi/moment-data-api-openapi.yml
+- openapi/moment-filter-lists-api-openapi.yml
+- openapi/moment-live-inventory-api-openapi.yml
+- openapi/moment-models-api-openapi.yml
+- openapi/moment-orders-api-openapi.yml
+- openapi/moment-organizations-api-openapi.yml
+- openapi/moment-organizations-roles-users-permissions-apis-openapi.yml
+- openapi/moment-portfolio-optimizer-api-openapi.yml
+- openapi/moment-quotes-api-openapi.yml
+format: custom
+envelope:
+  media_type: application/json
+  schema: APIError
+coverage:
+  operations: 157
+  statuses_declared: 10
+problems:
+- status: 400
+  title: Bad Request
+  description: Bad Request
+  operations: 93
+  media_types:
+  - application/json
+  schema: APIError
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  operations: 32
+  media_types:
+  - application/json
+  schema: APIError
+- status: 403
+  title: Forbidden
+  description: Forbidden - no access to organization
+  operations: 25
+  media_types:
+  - application/json
+  schema: APIError
+- status: 404
+  title: Not Found
+  description: Not Found
+  operations: 62
+  media_types:
+  - application/json
+  schema: APIError
+- status: 409
+  title: Conflict
+  description: A sleeve with the same client_id or name already exists in the account.
+  operations: 14
+  media_types:
+  - application/json
+  schema: APIError
+- status: 412
+  title: Precondition Failed
+  description: 'The account is not in a state that can take this cash raise. `error_type` names which precondition
+    failed:'
+  operations: 2
+  media_types:
+  - application/json
+  schema: APIError
+- status: 422
+  title: Unprocessable Content
+  description: Unprocessable Entity
+  operations: 5
+  media_types:
+  - application/json
+  schema: APIError
+- status: 500
+  title: Internal Server Error
+  description: Internal Server Error
+  operations: 4
+  media_types:
+  - application/json
+  schema: APIError
+- status: 501
+  title: Not Implemented
+  description: Not Implemented
+  operations: 4
+  media_types:
+  - application/json
+  schema: APIError
+- status: 503
+  title: Service Unavailable
+  description: Service Unavailable
+  operations: 4
+  media_types:
+  - application/json
+  schema: schema

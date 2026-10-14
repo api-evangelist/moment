@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-allocation-template-assignment-schema.json",
+  "title": "AllocationTemplateAssignment",
+  "description": "An account's assignment to a published asset allocation template",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-models-api-openapi.yml#/components/schemas/AllocationTemplateAssignment",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The ID of the assignment",
+      "type": "string"
+    },
+    "template_id": {
+      "description": "The assigned template",
+      "type": "string"
+    },
+    "account_id": {
+      "description": "The assigned account",
+      "type": "string"
+    },
+    "household_id": {
+      "description": "Optional household scope",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "assigned_version_id": {
+      "description": "The published template version this assignment resolved against",
+      "type": "string"
+    },
+    "overrides": {
+      "$ref": "#/$defs/AllocationTemplateOverrides"
+    },
+    "materialized_config": {
+      "description": "Resolved effective tree for this account",
+      "$ref": "#/$defs/AllocationTemplateConfig"
+    },
+    "flattened_groups": {
+      "description": "The materialized tree flattened for display, in display order. Served on detail, create, and update responses, and on list responses only when filtered by account_id; absent on unfiltered lists and on legacy rows whose stored config no longer flattens.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AllocationTemplateAssignmentGroup"
+      }
+    },
+    "status": {
+      "$ref": "#/$defs/AllocationTemplateAssignmentStatus"
+    },
+    "parent_organization_id": {
+      "description": "The parent organization that owns the assignment",
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "description": "The user who created the assignment",
+      "nullable": true,
+      "allOf": [
+        {
+          "$ref": "#/$defs/User"
+        }
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "description": "The user who last updated the assignment",
+      "nullable": true,
+      "allOf": [
+        {
+          "$ref": "#/$defs/User"
+        }
+      ]
+    },
+    "revision": {
+      "description": "Counts applied changes; starts at 1 and moves when a change to the overrides is applied. An update sends back the revision it was edited against as expected_revision.",
+      "type": "integer",
+      "format": "int64",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "id",
+    "template_id",
+    "account_id",
+    "household_id",
+    "assigned_version_id",
+    "overrides",
+    "materialized_config",
+    "status",
+    "parent_organization_id",
+    "created_at",
+    "created_by",
+    "updated_at",
+    "updated_by",
+    "revision"
+  ],
+  "$defs": {
+    "AllocationTemplateAssignmentGroup": {
+      "description": "One non-cash node of the materialized tree, flattened for display: relative weights pre-multiplied into an absolute target, in DFS document order (parent before children = display order). Cash nodes are omitted but their weights still shape siblings' absolute targets. A root that directly carries a strategy menu appears as a depth-0 group (empty path, null parent_name and relative_weight).",
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "description": "The node's stable id ('aatn_' ULID), never empty",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name",
+          "type": "string"
+        },
+        "path": {
+          "description": "Node ids from the root down to and including this node, exclusive of the root, so its length is the node's depth",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent_name": {
+          "description": "The parent node's name; null when the parent is the root",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "absolute_target": {
+          "description": "The node's share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        },
+        "relative_weight": {
+          "description": "The node's share of its parent as a percent decimal string (never a number)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slots": {
+          "description": "The expected sleeves under this node: one entry per funded strategy. (node_id, strategy_id) pairs are unique across groups.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateAssignmentSlot"
+          }
+        }
+      },
+      "required": [
+        "node_id",
+        "name",
+        "path",
+        "parent_name",
+        "absolute_target",
+        "relative_weight",
+        "slots"
+      ],
+      "title": "AllocationTemplateAssignmentGroup"
+    },
+    "AllocationTemplateAssignmentSlot": {
+      "description": "One expected sleeve under a group's node, keyed on the account by (node_id, strategy_id)",
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "description": "The funded strategy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "AllocationTemplateAssignmentSlot"
+    },
+    "AllocationTemplateAssignmentStatus": {
+      "description": "Lifecycle status of a template-to-account assignment. assigning, applying and unassigning mean a write to the account is in flight; reading the assignment by id finishes it.",
+      "type": "string",
+      "enum": [
+        "active",
+        "needs_resolution",
+        "assigning",
+        "applying",
+        "unassigning"
+      ],
+      "title": "AllocationTemplateAssignmentStatus"
+    },
+    "AllocationTemplateConfig": {
+      "description": "A fully materialized template tree. The document root is itself a node.",
+      "type": "object",
+      "properties": {
+        "root": {
+          "$ref": "#/$defs/AllocationTemplateNode"
+        }
+      },
+      "required": [
+        "root"
+      ],
+      "title": "AllocationTemplateConfig"
+    },
+    "AllocationTemplateNode": {
+      "description": "A node in the template tree. It holds either child nodes or a strategy menu, never both; cash holds neither. A model_category is a section defined by strategy tags — those tags filter which strategies show up in menus under it, and at least one is required. Ordinary sections and cash must not carry tags.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Stable node id ('aatn_' ULID). Minted server-side for new nodes: omit or send empty on creation, keep it verbatim on later publishes - child overrides are keyed by it.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name; the root node may have an empty name",
+          "type": "string"
+        },
+        "kind": {
+          "description": "What this node is. A node is a free-text section; a model_category is a section defined by strategy tags; cash is the funding buffer.",
+          "type": "string",
+          "enum": [
+            "node",
+            "model_category",
+            "cash"
+          ]
+        },
+        "relative_weight": {
+          "description": "The node's share of its parent as a decimal string (never a number). Null means unset; the root carries an implicit 100% and keeps this null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag_ids": {
+          "description": "Strategy tag ids from the tags service. Required on a model_category (at least one). Must be omitted or empty on ordinary sections and cash. A nested model_category cannot reuse a tag already set by an ancestor.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "children": {
+          "description": "Child nodes; mutually exclusive with strategies",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateNode"
+          }
+        },
+        "strategies": {
+          "description": "The leaf node's strategy menu; mutually exclusive with children",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateStrategyEntry"
+          }
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "AllocationTemplateNode"
+    },
+    "AllocationTemplateOverrides": {
+      "description": "A linked template's delta against its base, keyed by stable node id. Field semantics are tri-state and load-bearing: an absent field inherits from the base, an explicit null is an unset/clear override, a value is an override. Per node: relative_weight/min_weight/max_weight plus a strategies map keyed by strategy id with relative_weight/min_weight/max_weight (value overrides), added (child-added entry), and removed (child-removed base entry). Typed loosely so absent and null survive the wire.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-go-type": "stdjson.RawMessage",
+      "x-go-type-import": {
+        "path": "encoding/json",
+        "name": "stdjson"
+      },
+      "title": "AllocationTemplateOverrides"
+    },
+    "AllocationTemplateStrategyEntry": {
+      "description": "A reference from a leaf node's menu to an existing strategy, with a relative weight. A 0% weight means the strategy is approved for selection but not allocated by default.",
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "description": "The ID of the referenced strategy",
+          "type": "string"
+        },
+        "relative_weight": {
+          "description": "The entry's share of its menu as a decimal string (never a number). Null means unset.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "AllocationTemplateStrategyEntry"
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "description": "The display name of the user",
+          "type": "string"
+        },
+        "id": {
+          "description": "The ID of the user",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "display_name"
+      ]
+    }
+  }
+}

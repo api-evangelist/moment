@@ -1,0 +1,865 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/getmarkupcalculator-1.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Analytics API",
+    "description": "Access Moment's analytical capabilities to understand US fixed income data, through the REST API.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bond Calculator"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ],
+   "paths": {
+    "/v1/analytics/{instrument_id}/markup-calculator/": {
+     "get": {
+      "tags": [
+       "Bond Calculator"
+      ],
+      "summary": "Markup Calculator",
+      "description": "Get markup-adjusted prices and yields for a given instrument and risk group, for each leg of a trade.\n\n- For the `user`: the returned price and yields will be net of all markups (from street to introducing broker, and introducing broker to user).\n\n- For the `ib` (introducing broker): the returned price and yields will be net of the street markup (from street to introducing broker).\n\n- For the `street`: the returned price and yields will not include any of the markups.",
+      "operationId": "getMarkupCalculator",
+      "parameters": [
+       {
+        "name": "instrument_id",
+        "in": "path",
+        "description": "The ID of the instrument for which to calculate markups.",
+        "required": true,
+        "schema": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       },
+       {
+        "name": "price",
+        "in": "query",
+        "description": "The price to calculate markups, represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.",
+        "required": true,
+        "schema": {
+         "type": "number"
+        }
+       },
+       {
+        "name": "risk_group_id",
+        "in": "query",
+        "description": "The ID of the risk group to calculate markups for. If left null, and a single risk group exists for the organization, it will be used as the default risk group. If left null, and more than one risk group exists, the request will fail.",
+        "schema": {
+         "type": "string"
+        }
+       },
+       {
+        "name": "yield_to_worst",
+        "in": "query",
+        "description": "The yield to worst is the lowest possible annual rate of return that a bond can have assuming that it does not default.",
+        "schema": {
+         "type": "number"
+        }
+       },
+       {
+        "name": "side",
+        "in": "query",
+        "required": true,
+        "description": "The side of the trade.\n\n- `buy`\n  Markups will be added (from street to introducing broker, and from introducing broker to user).\n\n- `sell`\n  Markups will be subtracted (from street to introducing broker, and from introducing broker to user).",
+        "schema": {
+         "type": "string",
+         "enum": [
+          "buy",
+          "sell"
+         ]
+        }
+       },
+       {
+        "name": "leg",
+        "in": "query",
+        "required": true,
+        "description": "The leg of the trade, with the given price and yield to worst already accounting for the markups.\n\n- `user`\n  The given price and yield will be net of all markups (from street to introducing broker, and introducing broker to user).\n\n- `ib`\n  The given price and yield will be net of the street markup (from street to introducing broker).\n\n- `street`\n  The given price and yield will not include any of the markups.",
+        "schema": {
+         "type": "string",
+         "enum": [
+          "user",
+          "ib",
+          "street"
+         ]
+        }
+       },
+       {
+        "name": "trade_size",
+        "in": "query",
+        "description": "The trade size of an order in face value. For example, most corporate bonds have a face value of $1000, so a trade_size of $3000 indicates a trade for 3 bonds.",
+        "schema": {
+         "type": "number"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "user": {
+             "$ref": "#/components/schemas/MarkupPriceYield"
+            },
+            "ib": {
+             "$ref": "#/components/schemas/MarkupPriceYield"
+            },
+            "street": {
+             "$ref": "#/components/schemas/MarkupPriceYield"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument CUSIP or ISIN",
+      "example": "US594918AD65"
+     },
+     "MarkupPriceYield": {
+      "type": "object",
+      "title": "Price and yield",
+      "description": "Price and yield including markups.",
+      "properties": {
+       "price": {
+        "type": "number",
+        "description": "Price including markups, represented as a percentage of par."
+       },
+       "yield_to_worst": {
+        "type": "number",
+        "description": "Yield to worst including markups, when available.",
+        "nullable": true
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/pricetoyield-1.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Analytics API",
+    "description": "Access Moment's analytical capabilities to understand US fixed income data, through the REST API.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bond Calculator"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ],
+   "paths": {
+    "/v1/analytics/{instrument_id}/price-to-yield/": {
+     "get": {
+      "tags": [
+       "Bond Calculator"
+      ],
+      "summary": "Price to Yield",
+      "description": "Given a price for an instrument, calculate the yield to maturity and yield to worst at a given time. If a particular value is unavailable, it will be left null in the response.",
+      "operationId": "priceToYield",
+      "parameters": [
+       {
+        "name": "instrument_id",
+        "in": "path",
+        "description": "The ID of the instrument.",
+        "required": true,
+        "schema": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       },
+       {
+        "name": "price",
+        "in": "query",
+        "description": "The price to convert to yields, represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.",
+        "required": true,
+        "schema": {
+         "type": "number"
+        }
+       },
+       {
+        "name": "trade_time",
+        "in": "query",
+        "description": "The time to use when calculating yields from the price, as a Unix millisecond timestamp. If left empty, defaults to the current time.",
+        "required": false,
+        "schema": {
+         "type": "number"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/Yields"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument CUSIP or ISIN",
+      "example": "US594918AD65"
+     },
+     "Yields": {
+      "type": "object",
+      "title": "Yields",
+      "description": "Yield to worst and yield to maturity.",
+      "properties": {
+       "yield_to_worst": {
+        "type": "number",
+        "description": "Yield to worst, when available.",
+        "nullable": true
+       },
+       "yield_to_maturity": {
+        "type": "number",
+        "description": "Yield to maturity, when available.",
+        "nullable": true
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getyieldgrid.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Analytics API",
+    "description": "Access Moment's analytical capabilities to understand US fixed income data, through the REST API.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bond Calculator"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ],
+   "paths": {
+    "/v1/analytics/{instrument_id}/yield-grid/": {
+     "get": {
+      "tags": [
+       "Bond Calculator"
+      ],
+      "summary": "Yield Grid",
+      "description": "Given a range of prices, calculate yield to worst and yield to maturity for a representative sample of prices in the range. If a particular value is unavailable, it will be left null in the response.",
+      "operationId": "getYieldGrid",
+      "parameters": [
+       {
+        "name": "instrument_id",
+        "in": "path",
+        "description": "The ID of the instrument.",
+        "required": true,
+        "schema": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       },
+       {
+        "name": "min_price",
+        "in": "query",
+        "description": "The minimum price to calculate yields for, represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.",
+        "required": true,
+        "schema": {
+         "type": "number"
+        }
+       },
+       {
+        "name": "max_price",
+        "in": "query",
+        "description": "The maximum price to calculate yields for, represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.",
+        "required": true,
+        "schema": {
+         "type": "number"
+        }
+       },
+       {
+        "name": "size",
+        "in": "query",
+        "description": "The target number of points to return in the yield grid. The actual number of points returned may differ from this value.",
+        "required": true,
+        "schema": {
+         "type": "integer"
+        }
+       },
+       {
+        "name": "trade_time",
+        "in": "query",
+        "description": "The time to use when calculating yields from the price, as a Unix millisecond timestamp. If left empty, defaults to the current time.",
+        "required": false,
+        "schema": {
+         "type": "number"
+        }
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response.",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/YieldGrid"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument CUSIP or ISIN",
+      "example": "US594918AD65"
+     },
+     "YieldGrid": {
+      "type": "object",
+      "title": "Yield grid",
+      "description": "Yield to worst and yield to maturity for a range of prices.",
+      "properties": {
+       "price": {
+        "type": "array",
+        "description": "Prices, represented as a percentage of par.",
+        "items": {
+         "type": "number"
+        }
+       },
+       "yield_to_maturity": {
+        "type": "array",
+        "description": "Yield to maturity for each price.",
+        "items": {
+         "type": "number"
+        }
+       },
+       "yield_to_worst": {
+        "type": "array",
+        "description": "Yield to worst for each price, when available.",
+        "items": {
+         "type": "number",
+         "nullable": true
+        }
+       }
+      },
+      "example": {
+       "price": [
+        95,
+        96,
+        97,
+        98,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105
+       ],
+       "yield_to_maturity": [
+        5.989412,
+        5.604612,
+        5.486725,
+        5.219816,
+        4.999049,
+        4.835006,
+        4.525555,
+        4.450205,
+        4.065481,
+        4.065408
+       ],
+       "yield_to_worst": [
+        5.989412,
+        5.604612,
+        5.486725,
+        5.219816,
+        4.999049,
+        4.835006,
+        4.525555,
+        4.450205,
+        4.065481,
+        4.065408
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/postportfoliostats.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Analytics API",
+    "description": "Access Moment's analytical capabilities to understand US fixed income data, through the REST API.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Bond Calculator"
+    }
+   ],
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ],
+   "paths": {
+    "/v1/analytics/portfolio-stats/": {
+     "post": {
+      "tags": [
+       "Bond Calculator"
+      ],
+      "summary": "Portfolio Statistics",
+      "description": "Given the holdings in a portfolio, calculate aggregate statistics for the portfolio. If a particular value is unavailable, it will be left null in the response.",
+      "operationId": "postPortfolioStats",
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "type": "object",
+          "properties": {
+           "holdings": {
+            "$ref": "#/components/schemas/CurrentHoldings"
+           }
+          }
+         }
+        }
+       }
+      },
+      "responses": {
+       "200": {
+        "description": "Successful response.",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/PortfolioStats"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "PortfolioStats": {
+      "type": "object",
+      "title": "Portfolio Statistics",
+      "description": "Aggregate statistics for a portfolio, including the yield to worst and yield to maturity for the portfolio.",
+      "properties": {
+       "yield_to_worst": {
+        "type": "object",
+        "description": "Yield to worst statistics for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "number"
+         },
+         "max": {
+          "type": "number"
+         },
+         "avg": {
+          "type": "number"
+         },
+         "avg_with_cash": {
+          "type": "number"
+         }
+        },
+        "example": {
+         "min": 4.9,
+         "max": 5.1,
+         "avg": 5
+        }
+       },
+       "yield_to_maturity": {
+        "type": "object",
+        "description": "Yield to maturity statistics for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "number"
+         },
+         "max": {
+          "type": "number"
+         },
+         "avg": {
+          "type": "number"
+         },
+         "avg_with_cash": {
+          "type": "number"
+         }
+        },
+        "example": {
+         "min": 4.9,
+         "max": 5.1,
+         "avg": 5
+        }
+       },
+       "sp_rating": {
+        "type": "object",
+        "description": "The S&P rating statistics for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "string",
+          "nullable": true
+         },
+         "max": {
+          "type": "string",
+          "nullable": true
+         },
+         "avg": {
+          "type": "string",
+          "nullable": true
+         }
+        },
+        "example": {
+         "min": "BBB",
+         "max": "AA",
+         "avg": "A"
+        }
+       },
+       "coupon": {
+        "type": "object",
+        "description": "The coupon statistics for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "number"
+         },
+         "max": {
+          "type": "number"
+         },
+         "avg": {
+          "type": "number"
+         }
+        },
+        "example": {
+         "min": 1.25,
+         "max": 9,
+         "avg": 3.75
+        }
+       },
+       "duration": {
+        "type": "object",
+        "description": "The (modified) duration statistics for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "number"
+         },
+         "max": {
+          "type": "number"
+         },
+         "avg": {
+          "type": "number"
+         }
+        },
+        "example": {
+         "min": 1,
+         "max": 5,
+         "avg": 3
+        }
+       },
+       "maturity_years": {
+        "type": "object",
+        "description": "The time to maturity statistics (in years) for the portfolio, when available.",
+        "nullable": true,
+        "properties": {
+         "min": {
+          "type": "number"
+         },
+         "max": {
+          "type": "number"
+         },
+         "avg": {
+          "type": "number"
+         }
+        },
+        "example": {
+         "min": 0.1,
+         "max": 5,
+         "avg": 3
+        }
+       },
+       "cashflows": {
+        "description": "The cashflows for the portfolio, when available. Split into yearly, monthly and all cashflows, as well as by type (coupon or principal). All cashflow amounts are in USD.",
+        "type": "object",
+        "properties": {
+         "yearly": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/CashFlowEvent"
+          },
+          "example": [
+           {
+            "date": "2024-01-01",
+            "payment": 123,
+            "type": "coupon"
+           },
+           {
+            "date": "2024-01-01",
+            "payment": 10000,
+            "type": "principal"
+           },
+           {
+            "date": "2025-01-01",
+            "payment": 222.33,
+            "type": "coupon"
+           },
+           {
+            "date": "2025-01-01",
+            "payment": 10000,
+            "type": "principal"
+           }
+          ]
+         },
+         "monthly": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/CashFlowEvent"
+          },
+          "example": [
+           {
+            "date": "2024-01-01",
+            "payment": 123,
+            "type": "coupon"
+           },
+           {
+            "date": "2024-01-01",
+            "payment": 1000,
+            "type": "principal"
+           },
+           {
+            "date": "2025-02-01",
+            "payment": 222.33,
+            "type": "coupon"
+           },
+           {
+            "date": "2025-02-01",
+            "payment": 1000,
+            "type": "principal"
+           }
+          ]
+         },
+         "all": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/CashFlowEvent"
+          },
+          "example": [
+           {
+            "date": "2024-01-07",
+            "amount": 123,
+            "type": "coupon"
+           },
+           {
+            "date": "2024-01-11",
+            "amount": 10000,
+            "type": "principal"
+           },
+           {
+            "date": "2025-02-22",
+            "amount": 222.33,
+            "type": "coupon"
+           },
+           {
+            "date": "2025-03-01",
+            "amount": 10000,
+            "type": "principal"
+           }
+          ]
+         }
+        }
+       }
+      }
+     },
+     "CashFlowEvent": {
+      "type": "object",
+      "properties": {
+       "date": {
+        "type": "string",
+        "format": "date"
+       },
+       "amount": {
+        "type": "number"
+       },
+       "type": {
+        "type": "string",
+        "enum": [
+         "coupon",
+         "principal"
+        ]
+       }
+      }
+     },
+     "CurrentHoldings": {
+      "type": "array",
+      "title": "Current Holdings",
+      "description": "The portfolio contents, including cash. Cash is specified using an `instrument_id` of `CASH`.",
+      "items": {
+       "$ref": "#/components/schemas/holding"
+      }
+     },
+     "holding": {
+      "type": "object",
+      "title": "Holding",
+      "description": "An individual holding. Cash is specified using an `instrument_id` of `CASH`.",
+      "properties": {
+       "instrument_id": {
+        "$ref": "#/components/schemas/InstrumentID"
+       },
+       "size": {
+        "$ref": "#/components/schemas/PositionSize"
+       }
+      }
+     },
+     "PositionSize": {
+      "type": "object",
+      "title": "Size",
+      "description": "The size of the position, with a specified `type` indicating how the size is represented. Par sizes represent the size of the position in face value; most corporate bonds have a face value of $1000. Currently, only par sizes are supported.",
+      "properties": {
+       "value": {
+        "type": "number",
+        "example": 10000
+       },
+       "type": {
+        "type": "string",
+        "enum": [
+         "par"
+        ],
+        "default": "par"
+       }
+      },
+      "required": [
+       "value",
+       "type"
+      ]
+     },
+     "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument CUSIP or ISIN",
+      "example": "US594918AD65"
+     }
+    }
+   }
+  }
+ }
+]

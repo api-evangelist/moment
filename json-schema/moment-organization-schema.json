@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-organization-schema.json",
+  "title": "Organization",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-organizations-roles-users-permissions-apis-openapi.yml#/components/schemas/Organization",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Organization ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Organization name"
+    },
+    "client_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional client identifier"
+    },
+    "parent_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Parent organization ID for introducing brokers. Note: clearer_id database field serves the same purpose (legacy naming)."
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OrganizationDomain"
+      }
+    },
+    "allowed_ips": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of IP addresses that are allowed to connect to the organization's FIX sessions."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "client_id"
+  ],
+  "$defs": {
+    "OrganizationDomain": {
+      "type": "string",
+      "description": "A domain that is associated with an organization"
+    }
+  }
+}

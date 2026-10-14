@@ -1,0 +1,1791 @@
+openapi: 3.0.0
+info:
+  title: Account Management Extended API
+  version: 1.0.0
+  description: 'Account Management Extended API for managing account metadata and cash raise operations.
+
+    '
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+paths:
+  /v1/account/organizations/{organization_id}/accounts/:
+    get:
+      tags:
+      - Accounts
+      summary: Get accounts within an organization
+      description: Retrieves all accounts within an organization that can be manually assigned to users. Used to populate the account selection modal.
+      operationId: getOrganizationAccounts
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      - name: search
+        in: query
+        description: Search term for first_name or last_name
+        schema:
+          type: string
+      - name: custodian
+        in: query
+        description: Filter by custodian
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationAccount'
+                required:
+                - accounts
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/advisor-codes/:
+    get:
+      tags:
+      - Organization
+      - Advisor Codes
+      summary: Get advisor codes for an organization
+      description: Retrieves advisor codes within an organization with account counts and pagination
+      operationId: getOrganizationAdvisorCodes
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  advisor_codes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrganizationAdvisorCode'
+                required:
+                - advisor_codes
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/advisors/{advisor_id}/accounts/:
+    get:
+      tags:
+      - Advisor
+      - Accounts
+      summary: Get accounts associated with an advisor
+      description: Lists accounts associated with an advisor, paginated
+      operationId: getAdvisorAccounts
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: advisor_id
+        in: path
+        description: Advisor ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdvisorAccount'
+                required:
+                - accounts
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization or advisor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/advisors/{advisor_id}/users/:
+    get:
+      tags:
+      - Advisor
+      - Users
+      summary: Get users associated with an advisor
+      description: Lists users associated with an advisor, paginated
+      operationId: getAdvisorUsers
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: advisor_id
+        in: path
+        description: Advisor ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdvisorUser'
+                required:
+                - users
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization or advisor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/account-counts/:
+    post:
+      tags:
+      - User
+      - Account Counts
+      summary: Get account counts for a list of users
+      description: Get account counts for a list of users
+      operationId: getAccountCounts
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. Supports multiple users. Example: {"user1":["org1","org2"],"user2":["org3"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"],"user_def_456":["org3"]}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - user_ids
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCounts'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/advisor-codes/:
+    post:
+      tags:
+      - User
+      - Advisor Codes
+      summary: Get advisor codes for a list of users
+      description: Get advisor codes for a list of users
+      operationId: getAdvisorCodesBatch
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - user_ids
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvisorCodesBatch'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/access/:
+    get:
+      tags:
+      - User
+      - Access
+      summary: Get user organization account access
+      description: Check if a user has organization-wide access
+      operationId: getUserOrgAccountAccess
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrgWideAccess'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/accounts/:
+    get:
+      tags:
+      - User
+      - Accounts
+      summary: Get accounts for a user
+      description: Get accounts for a user
+      operationId: getAccountsForUser
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. For single-user endpoints, the map must contain exactly one user. Example: {"user_id":["org1","org2"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"]}'
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccounts'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/advisor-codes/:
+    get:
+      tags:
+      - User
+      - Advisor Codes
+      summary: Get advisor codes for a user
+      description: Get advisor codes for a user
+      operationId: getAdvisorCodes
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvisorCodesPerUser'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/manual-accounts/:
+    get:
+      tags:
+      - User
+      - Manual Accounts
+      summary: Get manual account overrides for a user
+      description: Get manual account overrides for a user
+      operationId: getManualAccountOverrides
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManualAccountOverrides'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - User
+      - Manual Accounts
+      summary: Create a manual account override
+      description: Create a manual account override
+      operationId: createManualAccountOverride
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/ManualAccountOverrides'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Manual account overrides created
+                required:
+                - message
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/organization-account-statuses/:
+    get:
+      tags:
+      - User
+      - Accounts
+      summary: Get organization account statuses for a user
+      description: Get organization account statuses for a user
+      operationId: getOrganizationAccountStatusesForUser
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. For single-user endpoints, the map must contain exactly one user. Example: {"user_id":["org1","org2"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"]}'
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      - name: search
+        in: query
+        description: Search term for account name
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationAccountWithStatuses'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/cash-raise/:
+    get:
+      tags:
+      - Cash Raises
+      summary: Get all cash raises for an account
+      description: Retrieve all cash raises associated with the specified account, including historical records.
+      operationId: getCashRaises
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Account not found or no access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - Cash Raises
+      summary: Create a new cash raise
+      description: Submit a cash raise request for a particular account.
+      operationId: createCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requested_amount:
+                  description: The size of the cash raise. Provide exactly one of requested_amount or liquidation_request; sending both, or neither, is rejected with a 400.
+                  $ref: '#/components/schemas/CentAmount'
+                target_date:
+                  description: The date by which the requested quantity of cash should be available for withdrawal.
+                  type: string
+                  format: date
+                annotation:
+                  description: A note about the request.
+                  type: string
+                  nullable: true
+                effective_at:
+                  description: The planned activation date of the cash raise. Must not be in the past. Defaults to today when omitted.
+                  type: string
+                  format: date
+                  nullable: true
+                liquidation_request:
+                  description: When true, the cash raise liquidates all available cash in the account rather than raising a fixed requested amount. Provide exactly one of requested_amount or liquidation_request; sending both, or neither, is rejected with a 400. Cash raises already open do not block it; they rank ahead of it and are paid first, and those not yet activated stay unactivated until the liquidation is resolved. While it is open, any new cash raise is refused — see the 412 response. Defaults to false.
+                  type: boolean
+                activation_lead_days:
+                  description: Plans activation the given number of business days before target_date, stamping the planned activation date as effective_at (the "Activate N days before due date" field, shared with recurring schedules). Mutually exclusive with effective_at. A plan whose date has already arrived activates on creation.
+                  type: integer
+                  minimum: 0
+                  maximum: 60
+                  nullable: true
+              required:
+              - target_date
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '412':
+          description: 'The account is not in a state that can take this cash raise. `error_type` names which precondition failed:
+
+
+            * `open_liquidation`: the account has an open liquidation, which claims all of its cash. Cancel it before creating another cash raise — a second liquidation included.
+
+            * `no_funding_sleeve`, `sleeve_unresolved`, `market_values_unavailable`, `no_sellable_sleeves`: the account''s sleeve setup or pricing cannot support the raise.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/cash-raise/{cash_raise_id}/:
+    patch:
+      tags:
+      - Cash Raises
+      summary: Update a cash raise
+      description: Update a cash raise. Completed, canceled, and liquidation cash raises cannot be modified.
+      operationId: updateCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requested_amount:
+                  description: The new size of the cash raise.
+                  $ref: '#/components/schemas/CentAmount'
+                target_date:
+                  description: 'The date by which the requested quantity of cash should be
+
+                    available for withdrawal. On a raise with a planned
+
+                    activation date (a schedule-generated instance or an
+
+                    activation-lead one-off), moving target_date re-anchors
+
+                    the plan to keep the same business-day lead; a plan that
+
+                    has already arrived activates immediately.
+
+                    '
+                  type: string
+                  format: date
+                annotation:
+                  description: A note about the request.
+                  type: string
+                  nullable: true
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request - bad input, non-pending cash raise, or missing user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '412':
+          description: 'The account has no funding sleeve (`no_funding_sleeve`). A raise
+
+            drawing from several sleeves at once restates its split on an amount
+
+            edit, which adds two: live market values were unreadable
+
+            (`market_values_unavailable`) and the account holds no sellable
+
+            managed sleeve (`no_sellable_sleeves`). The account has an open
+
+            liquidation (`open_liquidation`): an amount edit is refused until
+
+            the liquidation completes or is canceled.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    delete:
+      tags:
+      - Cash Raises
+      summary: Cancel a cash raise
+      description: Cancel an existing cash raise. Cash raises that have already been completed or canceled cannot be canceled again.
+      operationId: cancelCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Cash raise cannot be canceled or missing user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    get:
+      tags:
+      - Cash Raises
+      summary: Get a cash raise by ID
+      description: Retrieve a single cash raise by its ID, scoped to the specified account.
+      operationId: getCashRaiseById
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/cash-raise/{cash_raise_id}/complete/:
+    post:
+      tags:
+      - Cash Raises
+      summary: Mark a cash raise as complete
+      description: Mark a cash raise as successfully completed. Only pending cash raises can be completed.
+      operationId: completeCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/extra/:
+    patch:
+      tags:
+      - Metadata
+      summary: Update account metadata
+      description: 'Update account metadata for a specific account. This endpoint allows you to:
+
+        - Add new metadata keys
+
+        - Update existing metadata values
+
+        - Delete keys by setting them to an empty string ("")
+
+        '
+      operationId: updateAccountMetadata
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountMetadata'
+        required: true
+      responses:
+        '200':
+          description: Updated account metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountMetadata'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/projected-cash/:
+    get:
+      tags:
+      - Projected Cash
+      summary: Get projected cash for an account
+      description: "Projects an account's cash forward over upcoming dates, starting from the\nsettled cash balance and applying every known future cash event in date\norder. Answers \"will cash be available on date X\".\n\nThe timeline combines five kinds of event:\n\n- **Live holds** — cash already reserved against the account (open orders,\n  cash raises), dated today.\n- **Committed cash raises**: raises that will be funded but are not\n  reserved yet, including every instance a recurring schedule has\n  generated, each dated on the day it will be activated. A raise moves\n  from this kind to a live hold on that date without changing the\n  projected total. Only present for organizations where committed\n  cash-raise projection is enabled; contact Moment to have it enabled.\n  Where it is off, a raise reaches the timeline only once it is\n  activated, and every other kind of row is unaffected.\n- **Unsettled trades** — each executed-but-unsettled trade appears\n  **twice**: a `pending_buy`\
+        \ / `pending_sell` row on its trade date that\n  lands in the unsettled bucket, and a `buy` / `sell` row on its\n  settlement date that moves the same amount from unsettled into settled.\n  The second row does not change `running_total`.\n- **Fixed-income cashflows** — `coupon` and `maturity` rows for bonds held\n  in the account.\n- **Dividends** — `dividend` rows, for organizations where dividend\n  projection is enabled. Contact Moment to have it enabled.\n\nEach row carries the running `unsettled` and `settled` bucket balances\nafter that event is applied; `running_total` is always their sum and is the\nprojected total cash as of that row's date.\n\n**Projection window.** Coupon, maturity, and dividend rows extend roughly\n180 days forward, and a recurring cash raise's instances roughly 365 days\nforward. A schedule running past that has occurrences it has not\ngenerated yet, so they do not appear. Holds and unsettled trades are\nalways complete. Absence of a row beyond those\
+        \ windows does not mean no\nevent is due.\n\n**Best-effort cashflows.** Coupon, maturity, and dividend rows come from an\nupstream service. If that service is unavailable the endpoint still returns\n`200` with the holds and trade rows, and the cashflow rows are simply\nabsent — the response does not currently distinguish \"no cashflows due\"\nfrom \"cashflows could not be retrieved\". Holds and unsettled trades are\nalways complete and are unaffected.\n\nAn account with no cash and no activity returns `200` with a zero\n`settled_cash` and an empty `projections` list, not a `404`.\n"
+      operationId: getProjectedCash
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectedCashResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/cash-raise/resolve:
+    post:
+      tags:
+      - Cash Raises
+      summary: Resolve active cash raises after custodian withdrawals
+      description: 'Marks every active, non-liquidation cash raise on each requested account
+
+        as completed after the custodian has already withdrawn the cash. The
+
+        operation does not book another cash withdrawal.
+
+
+        The request is one atomic action page of at most 500 accounts. Accounts
+
+        without an active fixed-amount raise are left unchanged, as are
+
+        liquidation raises and unactivated sleeve-scoped raises.
+
+        '
+      operationId: resolveCashRaises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashRaiseResolveRequest'
+        required: true
+      responses:
+        '204':
+          description: Every requested account was processed; eligible cash raises were resolved
+        '400':
+          description: Invalid request body or an empty account_ids list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: One or more accounts are outside the caller's organization scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '500':
+          description: Internal error; refresh account state before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    OrganizationAccount:
+      type: object
+      properties:
+        advisor_codes:
+          description: List of advisor codes associated with the account
+          type: array
+          items:
+            type: string
+        custodian:
+          description: Name of the custodian holding the account
+          type: string
+        moment_account_id:
+          description: Moment's unique identifier for the account
+          type: string
+        name:
+          description: Name associated with the account
+          type: string
+      required:
+      - moment_account_id
+      - custodian
+      - advisor_codes
+      - name
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    DecimalString:
+      type: string
+      title: DecimalString
+      description: An exact decimal amount, serialized as a string to preserve precision.
+      example: '12500.00'
+    ProjectedCashResponse:
+      type: object
+      description: An account's settled cash baseline plus its projected cash timeline.
+      properties:
+        settled_cash:
+          description: The account's current settled cash balance, the baseline the projection starts from.
+          $ref: '#/components/schemas/DecimalString'
+        currency_code:
+          description: ISO 4217 currency code for every amount in the response.
+          type: string
+          example: USD
+        projections:
+          description: 'Cash events in date order. Empty for an account with no holds, no
+
+            committed cash raises, no unsettled trades, and no upcoming
+
+            cashflows.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectedCashProjection'
+      required:
+      - settled_cash
+      - currency_code
+      - projections
+    ProjectedCashProjection:
+      type: object
+      description: A single cash event on the projected-cash timeline.
+      properties:
+        type:
+          description: "The kind of cash event:\n\n- `pending`: committed cash whose instrument and side are not\n  known. Either a live hold (for example an activated cash raise),\n  or, only for organizations where committed cash-raise projection\n  is enabled, a cash raise that is committed but not yet activated,\n  dated on the day its hold will be placed. Both carry\n  `holder_type: cash_raise`; a client that treats them alike sees\n  the same cash reduction before and after activation.\n- `pending_buy` / `pending_sell` — an executed-but-unsettled trade on\n  its trade date, or a live order hold. The amount lands in the\n  unsettled bucket.\n- `buy` / `sell` — the settled leg of the same trade on its settlement\n  date, moving the amount from unsettled into settled. Does not change\n  `running_total`.\n- `coupon` — a bond coupon payment.\n- `maturity` — a bond principal repayment.\n- `dividend` — a dividend payment. Only present for organizations\n  where dividend projection is enabled.\n"
+          type: string
+          enum:
+          - pending
+          - pending_buy
+          - pending_sell
+          - buy
+          - sell
+          - coupon
+          - dividend
+          - maturity
+        reason:
+          description: 'Human-readable description of the event, intended for display. Where
+
+            the security is known this is its description (for example
+
+            `T 4.5% 05/12/31` for a bond, `AAPL` for an equity). Free text — do
+
+            not parse it; use `type`, `holder_type`, and `instrument_id` to
+
+            classify a row.
+
+            '
+          type: string
+          example: T 4.5% 05/12/31
+        instrument_id:
+          description: "The security this event relates to, when known. Always check for null\nbefore using it:\n\n- Null on holds that do not identify an instrument.\n- Usually populated on coupon, maturity, and dividend rows, but null\n  when the upstream cashflow data carries no per-instrument\n  attribution. The row's date and amount are still accurate; only the\n  security is unattributed.\n"
+          type: string
+          nullable: true
+        side:
+          description: 'Trade direction on trade-derived rows. Null on instrumentless commitments and on
+
+            coupon, maturity, and dividend rows — which is the majority of rows.
+
+            '
+          type: string
+          nullable: true
+          enum:
+          - BUY
+          - SELL
+          - null
+        holder_type:
+          description: 'Present only on rows where something holds or has committed the
+
+            cash. Null on every other row; use this to distinguish commitments
+
+            from pending trade legs.
+
+
+            - `order` / `allocation` — a buying-power hold keyed by order or allocation.
+
+            - `cash_raise`: a cash raise before or after activation.
+
+            - `sleeve_realignment` — a sleeve realignment funding its target sleeves.
+
+            '
+          type: string
+          nullable: true
+          example: order
+          enum:
+          - order
+          - allocation
+          - cash_raise
+          - sleeve_realignment
+          - null
+        holder_id:
+          description: Identifier of the entity responsible for a commitment. Null on every other row.
+          type: string
+          nullable: true
+        date:
+          description: 'The date this event lands on the timeline, `YYYY-MM-DD`. Live holds
+
+            are dated today. A cash raise awaiting activation is dated on the
+
+            day it is scheduled to activate, which can be months out for a
+
+            recurring schedule. A raise with no scheduled activation, such as one
+
+            waiting on a manual activation, is dated on its due date instead,
+
+            the only day it commits to. Either date, once past, lands on today.
+
+            Trade legs are dated on their trade and settlement dates; cashflows
+
+            on their payment date.
+
+            '
+          type: string
+          format: date
+        amount:
+          description: The signed amount of this event. Negative reduces cash.
+          $ref: '#/components/schemas/DecimalString'
+        unsettled:
+          description: Running unsettled-cash balance after this event is applied.
+          $ref: '#/components/schemas/DecimalString'
+        settled:
+          description: Running settled-cash balance after this event is applied, starting from `settled_cash`.
+          $ref: '#/components/schemas/DecimalString'
+        running_total:
+          description: 'Projected total cash as of this row''s date. Always the sum of
+
+            `unsettled` and `settled`.
+
+            '
+          $ref: '#/components/schemas/DecimalString'
+      required:
+      - type
+      - reason
+      - instrument_id
+      - side
+      - holder_type
+      - holder_id
+      - date
+      - amount
+      - unsettled
+      - settled
+      - running_total
+    AccountMetadata:
+      type: object
+    Decimal:
+      type: number
+      format: double
+      title: Decimal
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    CashRaise:
+      type: object
+      properties:
+        annotation:
+          description: Optional annotation or note about the cash raise request.
+          type: string
+          nullable: true
+        cancel_reason:
+          description: 'The machine-set reason a canceled raise was canceled. Null on a user/manual cancel and on non-canceled raises.
+
+            * superseded_by_edit: replaced by an instance regenerated after a schedule edit.
+
+            * detached_to_one_off: replaced by the standalone one-off created by a "this one" edit.
+
+            * reconciled_orphan: canceled by reconciliation as an un-activated instance off its schedule''s cadence.
+
+            * schedule_deleted: canceled because its owning schedule was deleted.
+
+            * claimed_by_predecessor: a placeholder held by a schedule created by a "this and future" edit, for an occurrence whose raise still belongs to the schedule it replaced. Never funds.'
+          type: string
+          enum:
+          - superseded_by_edit
+          - detached_to_one_off
+          - reconciled_orphan
+          - schedule_deleted
+          - claimed_by_predecessor
+          nullable: true
+        completed_at:
+          description: The time at which the cash was withdrawn or the cash raise was canceled.
+          type: string
+          format: date-time
+          nullable: true
+        completed_by:
+          description: The user who marked the cash raise as complete or canceled.
+          type: string
+          nullable: true
+        activated_at:
+          description: The date and time at which the cash raise's activation executed and its reservation was created. Null until then.
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          description: The date and time when the cash raise was created.
+          type: string
+          format: date-time
+        created_by:
+          description: The advisor who created the cash raise request.
+          type: string
+        effective_at:
+          description: The planned or actual activation date of the cash raise. Null when un-activated with no planned date.
+          type: string
+          format: date
+          nullable: true
+        id:
+          description: The unique identifier of the cash raise.
+          type: string
+        liquidation_request:
+          description: When true, the cash raise liquidates all available cash in the account rather than raising a fixed requested amount.
+          type: boolean
+        occurrence_date:
+          description: The nominal cadence date of a schedule-generated raise, set together with schedule_id. Null on one-offs.
+          type: string
+          format: date
+          nullable: true
+        raised_amount:
+          description: The amount of cash that has been withdrawn. This will be zero until the cash raise is complete.
+          $ref: '#/components/schemas/Decimal'
+        request_type:
+          description: 'How the raise was created.
+
+            * ONE_TIME: a manual one-off raise.
+
+            * RECURRING: an instance generated by a recurring schedule.
+
+            * LIQUIDATION: a raise that liquidates all available cash (liquidation_request is true).'
+          type: string
+          enum:
+          - ONE_TIME
+          - RECURRING
+          - LIQUIDATION
+        requested_amount:
+          description: The amount of cash requested to be raised. 0 for liquidation raises (liquidation_request is true) — a liquidation has no fixed target.
+          $ref: '#/components/schemas/Decimal'
+        schedule_id:
+          description: The recurring schedule that generated this raise. Null on a manual one-off.
+          type: string
+          nullable: true
+        settled_cash:
+          description: The amount of cash that is currently reserved for the cash raise. For complete and canceled cash raises, this will be zero.
+          $ref: '#/components/schemas/Decimal'
+        status:
+          description: 'The current status of the cash raise.
+
+            * pending: The cash raise is active and in progress.
+
+            * ready_to_withdraw: The entire requested amount of cash is available for withdrawal in the account.
+
+            * cash_withdrawn: The cash has been withdrawn from the account.
+
+            * past_due: The cash raise is still pending (not enough cash is available yet) and its target date is in the past. A raise with enough cash available is reported as ready_to_withdraw even after its target date has passed.
+
+            * canceled: The cash raise has been canceled.
+
+            * pending_activation: The cash raise has not been activated yet, so no cash has been reserved or moved for it. Sleeve-scoped (DoD) accounts only.
+
+            * not_ready: The cash raise is activated but its cash is not available yet — either the account has a funding violation, or earlier-due raises still claim the available cash. Sleeve-scoped (DoD) accounts only.
+
+            * future: The cash raise has a planned activation date in the future and has not been activated. Sleeve-scoped (DoD) accounts only.'
+          type: string
+          enum:
+          - pending
+          - ready_to_withdraw
+          - cash_withdrawn
+          - past_due
+          - canceled
+          - pending_activation
+          - not_ready
+          - future
+        target_date:
+          description: The target date by which the cash should be raised.
+          type: string
+          format: date
+        unsettled_cash:
+          description: The amount of unsettled cash in the account. For complete and canceled cash raises, this will be zero.
+          $ref: '#/components/schemas/Decimal'
+        updated_at:
+          description: The date and time when the cash raise was last updated.
+          type: string
+          format: date-time
+      required:
+      - id
+      - requested_amount
+      - settled_cash
+      - unsettled_cash
+      - raised_amount
+      - status
+      - target_date
+      - created_at
+      - updated_at
+      - created_by
+      - liquidation_request
+      - request_type
+    CentAmount:
+      type: number
+      format: double
+      multipleOf: 0.01
+      title: CentAmount
+      description: A decimal monetary amount exactly representable in cents.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    CashRaiseResolveRequest:
+      type: object
+      properties:
+        account_ids:
+          description: Account IDs whose active cash raises should be resolved. Duplicate IDs are processed once.
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: string
+      required:
+      - account_ids
+    AdvisorCodes:
+      description: Advisor codes mapped by custodian ID (e.g., cust_fidelity, cust_schwab, cust_pershing)
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+        description: Array of advisor codes for this custodian
+    AdvisorCodesPerUser:
+      type: object
+      properties:
+        advisor_codes:
+          $ref: '#/components/schemas/AdvisorCodes'
+        user_id:
+          description: The user ID.
+          type: string
+      required:
+      - user_id
+      - advisor_codes
+    AccountCounts:
+      type: object
+      properties:
+        counts:
+          description: Map of user_id to integer count
+          type: object
+          additionalProperties:
+            type: integer
+      example:
+        counts:
+          user_abc_123: 42
+          user_def_456: 15
+          user_ghi_789: 112
+      required:
+      - counts
+    UserAccount:
+      type: object
+      properties:
+        account_name:
+          description: The name of the account.
+          type: string
+        advisor_codes:
+          description: The advisor codes associated with the account.
+          type: array
+          items:
+            type: string
+        custodian:
+          description: The custodian of the account.
+          type: string
+      required:
+      - custodian
+      - account_name
+      - advisor_codes
+    UserAccounts:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAccount'
+      required:
+      - accounts
+    ManualAccountOverride:
+      type: object
+      properties:
+        account_id:
+          description: The account ID.
+          type: string
+        status:
+          description: The status of the override.
+          type: string
+          enum:
+          - allow
+          - deny
+          - inherit
+      required:
+      - account_id
+      - status
+    ManualAccountOverrides:
+      type: object
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManualAccountOverride'
+      required:
+      - overrides
+    AdvisorCodesBatch:
+      type: object
+      properties:
+        advisor_codes:
+          description: Map of user_id to their advisor codes
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AdvisorCodesPerUser'
+      required:
+      - advisor_codes
+    OrganizationAccountWithStatus:
+      allOf:
+      - $ref: '#/components/schemas/OrganizationAccount'
+      - type: object
+        properties:
+          status:
+            description: The status of the account
+            type: string
+            enum:
+            - allow
+            - deny
+            - inherit
+        required:
+        - status
+    OrganizationAccountWithStatuses:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationAccountWithStatus'
+      required:
+      - accounts
+    UserOrgWideAccess:
+      type: object
+      properties:
+        has_org_wide_access:
+          description: Indicates whether the user has organization-wide access
+          type: boolean
+      required:
+      - has_org_wide_access
+    OrganizationAdvisorCode:
+      type: object
+      properties:
+        account_count:
+          description: Number of accounts for this advisor code
+          type: integer
+        advisor_code:
+          description: The advisor code
+          type: string
+        custodian:
+          description: Name of the custodian
+          type: string
+      required:
+      - custodian
+      - advisor_code
+      - account_count
+    AdvisorUser:
+      type: object
+      properties:
+        user_id:
+          description: The user ID
+          type: string
+      required:
+      - user_id
+    AdvisorAccount:
+      type: object
+      properties:
+        account_id:
+          description: The account ID
+          type: string
+        account_name:
+          description: The account name
+          type: string
+        custodian:
+          description: The custodian
+          type: string
+      required:
+      - account_id
+      - account_name
+      - custodian
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/cancelcashraise.md
+  - https://docs.moment.com/reference/completecashraise.md
+  - https://docs.moment.com/reference/createcashraise.md
+  - https://docs.moment.com/reference/createmanualaccountoverride.md
+  - https://docs.moment.com/reference/getaccountcounts.md
+  - https://docs.moment.com/reference/getaccountsforuser.md
+  - https://docs.moment.com/reference/getadvisoraccounts.md
+  - https://docs.moment.com/reference/getadvisorcodes.md
+  - https://docs.moment.com/reference/getadvisorcodesbatch.md
+  - https://docs.moment.com/reference/getadvisorusers.md
+  - https://docs.moment.com/reference/getcashraisebyid.md
+  - https://docs.moment.com/reference/getcashraises.md
+  - https://docs.moment.com/reference/getmanualaccountoverrides.md
+  - https://docs.moment.com/reference/getorganizationaccounts.md
+  - https://docs.moment.com/reference/getorganizationaccountstatusesforuser.md
+  - https://docs.moment.com/reference/getorganizationadvisorcodes.md
+  - https://docs.moment.com/reference/getprojectedcash.md
+  - https://docs.moment.com/reference/getuserorgaccountaccess.md
+  - https://docs.moment.com/reference/resolvecashraises.md
+  - https://docs.moment.com/reference/updateaccountmetadata.md
+  - https://docs.moment.com/reference/updatecashraise.md
+  merge:
+    pages: 21
+    deduped: 56
+    conflicts_kept_first: 0

@@ -1,0 +1,423 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-allocation-template-assignment-preview-schema.json",
+  "title": "AllocationTemplateAssignmentPreview",
+  "description": "What an update with the candidate overrides would do, computed without writing anything. The sleeve plan is the one the update would send to accounts if nothing changes in between.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-models-api-openapi.yml#/components/schemas/AllocationTemplateAssignmentPreview",
+  "type": "object",
+  "properties": {
+    "revision": {
+      "description": "The assignment revision the preview was computed against",
+      "type": "integer",
+      "format": "int64",
+      "minimum": 1
+    },
+    "assigned_version_id": {
+      "description": "The published template version the overrides resolve against",
+      "type": "string"
+    },
+    "materialized_config": {
+      "description": "The resolved effective tree the update would store",
+      "$ref": "#/$defs/AllocationTemplateConfig"
+    },
+    "flattened_groups": {
+      "description": "The resolved tree flattened for display, as on the assignment",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AllocationTemplateAssignmentGroup"
+      }
+    },
+    "sleeve_plan": {
+      "description": "What the update would do with each funded slot, in flattened_groups order",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/AllocationTemplateAssignmentPlannedSleeve"
+      }
+    },
+    "transitioning_sleeve_ids": {
+      "description": "Every sleeve the update would leave marked transitioning (winding down at zero target). A set, as on the update response.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cash": {
+      "$ref": "#/$defs/AllocationTemplateAssignmentCashPlan"
+    }
+  },
+  "required": [
+    "revision",
+    "assigned_version_id",
+    "materialized_config",
+    "flattened_groups",
+    "sleeve_plan",
+    "transitioning_sleeve_ids",
+    "cash"
+  ],
+  "$defs": {
+    "AllocationTemplateAssignmentCashClear": {
+      "description": "The tree has no cash node, so the update would remove the account's buffer cash",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "clear"
+          ],
+          "x-enum-varnames": [
+            "CashPlanClear"
+          ]
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "AllocationTemplateAssignmentCashClear"
+    },
+    "AllocationTemplateAssignmentCashPlan": {
+      "description": "What the update would do to the account's buffer cash: set it to the tree's cash node, or clear it when the tree has no cash node. A 0% buffer is a set, not a clear.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AllocationTemplateAssignmentCashSet"
+        },
+        {
+          "$ref": "#/$defs/AllocationTemplateAssignmentCashClear"
+        }
+      ]
+    },
+    "AllocationTemplateAssignmentCashSet": {
+      "description": "The update would set the account's buffer cash to the tree's cash node",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "set"
+          ],
+          "x-enum-varnames": [
+            "CashPlanSet"
+          ]
+        },
+        "absolute_target": {
+          "description": "The buffer's target share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "absolute_target"
+      ],
+      "title": "AllocationTemplateAssignmentCashSet"
+    },
+    "AllocationTemplateAssignmentGroup": {
+      "description": "One non-cash node of the materialized tree, flattened for display: relative weights pre-multiplied into an absolute target, in DFS document order (parent before children = display order). Cash nodes are omitted but their weights still shape siblings' absolute targets. A root that directly carries a strategy menu appears as a depth-0 group (empty path, null parent_name and relative_weight).",
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "description": "The node's stable id ('aatn_' ULID), never empty",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name",
+          "type": "string"
+        },
+        "path": {
+          "description": "Node ids from the root down to and including this node, exclusive of the root, so its length is the node's depth",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parent_name": {
+          "description": "The parent node's name; null when the parent is the root",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "absolute_target": {
+          "description": "The node's share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        },
+        "relative_weight": {
+          "description": "The node's share of its parent as a percent decimal string (never a number)",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slots": {
+          "description": "The expected sleeves under this node: one entry per funded strategy. (node_id, strategy_id) pairs are unique across groups.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateAssignmentSlot"
+          }
+        }
+      },
+      "required": [
+        "node_id",
+        "name",
+        "path",
+        "parent_name",
+        "absolute_target",
+        "relative_weight",
+        "slots"
+      ],
+      "title": "AllocationTemplateAssignmentGroup"
+    },
+    "AllocationTemplateAssignmentPlannedAdopt": {
+      "description": "An existing unstamped sleeve holding the slot's strategy would be stamped for the slot in place",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "adopt"
+          ],
+          "x-enum-varnames": [
+            "PlannedSleeveAdopt"
+          ]
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "strategy_id": {
+          "type": "string"
+        },
+        "sleeve_id": {
+          "description": "The existing account sleeve ('slv_' id)",
+          "type": "string"
+        },
+        "absolute_target": {
+          "description": "The sleeve's target share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "node_id",
+        "strategy_id",
+        "sleeve_id",
+        "absolute_target"
+      ],
+      "title": "AllocationTemplateAssignmentPlannedAdopt"
+    },
+    "AllocationTemplateAssignmentPlannedCreate": {
+      "description": "No sleeve holds the slot yet, so accounts would create one; its id arrives in the update's sleeve_results",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "create"
+          ],
+          "x-enum-varnames": [
+            "PlannedSleeveCreate"
+          ]
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "strategy_id": {
+          "type": "string"
+        },
+        "absolute_target": {
+          "description": "The sleeve's target share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "node_id",
+        "strategy_id",
+        "absolute_target"
+      ],
+      "title": "AllocationTemplateAssignmentPlannedCreate"
+    },
+    "AllocationTemplateAssignmentPlannedSleeve": {
+      "description": "What the update would do with one funded slot, keyed by (node_id, strategy_id). Only update and adopt land on an existing sleeve, so only they carry a sleeve_id.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AllocationTemplateAssignmentPlannedCreate"
+        },
+        {
+          "$ref": "#/$defs/AllocationTemplateAssignmentPlannedUpdate"
+        },
+        {
+          "$ref": "#/$defs/AllocationTemplateAssignmentPlannedAdopt"
+        }
+      ]
+    },
+    "AllocationTemplateAssignmentPlannedUpdate": {
+      "description": "The sleeve already stamped for the slot would be updated in place",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "update"
+          ],
+          "x-enum-varnames": [
+            "PlannedSleeveUpdate"
+          ]
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "strategy_id": {
+          "type": "string"
+        },
+        "sleeve_id": {
+          "description": "The existing account sleeve ('slv_' id)",
+          "type": "string"
+        },
+        "absolute_target": {
+          "description": "The sleeve's target share of the account's managed value as a percent decimal string (never a number)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "node_id",
+        "strategy_id",
+        "sleeve_id",
+        "absolute_target"
+      ],
+      "title": "AllocationTemplateAssignmentPlannedUpdate"
+    },
+    "AllocationTemplateAssignmentSlot": {
+      "description": "One expected sleeve under a group's node, keyed on the account by (node_id, strategy_id)",
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "description": "The funded strategy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "AllocationTemplateAssignmentSlot"
+    },
+    "AllocationTemplateConfig": {
+      "description": "A fully materialized template tree. The document root is itself a node.",
+      "type": "object",
+      "properties": {
+        "root": {
+          "$ref": "#/$defs/AllocationTemplateNode"
+        }
+      },
+      "required": [
+        "root"
+      ],
+      "title": "AllocationTemplateConfig"
+    },
+    "AllocationTemplateNode": {
+      "description": "A node in the template tree. It holds either child nodes or a strategy menu, never both; cash holds neither. A model_category is a section defined by strategy tags — those tags filter which strategies show up in menus under it, and at least one is required. Ordinary sections and cash must not carry tags.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Stable node id ('aatn_' ULID). Minted server-side for new nodes: omit or send empty on creation, keep it verbatim on later publishes - child overrides are keyed by it.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name; the root node may have an empty name",
+          "type": "string"
+        },
+        "kind": {
+          "description": "What this node is. A node is a free-text section; a model_category is a section defined by strategy tags; cash is the funding buffer.",
+          "type": "string",
+          "enum": [
+            "node",
+            "model_category",
+            "cash"
+          ]
+        },
+        "relative_weight": {
+          "description": "The node's share of its parent as a decimal string (never a number). Null means unset; the root carries an implicit 100% and keeps this null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag_ids": {
+          "description": "Strategy tag ids from the tags service. Required on a model_category (at least one). Must be omitted or empty on ordinary sections and cash. A nested model_category cannot reuse a tag already set by an ancestor.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "children": {
+          "description": "Child nodes; mutually exclusive with strategies",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateNode"
+          }
+        },
+        "strategies": {
+          "description": "The leaf node's strategy menu; mutually exclusive with children",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateStrategyEntry"
+          }
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "AllocationTemplateNode"
+    },
+    "AllocationTemplateStrategyEntry": {
+      "description": "A reference from a leaf node's menu to an existing strategy, with a relative weight. A 0% weight means the strategy is approved for selection but not allocated by default.",
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "description": "The ID of the referenced strategy",
+          "type": "string"
+        },
+        "relative_weight": {
+          "description": "The entry's share of its menu as a decimal string (never a number). Null means unset.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "AllocationTemplateStrategyEntry"
+    }
+  }
+}

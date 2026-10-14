@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-full-order-book-response-schema.json",
+  "title": "FullOrderBookResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-quotes-api-openapi.yml#/components/schemas/FullOrderBookResponse",
+  "type": "object",
+  "properties": {
+    "asks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "min_balance_remaining": {
+            "description": "The minimum amount in par that must remain on the quote after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_increment": {
+            "description": "The minimum quantity increment for which orders can be placed on this quote. All orders executing on this quote must be in multiples of this value.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_size": {
+            "description": "Ask minimum trade size in par value",
+            "type": "number"
+          },
+          "price": {
+            "description": "Ask price",
+            "type": "number"
+          },
+          "size": {
+            "description": "Ask size in par value",
+            "type": "number"
+          },
+          "spread_benchmark_isin": {
+            "description": "Benchmark ISIN for the spread",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spread_to_benchmark_bps": {
+            "description": "Spread to benchmark in basis points",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "venue_mpid": {
+            "description": "The venue's Market Participant Identifier",
+            "type": "string"
+          },
+          "yield_to_maturity": {
+            "description": "Ask yield to maturity",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "yield_to_worst": {
+            "description": "Ask yield to worst",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "bids": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "min_balance_remaining": {
+            "description": "The minimum amount in par that must remain on the quote after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_increment": {
+            "description": "The minimum quantity increment for which orders can be placed on this quote. All orders executing on this quote must be in multiples of this value.",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_size": {
+            "description": "Bid minimum trade size in par value",
+            "type": "number"
+          },
+          "price": {
+            "description": "Bid price",
+            "type": "number"
+          },
+          "size": {
+            "description": "Bid size in par value",
+            "type": "number"
+          },
+          "spread_benchmark_isin": {
+            "description": "Benchmark ISIN for the spread",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spread_to_benchmark_bps": {
+            "description": "Spread to benchmark in basis points",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "venue_mpid": {
+            "description": "The venue's Market Participant Identifier",
+            "type": "string"
+          },
+          "yield_to_maturity": {
+            "description": "Bid yield to maturity",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "yield_to_worst": {
+            "description": "Bid yield to worst",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "timestamp": {
+      "description": "Timestamp in RFC-3339 format with nanosecond precision",
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

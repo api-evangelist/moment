@@ -1,0 +1,937 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-corporate-action-detail-response-schema.json",
+  "title": "CorporateActionDetailResponse",
+  "description": "Provides corporate action details for a single corporate action.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-data-api-openapi.yml#/components/schemas/CorporateActionDetailResponse",
+  "type": "object",
+  "properties": {
+    "corporate_actions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/CorporateActionFullCallInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionPartialCallInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionPutInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionPreRefundingInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionPartialRedemptionWithPoolFactorReductionInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionInterestInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionRedemptionInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionTenderInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionBidsInfo"
+          },
+          {
+            "$ref": "#/$defs/CorporateActionCapitalizationInfo"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "CorporateActionBidsInfo": {
+      "title": "bids",
+      "type": "object",
+      "description": "BIDS (Bid) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "instruction_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventInstructionExpirationDate"
+        },
+        "withdrawal_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventWithdrawalExpirationDate"
+        },
+        "actual_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventActualExpirationDate"
+        },
+        "dispursed_security": {
+          "$ref": "#/$defs/CorporateActionEventDispursedSecurity"
+        },
+        "option_price": {
+          "$ref": "#/$defs/CorporateActionEventOptionPrice"
+        },
+        "option_quantity": {
+          "$ref": "#/$defs/CorporateActionEventOptionQuantity"
+        }
+      }
+    },
+    "CorporateActionCapitalizationInfo": {
+      "title": "capitalization",
+      "type": "object",
+      "description": "Capitalization (CAPI) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "rate_amount": {
+          "$ref": "#/$defs/CorporateActionEventRateAmount"
+        }
+      }
+    },
+    "CorporateActionEventActualExpirationDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Issuer or issuer's agent deadline to respond with an instruction to an outstanding offer or privilege."
+    },
+    "CorporateActionEventAdditionalInfo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Additional information provided by the issuer.",
+      "format": "string"
+    },
+    "CorporateActionEventCancelDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Record date of the cancellation, optionally present when corporate action is a cancellation. YYYY-MM-DD.",
+      "format": "string"
+    },
+    "CorporateActionEventCancelInfo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Additional information provided by the issuer, only populated when the corporate action is a cancellation.",
+      "format": "string"
+    },
+    "CorporateActionEventCancelType": {
+      "type": "string",
+      "description": "The cancellation type of the corporate action event. Only populated when the corporate action is a cancellation.\n\n* \"PROC\" - Canceled due to processing error\n* \"WITH\" - Withdrawn/canceled by the issuer",
+      "enum": [
+        "PROC",
+        "WITH"
+      ]
+    },
+    "CorporateActionEventCategory": {
+      "type": "string",
+      "description": "The category of the corporate action event.\n\n  * \"MAND\" - Mandatory\n  * \"VOLU\" - Voluntary\n  * \"CHOS\" - Mandatory with Options",
+      "enum": [
+        "MAND",
+        "VOLU",
+        "CHOS"
+      ]
+    },
+    "CorporateActionEventConfirmation": {
+      "type": "string",
+      "description": "The confirmation status of the corporate action event.\n\n* \"CONF\" - Confirmed\n* \"UCON\" - Unconfirmed",
+      "enum": [
+        "CONF",
+        "UCON"
+      ]
+    },
+    "CorporateActionEventCusip": {
+      "type": "string",
+      "description": "The instrument Cusip of the corporate action event."
+    },
+    "CorporateActionEventDispursedSecurity": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The security that is being distributed as a result of a corporate action as declared by the issuer or offeror on the market."
+    },
+    "CorporateActionEventEarliestPaymentDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The earliest payment date of the corporate action event.",
+      "format": "date"
+    },
+    "CorporateActionEventISIN": {
+      "type": "string",
+      "description": "The instrument ISIN of the corporate action event."
+    },
+    "CorporateActionEventInstructionExpirationDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Date/time that the account servicer has set as the deadline to respond, with instructions, to an outstanding event, giving the holder eligibility to incentives."
+    },
+    "CorporateActionEventLotteryDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The lottery date of the corporate action event.",
+      "format": "date"
+    },
+    "CorporateActionEventLotteryType": {
+      "type": "string",
+      "description": "The lottery type of the corporate action event, if applicable.\n\n* \"ORIG\" - Original, As Announced\n* \"SUPP\" - Supplemental, Additional",
+      "enum": [
+        "ORIG",
+        "SUPP"
+      ]
+    },
+    "CorporateActionEventMarketDeadline": {
+      "type": "string",
+      "description": "The deadline for an issuer or agent to respond to an outstanding offer by account servicer.",
+      "format": "date-time"
+    },
+    "CorporateActionEventNonRefundedSecurity": {
+      "type": "string",
+      "description": "The non-refunded security of a PDEF corporate action event."
+    },
+    "CorporateActionEventOptionPrice": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Price of financial instruments that can be actioned upon."
+    },
+    "CorporateActionEventOptionQuantity": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Quantity of financial instruments that can be actioned upon."
+    },
+    "CorporateActionEventPaymentDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The payment date of the corporate action event.",
+      "format": "date"
+    },
+    "CorporateActionEventPayout": {
+      "type": "string",
+      "description": "The payout type of the corporate action event.\n\n* \"CASH\" - Cash\n* \"SECU\" - Securities\n* \"CASE\" - Cash and Securities",
+      "enum": [
+        "CASH",
+        "SECU",
+        "CASE"
+      ]
+    },
+    "CorporateActionEventPositionCaptureDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Date when positions are captured and entitlements are calculated in the system at DTC."
+    },
+    "CorporateActionEventPrice": {
+      "type": "number",
+      "description": "The price that applies for the corporate action event."
+    },
+    "CorporateActionEventPutMinIncrement": {
+      "type": "number",
+      "description": "The minimum put increment of the corporate action event."
+    },
+    "CorporateActionEventPutMinQuantity": {
+      "type": "number",
+      "description": "The minimum put quantity of the corporate action event."
+    },
+    "CorporateActionEventRateAmount": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Rate of the corporate action event."
+    },
+    "CorporateActionEventRateType": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Type of the corporate action event rate."
+    },
+    "CorporateActionEventRecordDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The record date of the corporate action event.",
+      "format": "date"
+    },
+    "CorporateActionEventRefundedSecurity": {
+      "type": "string",
+      "description": "The refunded security of a PDEF corporate action event."
+    },
+    "CorporateActionEventResponseDeadline": {
+      "type": "string",
+      "description": "The deadline for an account servicer to respond to an outstanding event.",
+      "format": "date-time"
+    },
+    "CorporateActionEventResultsPublicationDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The lottery results publication date of the corporate action event.",
+      "format": "date"
+    },
+    "CorporateActionEventStatus": {
+      "type": "string",
+      "description": "The status of the corporate action event.\n\n* \"COMP\" - Complete\n* \"INCO\" - Incomplete",
+      "enum": [
+        "COMP",
+        "INCO"
+      ]
+    },
+    "CorporateActionEventWithdrawalExpirationDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Period during which the participant of the account servicer can revoke change or withdraw its instructions."
+    },
+    "CorporateActionFullCallInfo": {
+      "title": "full_call",
+      "type": "object",
+      "description": "MCAL (Full Call) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "earliest_payment_date": {
+          "$ref": "#/$defs/CorporateActionEventEarliestPaymentDate"
+        }
+      }
+    },
+    "CorporateActionId": {
+      "type": "string",
+      "description": "Unique corporate action event ID."
+    },
+    "CorporateActionInterestInfo": {
+      "title": "interest",
+      "type": "object",
+      "description": "INTR (Interest) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "rate_type": {
+          "$ref": "#/$defs/CorporateActionEventRateType"
+        },
+        "rate_amount": {
+          "$ref": "#/$defs/CorporateActionEventRateAmount"
+        }
+      }
+    },
+    "CorporateActionPartialCallInfo": {
+      "title": "partial_call",
+      "type": "object",
+      "description": "DRAW (Partial Call) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "results_publication_date": {
+          "$ref": "#/$defs/CorporateActionEventResultsPublicationDate"
+        },
+        "record_date": {
+          "$ref": "#/$defs/CorporateActionEventRecordDate"
+        },
+        "lottery_type": {
+          "$ref": "#/$defs/CorporateActionEventLotteryType"
+        },
+        "lottery_date": {
+          "$ref": "#/$defs/CorporateActionEventLotteryDate"
+        }
+      }
+    },
+    "CorporateActionPartialRedemptionWithPoolFactorReductionInfo": {
+      "title": "pred",
+      "type": "object",
+      "description": "Partial Redemption With Pool Factor Reduction Info (PRED) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "position_capture_date": {
+          "$ref": "#/$defs/CorporateActionEventPositionCaptureDate"
+        }
+      }
+    },
+    "CorporateActionPreRefundingInfo": {
+      "title": "pre_refunding",
+      "type": "object",
+      "description": "PDEF (Pre-Refunding / Defeasance) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "results_publication_date": {
+          "$ref": "#/$defs/CorporateActionEventResultsPublicationDate"
+        },
+        "lottery_type": {
+          "$ref": "#/$defs/CorporateActionEventLotteryType"
+        },
+        "lottery_date": {
+          "$ref": "#/$defs/CorporateActionEventLotteryDate"
+        },
+        "refunded_security": {
+          "$ref": "#/$defs/CorporateActionEventRefundedSecurity"
+        },
+        "non_refunded_security": {
+          "$ref": "#/$defs/CorporateActionEventNonRefundedSecurity"
+        }
+      }
+    },
+    "CorporateActionPutInfo": {
+      "title": "put",
+      "type": "object",
+      "description": "BPUT (Put) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "market_deadline": {
+          "$ref": "#/$defs/CorporateActionEventMarketDeadline"
+        },
+        "response_deadline": {
+          "$ref": "#/$defs/CorporateActionEventResponseDeadline"
+        },
+        "put_min_quantity": {
+          "$ref": "#/$defs/CorporateActionEventPutMinQuantity"
+        },
+        "put_min_increment": {
+          "$ref": "#/$defs/CorporateActionEventPutMinIncrement"
+        }
+      }
+    },
+    "CorporateActionRedemptionInfo": {
+      "title": "redemption",
+      "type": "object",
+      "description": "REDM (Redemption) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "earliest_payment_date": {
+          "$ref": "#/$defs/CorporateActionEventEarliestPaymentDate"
+        }
+      }
+    },
+    "CorporateActionTenderInfo": {
+      "title": "tender",
+      "type": "object",
+      "description": "TEND (Tender) corporate action event details",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/CorporateActionId"
+        },
+        "update_id": {
+          "$ref": "#/$defs/CorporateActionUpdateId"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/CorporateActionUpdatedAt"
+        },
+        "type": {
+          "type": "string",
+          "description": "The ISO event code of the corporate action event."
+        },
+        "isin": {
+          "$ref": "#/$defs/CorporateActionEventISIN"
+        },
+        "cusip": {
+          "$ref": "#/$defs/CorporateActionEventCusip"
+        },
+        "status": {
+          "$ref": "#/$defs/CorporateActionEventStatus"
+        },
+        "confirmation": {
+          "$ref": "#/$defs/CorporateActionEventConfirmation"
+        },
+        "category": {
+          "$ref": "#/$defs/CorporateActionEventCategory"
+        },
+        "price": {
+          "$ref": "#/$defs/CorporateActionEventPrice"
+        },
+        "payout": {
+          "$ref": "#/$defs/CorporateActionEventPayout"
+        },
+        "payment_date": {
+          "$ref": "#/$defs/CorporateActionEventPaymentDate"
+        },
+        "additional_info": {
+          "$ref": "#/$defs/CorporateActionEventAdditionalInfo"
+        },
+        "cancel_info": {
+          "$ref": "#/$defs/CorporateActionEventCancelInfo"
+        },
+        "cancel_type": {
+          "$ref": "#/$defs/CorporateActionEventCancelType"
+        },
+        "cancel_date": {
+          "$ref": "#/$defs/CorporateActionEventCancelDate"
+        },
+        "instruction_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventInstructionExpirationDate"
+        },
+        "withdrawal_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventWithdrawalExpirationDate"
+        },
+        "actual_expiration_date": {
+          "$ref": "#/$defs/CorporateActionEventActualExpirationDate"
+        },
+        "dispursed_security": {
+          "$ref": "#/$defs/CorporateActionEventDispursedSecurity"
+        },
+        "option_price": {
+          "$ref": "#/$defs/CorporateActionEventOptionPrice"
+        },
+        "option_quantity": {
+          "$ref": "#/$defs/CorporateActionEventOptionQuantity"
+        }
+      }
+    },
+    "CorporateActionUpdateId": {
+      "type": "string",
+      "description": "Unique message identifier."
+    },
+    "CorporateActionUpdatedAt": {
+      "type": "string",
+      "description": "The time at which the corporate action event was last updated in RFC-3339 format.",
+      "format": "date-time"
+    }
+  }
+}

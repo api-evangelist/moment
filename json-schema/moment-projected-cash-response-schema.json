@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-projected-cash-response-schema.json",
+  "title": "ProjectedCashResponse",
+  "description": "An account's settled cash baseline plus its projected cash timeline.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/ProjectedCashResponse",
+  "type": "object",
+  "properties": {
+    "settled_cash": {
+      "description": "The account's current settled cash balance, the baseline the projection starts from.",
+      "$ref": "#/$defs/DecimalString"
+    },
+    "currency_code": {
+      "description": "ISO 4217 currency code for every amount in the response.",
+      "type": "string"
+    },
+    "projections": {
+      "description": "Cash events in date order. Empty for an account with no holds, no\ncommitted cash raises, no unsettled trades, and no upcoming\ncashflows.\n",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ProjectedCashProjection"
+      }
+    }
+  },
+  "required": [
+    "settled_cash",
+    "currency_code",
+    "projections"
+  ],
+  "$defs": {
+    "DecimalString": {
+      "type": "string",
+      "title": "DecimalString",
+      "description": "An exact decimal amount, serialized as a string to preserve precision."
+    },
+    "ProjectedCashProjection": {
+      "type": "object",
+      "description": "A single cash event on the projected-cash timeline.",
+      "properties": {
+        "type": {
+          "description": "The kind of cash event:\n\n- `pending`: committed cash whose instrument and side are not\n  known. Either a live hold (for example an activated cash raise),\n  or, only for organizations where committed cash-raise projection\n  is enabled, a cash raise that is committed but not yet activated,\n  dated on the day its hold will be placed. Both carry\n  `holder_type: cash_raise`; a client that treats them alike sees\n  the same cash reduction before and after activation.\n- `pending_buy` / `pending_sell` — an executed-but-unsettled trade on\n  its trade date, or a live order hold. The amount lands in the\n  unsettled bucket.\n- `buy` / `sell` — the settled leg of the same trade on its settlement\n  date, moving the amount from unsettled into settled. Does not change\n  `running_total`.\n- `coupon` — a bond coupon payment.\n- `maturity` — a bond principal repayment.\n- `dividend` — a dividend payment. Only present for organizations\n  where dividend projection is enabled.\n",
+          "type": "string",
+          "enum": [
+            "pending",
+            "pending_buy",
+            "pending_sell",
+            "buy",
+            "sell",
+            "coupon",
+            "dividend",
+            "maturity"
+          ]
+        },
+        "reason": {
+          "description": "Human-readable description of the event, intended for display. Where\nthe security is known this is its description (for example\n`T 4.5% 05/12/31` for a bond, `AAPL` for an equity). Free text — do\nnot parse it; use `type`, `holder_type`, and `instrument_id` to\nclassify a row.\n",
+          "type": "string"
+        },
+        "instrument_id": {
+          "description": "The security this event relates to, when known. Always check for null\nbefore using it:\n\n- Null on holds that do not identify an instrument.\n- Usually populated on coupon, maturity, and dividend rows, but null\n  when the upstream cashflow data carries no per-instrument\n  attribution. The row's date and amount are still accurate; only the\n  security is unattributed.\n",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "side": {
+          "description": "Trade direction on trade-derived rows. Null on instrumentless commitments and on\ncoupon, maturity, and dividend rows — which is the majority of rows.\n",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "BUY",
+            "SELL",
+            null
+          ]
+        },
+        "holder_type": {
+          "description": "Present only on rows where something holds or has committed the\ncash. Null on every other row; use this to distinguish commitments\nfrom pending trade legs.\n\n- `order` / `allocation` — a buying-power hold keyed by order or allocation.\n- `cash_raise`: a cash raise before or after activation.\n- `sleeve_realignment` — a sleeve realignment funding its target sleeves.\n",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "order",
+            "allocation",
+            "cash_raise",
+            "sleeve_realignment",
+            null
+          ]
+        },
+        "holder_id": {
+          "description": "Identifier of the entity responsible for a commitment. Null on every other row.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date": {
+          "description": "The date this event lands on the timeline, `YYYY-MM-DD`. Live holds\nare dated today. A cash raise awaiting activation is dated on the\nday it is scheduled to activate, which can be months out for a\nrecurring schedule. A raise with no scheduled activation, such as one\nwaiting on a manual activation, is dated on its due date instead,\nthe only day it commits to. Either date, once past, lands on today.\nTrade legs are dated on their trade and settlement dates; cashflows\non their payment date.\n",
+          "type": "string",
+          "format": "date"
+        },
+        "amount": {
+          "description": "The signed amount of this event. Negative reduces cash.",
+          "$ref": "#/$defs/DecimalString"
+        },
+        "unsettled": {
+          "description": "Running unsettled-cash balance after this event is applied.",
+          "$ref": "#/$defs/DecimalString"
+        },
+        "settled": {
+          "description": "Running settled-cash balance after this event is applied, starting from `settled_cash`.",
+          "$ref": "#/$defs/DecimalString"
+        },
+        "running_total": {
+          "description": "Projected total cash as of this row's date. Always the sum of\n`unsettled` and `settled`.\n",
+          "$ref": "#/$defs/DecimalString"
+        }
+      },
+      "required": [
+        "type",
+        "reason",
+        "instrument_id",
+        "side",
+        "holder_type",
+        "holder_id",
+        "date",
+        "amount",
+        "unsettled",
+        "settled",
+        "running_total"
+      ]
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-custom-fee-schema.json",
+  "title": "CustomFee",
+  "description": "Custom fees to be applied.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-quotes-api-openapi.yml#/components/schemas/CustomFee",
+  "type": "object",
+  "properties": {
+    "fee_amount": {
+      "description": "The amount of the fee.",
+      "type": "number"
+    },
+    "fee_amount_type": {
+      "description": "The type of fee amount.",
+      "type": "string",
+      "enum": [
+        "percentage_of_par",
+        "percentage_of_market_value",
+        "yield_bps"
+      ]
+    },
+    "fee_schedule_asset_level_id": {
+      "description": "The ID of the fee schedule asset level.",
+      "type": "string"
+    },
+    "fee_schedule_id": {
+      "description": "The ID of the fee schedule.",
+      "type": "string"
+    },
+    "fee_type": {
+      "description": "The type of fee.",
+      "type": "string",
+      "enum": [
+        "commission",
+        "markup"
+      ]
+    },
+    "max_fee_amount": {
+      "description": "The maximum amount of the fee.",
+      "type": "number"
+    },
+    "recipient_id": {
+      "description": "The ID of the recipient.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "fee_schedule_id",
+    "fee_schedule_asset_level_id",
+    "recipient_id",
+    "fee_type",
+    "fee_amount_type",
+    "fee_amount"
+  ]
+}

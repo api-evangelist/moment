@@ -1,0 +1,454 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-allocation-template-details-schema.json",
+  "title": "AllocationTemplateDetails",
+  "description": "Full template representation for the details page and mutation responses",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-models-api-openapi.yml#/components/schemas/AllocationTemplateDetails",
+  "type": "object",
+  "properties": {
+    "template": {
+      "$ref": "#/$defs/AllocationTemplateSummary"
+    },
+    "total_descendant_count": {
+      "description": "Number of live direct and transitive linked descendants",
+      "type": "integer"
+    },
+    "strategy_entry_count": {
+      "description": "Number of strategy entries across the published configuration's menus",
+      "type": "integer"
+    },
+    "materialized_config": {
+      "description": "The frozen published snapshot every reader consumes",
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationTemplateConfig"
+        }
+      ]
+    },
+    "overrides": {
+      "description": "The published override set; null for standalone templates",
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationTemplateOverrides"
+        }
+      ],
+      "nullable": true
+    },
+    "lineage": {
+      "$ref": "#/$defs/AllocationTemplateLineage"
+    },
+    "conflict_view": {
+      "description": "Present only while the template needs resolution",
+      "allOf": [
+        {
+          "$ref": "#/$defs/AllocationTemplateConflictView"
+        }
+      ],
+      "nullable": true
+    },
+    "sleeve_targets": {
+      "description": "The sleeves an account assigned to the published configuration would get, one per funded strategy in tree order, before any account overrides. Null when the configuration has unset weights and cannot be assigned.",
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/AllocationTemplateSleeveTarget"
+      }
+    }
+  },
+  "required": [
+    "template",
+    "total_descendant_count",
+    "strategy_entry_count",
+    "materialized_config",
+    "overrides",
+    "lineage",
+    "conflict_view",
+    "sleeve_targets"
+  ],
+  "$defs": {
+    "AllocationTemplateConfig": {
+      "description": "A fully materialized template tree. The document root is itself a node.",
+      "type": "object",
+      "properties": {
+        "root": {
+          "$ref": "#/$defs/AllocationTemplateNode"
+        }
+      },
+      "required": [
+        "root"
+      ],
+      "title": "AllocationTemplateConfig"
+    },
+    "AllocationTemplateConflict": {
+      "description": "A validation or resolution conflict identifying a failing node (and optionally a menu entry)",
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "description": "The ID of the node the conflict is attached to",
+          "type": "string"
+        },
+        "strategy_id": {
+          "description": "The menu entry the conflict is attached to, when applicable",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "code": {
+          "description": "Machine-readable conflict code",
+          "type": "string",
+          "enum": [
+            "sum_mismatch",
+            "mixed_unset_group",
+            "weight_out_of_bounds",
+            "range_violation",
+            "empty_leaf_menu",
+            "empty_node",
+            "unknown_strategy",
+            "archived_strategy",
+            "override_target_missing",
+            "structure_violation",
+            "unset_inherited_value",
+            "incomplete_weights"
+          ]
+        },
+        "message": {
+          "description": "Human-readable explanation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "strategy_id",
+        "code",
+        "message"
+      ],
+      "title": "AllocationTemplateConflict"
+    },
+    "AllocationTemplateConflictView": {
+      "description": "The derived conflict state, recomputed on demand: the published overrides re-resolved against the base's current published version (best effort), with the failing nodes flagged. Seeds the Resolve builder session.",
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/AllocationTemplateConfig"
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateConflict"
+          }
+        }
+      },
+      "required": [
+        "config",
+        "conflicts"
+      ],
+      "title": "AllocationTemplateConflictView"
+    },
+    "AllocationTemplateLineage": {
+      "description": "The template's family neighborhood",
+      "type": "object",
+      "properties": {
+        "ancestors": {
+          "description": "The ancestor chain ordered family root first, direct base last",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateSummary"
+          }
+        },
+        "children": {
+          "description": "Live templates directly linked to this one",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateSummary"
+          }
+        }
+      },
+      "required": [
+        "ancestors",
+        "children"
+      ],
+      "title": "AllocationTemplateLineage"
+    },
+    "AllocationTemplateNode": {
+      "description": "A node in the template tree. It holds either child nodes or a strategy menu, never both; cash holds neither. A model_category is a section defined by strategy tags — those tags filter which strategies show up in menus under it, and at least one is required. Ordinary sections and cash must not carry tags.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Stable node id ('aatn_' ULID). Minted server-side for new nodes: omit or send empty on creation, keep it verbatim on later publishes - child overrides are keyed by it.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name; the root node may have an empty name",
+          "type": "string"
+        },
+        "kind": {
+          "description": "What this node is. A node is a free-text section; a model_category is a section defined by strategy tags; cash is the funding buffer.",
+          "type": "string",
+          "enum": [
+            "node",
+            "model_category",
+            "cash"
+          ]
+        },
+        "relative_weight": {
+          "description": "The node's share of its parent as a decimal string (never a number). Null means unset; the root carries an implicit 100% and keeps this null.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tag_ids": {
+          "description": "Strategy tag ids from the tags service. Required on a model_category (at least one). Must be omitted or empty on ordinary sections and cash. A nested model_category cannot reuse a tag already set by an ancestor.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "children": {
+          "description": "Child nodes; mutually exclusive with strategies",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateNode"
+          }
+        },
+        "strategies": {
+          "description": "The leaf node's strategy menu; mutually exclusive with children",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AllocationTemplateStrategyEntry"
+          }
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "AllocationTemplateNode"
+    },
+    "AllocationTemplateOverrides": {
+      "description": "A linked template's delta against its base, keyed by stable node id. Field semantics are tri-state and load-bearing: an absent field inherits from the base, an explicit null is an unset/clear override, a value is an override. Per node: relative_weight/min_weight/max_weight plus a strategies map keyed by strategy id with relative_weight/min_weight/max_weight (value overrides), added (child-added entry), and removed (child-removed base entry). Typed loosely so absent and null survive the wire.",
+      "type": "object",
+      "additionalProperties": true,
+      "x-go-type": "stdjson.RawMessage",
+      "x-go-type-import": {
+        "path": "encoding/json",
+        "name": "stdjson"
+      },
+      "title": "AllocationTemplateOverrides"
+    },
+    "AllocationTemplateSleeveTarget": {
+      "description": "One funded strategy entry of the configuration, with its weights multiplied down the tree. Shares are percents of the account's managed value as decimal strings (never numbers).",
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "strategy_id": {
+          "type": "string"
+        },
+        "absolute_target": {
+          "type": "string"
+        },
+        "absolute_min": {
+          "description": "The lowest share the sleeve may drift to; 0 when unconstrained",
+          "type": "string"
+        },
+        "absolute_max": {
+          "description": "The highest share the sleeve may drift to; 100 when unconstrained",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "strategy_id",
+        "absolute_target",
+        "absolute_min",
+        "absolute_max"
+      ],
+      "title": "AllocationTemplateSleeveTarget"
+    },
+    "AllocationTemplateStrategyEntry": {
+      "description": "A reference from a leaf node's menu to an existing strategy, with a relative weight. A 0% weight means the strategy is approved for selection but not allocated by default.",
+      "type": "object",
+      "properties": {
+        "strategy_id": {
+          "description": "The ID of the referenced strategy",
+          "type": "string"
+        },
+        "relative_weight": {
+          "description": "The entry's share of its menu as a decimal string (never a number). Null means unset.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "min_weight": {
+          "description": "Optional lower range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_weight": {
+          "description": "Optional upper range bound in relative-weight terms, as a decimal string",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "strategy_id"
+      ],
+      "title": "AllocationTemplateStrategyEntry"
+    },
+    "AllocationTemplateSummary": {
+      "description": "Summary representation used by list rows and lineage entries",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The ID of the template",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the template",
+          "type": "string"
+        },
+        "description": {
+          "description": "The description of the template",
+          "type": "string"
+        },
+        "template_type": {
+          "description": "Whether the template owns its tree or inherits from a base",
+          "type": "string",
+          "enum": [
+            "standalone",
+            "linked"
+          ]
+        },
+        "base_template_id": {
+          "description": "The base template a linked template inherits from",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "base_template_name": {
+          "description": "The base template's name",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "description": "The template's lifecycle status",
+          "type": "string",
+          "enum": [
+            "published",
+            "needs_resolution",
+            "archived"
+          ]
+        },
+        "needs_resolution": {
+          "description": "True when the published overrides no longer validate against the base's current published version",
+          "type": "boolean"
+        },
+        "is_incomplete": {
+          "description": "True when at least one category or strategy in the template has no weight set. An incomplete template can still be the base for linked templates, but it cannot be assigned to accounts until every weight is filled in.",
+          "type": "boolean"
+        },
+        "direct_descendant_count": {
+          "description": "Number of live templates directly linked to this one",
+          "type": "integer"
+        },
+        "current_version_id": {
+          "description": "The ID of the currently published version",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "description": "The user who created the template",
+          "nullable": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/User"
+            }
+          ]
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_by": {
+          "description": "The user who last updated the template",
+          "nullable": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/User"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "template_type",
+        "base_template_id",
+        "base_template_name",
+        "status",
+        "needs_resolution",
+        "is_incomplete",
+        "direct_descendant_count",
+        "current_version_id",
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by"
+      ],
+      "title": "AllocationTemplateSummary"
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "description": "The display name of the user",
+          "type": "string"
+        },
+        "id": {
+          "description": "The ID of the user",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "display_name"
+      ]
+    }
+  }
+}

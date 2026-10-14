@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-maturity-bucket-percentile-batch-response-schema.json",
+  "title": "MaturityBucketPercentileBatchResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-live-inventory-api-openapi.yml#/components/schemas/MaturityBucketPercentileBatchResponse",
+  "type": "object",
+  "properties": {
+    "bucket_selection": {
+      "description": "The date field used for maturity bucket selection",
+      "type": "string",
+      "enum": [
+        "maturity_date",
+        "workout_date"
+      ]
+    },
+    "percentile": {
+      "description": "The percentile that was calculated",
+      "type": "number"
+    },
+    "series": {
+      "description": "The computed series, keyed by the key supplied in the request",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/MaturityBucketPercentileBatchSeriesResult"
+      }
+    }
+  },
+  "$defs": {
+    "MaturityBucketData": {
+      "type": "object",
+      "properties": {
+        "ask_ytw_percentile": {
+          "description": "The ask yield to worst at the specified percentile for this bucket",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bid_ytw_percentile": {
+          "description": "The bid yield to worst at the specified percentile for this bucket",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "bucket": {
+          "description": "The maturity bucket range",
+          "type": "string",
+          "enum": [
+            "1-3 mo",
+            "3-6 mo",
+            "6-9 mo",
+            "9-12 mo",
+            "1-1.5 yr",
+            "1.5-2.5 yr",
+            "2.5-3.5 yr",
+            "3.5-4.5 yr",
+            "4.5-5.5 yr",
+            "5.5-6.5 yr",
+            "6.5-7.5 yr",
+            "7.5-8.5 yr",
+            "8.5-9.5 yr",
+            "9.5-10.5 yr",
+            "10.5-11.5 yr",
+            "11.5-12.5 yr",
+            "12.5-13.5 yr",
+            "13.5-14.5 yr",
+            "14.5-15.5 yr",
+            "15.5-16.5 yr",
+            "16.5-17.5 yr",
+            "17.5-18.5 yr",
+            "18.5-19.5 yr",
+            "19.5-20.5 yr",
+            "20.5-21.5 yr",
+            "21.5-22.5 yr",
+            "22.5-23.5 yr",
+            "23.5-24.5 yr",
+            "24.5-25.5 yr",
+            "25.5-26.5 yr",
+            "26.5-27.5 yr",
+            "27.5-28.5 yr",
+            "28.5-29.5 yr",
+            "29.5+ yr"
+          ]
+        },
+        "instrument_count": {
+          "description": "Number of instruments in this maturity bucket",
+          "type": "integer"
+        }
+      },
+      "title": "MaturityBucketData"
+    },
+    "MaturityBucketPercentileBatchSeriesResult": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "description": "The total number of instruments included across all buckets in this series",
+          "type": "integer"
+        },
+        "data": {
+          "description": "Array of maturity buckets with their corresponding percentile YTW values",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MaturityBucketData"
+          }
+        }
+      },
+      "title": "MaturityBucketPercentileBatchSeriesResult"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-update-filter-list-request-schema.json",
+  "title": "UpdateFilterListRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-filter-lists-api-openapi.yml#/components/schemas/UpdateFilterListRequest",
+  "type": "object",
+  "properties": {
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FilterListOperationRequest"
+      },
+      "description": "The operations to perform on the filter list",
+      "x-go-type-skip-optional-pointer": true
+    }
+  },
+  "$defs": {
+    "FilterListOperationAction": {
+      "type": "string",
+      "enum": [
+        "add",
+        "remove",
+        "replace"
+      ],
+      "description": "The action to perform on filter list values",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "FilterListOperationRequest": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/FilterListOperationAction"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The values to add, remove, or replace"
+          },
+          "description": "The values for the operation (required for add/remove/replace actions)",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "source": {
+          "type": "string",
+          "description": "The source file name for the operation",
+          "x-go-type-skip-optional-pointer": true
+        }
+      },
+      "required": [
+        "action",
+        "values"
+      ]
+    }
+  }
+}

@@ -1,0 +1,654 @@
+openapi: 3.0.0
+info:
+  title: Quotes API
+  description: 'Moment''s Quotes API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Quotes API and to obtain your keys, visit:
+
+    [Moment API Documentation](https://withmoment.com/docs/api-documentation/api-v1/).
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+paths:
+  /v1/trading/calendar/:
+    get:
+      tags:
+      - Calendar
+      summary: Trading Calendar
+      description: The Trading Calendar API returns a list of days in sequential order, with information regarding whether that day is a full trading day, half trading day, holiday, or weekend. Currently, Moment only supports dates between 2023-08-01 and 2026-01-01 (inclusive).
+      operationId: getTradingCalendar
+      parameters:
+      - name: start_date
+        in: query
+        description: The start date of the calendar formatted as yyyy-mm-dd.
+        schema:
+          type: string
+        example: '2023-08-01'
+      - name: end_date
+        in: query
+        description: The end date of the calendar formatted as yyyy-mm-dd.
+        schema:
+          type: string
+        example: '2026-01-01'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  days:
+                    description: A list containing information about each day between the start_date and end_date.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          description: The date in yyyy-mm-dd format.
+                          type: string
+                          example: '2023-08-01'
+                        day_type:
+                          description: The type of trading day.
+                          type: string
+                          enum:
+                          - full_trading_day
+                          - half_trading_day
+                          - holiday
+                          - weekend
+  /v1/trading/fractional-universe/:
+    get:
+      tags:
+      - Fractional Universe
+      summary: Fractional Universe
+      description: The GET fractional universe endpoint returns a list of ISINs representing all fractional bonds available for trading on the platform.
+      operationId: getFractionalUniverse
+      parameters:
+      - name: side
+        in: query
+        schema:
+          description: Filters out ISINs that are available for the specified side.
+          type: string
+          example: buy
+          enum:
+          - buy
+          - sell
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Instrument ISIN
+                example:
+                - US594918AD66
+                - US1234567890
+  /v1/trading/market/{instrument_id}/:
+    get:
+      tags:
+      - Unified Market
+      summary: Unified Market
+      description: 'The Unified Market API returns the cumulative information for a specified bond for a given risk group.
+
+
+        If the specified bond exists in our universe, you will receive a response with the full order book, the evaluated price, yield-to-worst and yield-to-maturity, a yield grid, the accrued interest and par value, and the total fees for the instrument.
+
+
+        If the specified bond does not exist in our universe or is inactive, you will receive a `not_found` error.'
+      operationId: getUnifiedMarket
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: risk_group_id
+        in: query
+        description: The risk group ID to use for this quote. A risk group is required for fees and yields to be accurately reflected in the return.
+        required: true
+        schema:
+          type: string
+      - name: skip_fees
+        in: query
+        description: Do not include fees in the response.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FullOrderBookResponse'
+                - type: object
+                  properties:
+                    evaluated_price:
+                      description: The evaluated price of the bond
+                      type: number
+                    evaluated_yield_to_maturity:
+                      description: The evaluated yield to maturity of the bond
+                      type: number
+                      nullable: true
+                    evaluated_yield_to_worst:
+                      description: The evaluated yield to worst of the bond
+                      type: number
+                      nullable: true
+                    accrued_interest:
+                      description: The accrued interest of the bond
+                      type: number
+                      example: 0
+                    par_value:
+                      description: The par value of the bond
+                      type: number
+                    fees:
+                      description: Fees from the risk group
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          receipient_id:
+                            description: The ID of the fee owner
+                            type: string
+                          type:
+                            description: The type of the fee
+                            type: string
+                            enum:
+                            - markup
+                            - commission
+                          amount_type:
+                            type: string
+                            enum:
+                            - dollar_per_trade
+                            - percentage_of_par
+                            - percentage_of_notional
+                          amount:
+                            description: The amount of the fee
+                            type: number
+                    yield_grid:
+                      properties:
+                        price:
+                          description: Prices, represented as a percentage of par.
+                          type: array
+                          items:
+                            type: number
+                        yield_to_maturity:
+                          description: Yield to maturity for each price.
+                          type: array
+                          items:
+                            type: number
+                            nullable: true
+                        yield_to_worst:
+                          description: Yield to worst for each price, when available.
+                          type: array
+                          items:
+                            type: number
+                            nullable: true
+  /v1/trading/order-book/{instrument_id}/:
+    get:
+      tags:
+      - Order Book
+      summary: Full Order Book
+      description: 'The Full Order Book API returns the current full order book for a specified bond.
+
+
+        If the specified bond exists in our universe, you will receive a
+
+        response with all bids and asks in the order book. Moment
+
+        will provide data on yields to maturity and yields to worst as
+
+        available, however, Moment can not guarantee that these yields will be
+
+        available for all bonds. If yields are not available, the response will
+
+        contain null values for yield-related fields.
+
+
+        If the specified bond does not exist in our universe or is inactive, you
+
+        will receive a `not_found` error. If the bond is not tradeable, you will
+
+        receive a `bad_request` error.'
+      operationId: getFullOrderBook
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: risk_group_id
+        in: query
+        description: The risk group ID to use for this quote. A risk group is required for fees and yields to be accurately reflected in the return. If a risk group is not provided, your organization's default risk group will be used. If a risk group is not provided and your organization has no default risk group, the request will fail.
+        schema:
+          type: string
+      - name: skip_fees
+        in: query
+        description: Do not include fees in the response.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullOrderBookResponse'
+  /v1/trading/quote/{instrument_id}/:
+    get:
+      tags:
+      - Order Book
+      summary: Quotes
+      description: 'The Top of Order Book API returns the current best bid and offer for a specified bond.
+
+
+        If the specified bond exists in our universe, you will receive a response with all available data regarding the best bid and best ask. For example, if there are only asks and no bids for a given bond, the response will contain data for the ask-related fields, while the bid-related fields will all be null. If there are neither bids nor asks, the response will contain null values for all ask and bid fields.
+
+        Moment will provide data on yields to maturity and yields to worst as available, however, Moment can not guarantee that these yields will be available for all bonds. If yields are not available, the response will contain null values for yield-related fields.
+
+
+        If the specified bond does not exist in our universe or is inactive, you will receive a `not_found` error. If the bond is not tradeable, you will receive a `bad_request` error.'
+      operationId: getTopOfOrderBook
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: risk_group_id
+        in: query
+        description: The risk group ID to use for this quote. A risk group is required for fees and yields to be accurately reflected in the return. If a risk group is not provided, your organization's default risk group will be used. If a risk group is not provided and your organization has no default risk group, the request will fail.
+        schema:
+          type: string
+      - name: trade_size
+        in: query
+        description: 'Trade size for the quote. Filters to best bid/ask where minimum trade size is less than or equal to the given numeric value. Optionally, set value to "lowest" for best bid/ask for the smallest trade size on either side.
+
+
+          For example, assume bids {bid_price: 100, bid_min_size: 5000}, {bid_price: 99, bid_min_size: 2000}, and {bid_price: 98, bid_min_size: 1000} are available. Querying with trade_size=3000 returns the {bid_price: 99, bid_min_size: 2000} bid. Querying with trade_size="lowest" returns the {bid_price: 98, bid_min_size:1000} bid."'
+        schema:
+          type: string
+      - name: skip_fees
+        in: query
+        description: Do not include fees in the response.
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    description: Timestamp in RFC-3339 format with nanosecond precision
+                    type: string
+                    format: date-time
+                  bid_price:
+                    description: Best bid price
+                    type: number
+                    nullable: true
+                  bid_yield_to_maturity:
+                    description: Best bid yield to maturity
+                    type: number
+                    nullable: true
+                  bid_yield_to_worst:
+                    description: Best bid yield to worst
+                    type: number
+                    nullable: true
+                  bid_size:
+                    description: Best bid size in par value
+                    type: number
+                    nullable: true
+                  bid_min_size:
+                    description: Best bid minimum trade size in par value
+                    type: number
+                    nullable: true
+                  bid_min_balance_remaining:
+                    description: The minimum amount in par that must remain on the bid after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.
+                    type: number
+                    nullable: true
+                  bid_min_increment:
+                    description: The minimum quantity increment for which orders can be placed on this bid. All orders executing on this bid must be in multiples of this value.
+                    type: number
+                    nullable: true
+                  ask_price:
+                    description: Best ask price
+                    type: number
+                    nullable: true
+                  ask_yield_to_maturity:
+                    description: Best ask yield to maturity
+                    type: number
+                    nullable: true
+                  ask_yield_to_worst:
+                    description: Best ask yield to worst
+                    type: number
+                    nullable: true
+                  ask_size:
+                    description: Best ask size in par value
+                    type: number
+                    nullable: true
+                  ask_min_size:
+                    description: Best ask minimum trade size in par value
+                    type: number
+                    nullable: true
+                  ask_min_balance_remaining:
+                    description: The minimum amount in par that must remain on the ask after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.
+                    type: number
+                    nullable: true
+                  ask_min_increment:
+                    description: The minimum quantity increment for which orders can be placed on this ask. All orders executing on this ask must be in multiples of this value.
+                    type: number
+                    nullable: true
+  /v1/trading/quotes/hydrate/:
+    post:
+      tags:
+      - Hydrate Quotes
+      summary: Hydrate Quotes
+      description: The Hydrate Quotes API accepts a list of pre fee quotes, an optional list of custom fees, and returns a list of post fee quotes with yields and spread prices.
+      operationId: hydrateQuotes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isin:
+                  description: The ISIN of the bond
+                  type: string
+                quotes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PreFeeQuote'
+                custom_fees:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CustomFee'
+                trade_size:
+                  description: The trade size of the quote
+                  type: number
+                  nullable: true
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HydratedQuote'
+  /v1/trading/trade-price/{instrument_id}/:
+    get:
+      tags:
+      - Trade Price
+      summary: Trade Price
+      description: 'The Trade Price API returns the principal, the accrued interest,
+
+        the total fees (as a result of the risk group), and the total trade costs
+
+        for a specified instrument, trade size, price, and risk group.
+
+
+        If the specified bond does not exist in our universe, you
+
+        will receive a `not_found` error.'
+      operationId: getTradePrice
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: trade_size
+        in: query
+        description: The trade size of an order in face value. For example, most corporate bonds have a face value of $1000, so a trade_size of $3000 indicates a trade for 3 bonds.
+        required: true
+        schema:
+          type: number
+      - name: price
+        in: query
+        description: The price is represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.
+        required: true
+        schema:
+          type: number
+      - name: risk_group_id
+        in: query
+        description: The risk group ID to use for this quote. A risk group is required for fees to be accurately reflected in the return.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  principal:
+                    description: The principal amount of the trade, specified in the issuing currency.
+                    type: number
+                  accrued_interest:
+                    description: The cumulative amount of accrued interest for the trade, specified in the issuing currency.
+                    type: number
+                    example: 0
+                  total_fees:
+                    description: The total fees for the trade, specified in the issuing currency.
+                    type: number
+components:
+  schemas:
+    PreFeeQuote:
+      type: object
+      properties:
+        id:
+          description: The ID of the quote.
+          type: string
+        pre_fee_price:
+          description: The pre fee price of the quote.
+          type: number
+        side:
+          description: The side of the quote.
+          type: string
+          enum:
+          - ask
+          - bid
+      required:
+      - id
+      - pre_fee_price
+      - side
+    CustomFee:
+      description: Custom fees to be applied.
+      type: object
+      properties:
+        fee_amount:
+          description: The amount of the fee.
+          type: number
+        fee_amount_type:
+          description: The type of fee amount.
+          type: string
+          enum:
+          - percentage_of_par
+          - percentage_of_market_value
+          - yield_bps
+        fee_schedule_asset_level_id:
+          description: The ID of the fee schedule asset level.
+          type: string
+        fee_schedule_id:
+          description: The ID of the fee schedule.
+          type: string
+        fee_type:
+          description: The type of fee.
+          type: string
+          enum:
+          - commission
+          - markup
+        max_fee_amount:
+          description: The maximum amount of the fee.
+          type: number
+        recipient_id:
+          description: The ID of the recipient.
+          type: string
+      required:
+      - fee_schedule_id
+      - fee_schedule_asset_level_id
+      - recipient_id
+      - fee_type
+      - fee_amount_type
+      - fee_amount
+    HydratedQuote:
+      description: A hydrated quote with yields and spread prices.
+      type: object
+      properties:
+        id:
+          description: The ID of the quote.
+          type: string
+        percent_price:
+          description: The percent price of the quote.
+          type: number
+        pre_fee_price:
+          description: The pre fee price of the quote.
+          type: number
+        side:
+          description: The side of the quote.
+          type: string
+          enum:
+          - ask
+          - bid
+        spread_benchmark_isin:
+          description: The ISIN of the spread benchmark.
+          type: string
+        spread_to_benchmark_bps:
+          description: The spread to the benchmark in basis points.
+          type: string
+        yield_to_maturity:
+          description: The yield to maturity of the quote.
+          type: number
+        yield_to_worst:
+          description: The yield to worst of the quote.
+          type: number
+      required:
+      - id
+      - percent_price
+      - side
+    FullOrderBookResponse:
+      type: object
+      properties:
+        asks:
+          type: array
+          items:
+            type: object
+            properties:
+              min_balance_remaining:
+                description: The minimum amount in par that must remain on the quote after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.
+                type: number
+                nullable: true
+              min_increment:
+                description: The minimum quantity increment for which orders can be placed on this quote. All orders executing on this quote must be in multiples of this value.
+                type: number
+                nullable: true
+              min_size:
+                description: Ask minimum trade size in par value
+                type: number
+              price:
+                description: Ask price
+                type: number
+              size:
+                description: Ask size in par value
+                type: number
+              spread_benchmark_isin:
+                description: Benchmark ISIN for the spread
+                type: string
+                nullable: true
+              spread_to_benchmark_bps:
+                description: Spread to benchmark in basis points
+                type: string
+                nullable: true
+              venue_mpid:
+                description: The venue's Market Participant Identifier
+                type: string
+              yield_to_maturity:
+                description: Ask yield to maturity
+                type: number
+                nullable: true
+              yield_to_worst:
+                description: Ask yield to worst
+                type: number
+                nullable: true
+        bids:
+          type: array
+          items:
+            type: object
+            properties:
+              min_balance_remaining:
+                description: The minimum amount in par that must remain on the quote after a partial fill. If an incoming order would reduce the remaining balance below this minimum, the entire remaining balance is filled instead.
+                type: number
+                nullable: true
+              min_increment:
+                description: The minimum quantity increment for which orders can be placed on this quote. All orders executing on this quote must be in multiples of this value.
+                type: number
+                nullable: true
+              min_size:
+                description: Bid minimum trade size in par value
+                type: number
+              price:
+                description: Bid price
+                type: number
+              size:
+                description: Bid size in par value
+                type: number
+              spread_benchmark_isin:
+                description: Benchmark ISIN for the spread
+                type: string
+                nullable: true
+              spread_to_benchmark_bps:
+                description: Spread to benchmark in basis points
+                type: string
+                nullable: true
+              venue_mpid:
+                description: The venue's Market Participant Identifier
+                type: string
+              yield_to_maturity:
+                description: Bid yield to maturity
+                type: number
+                nullable: true
+              yield_to_worst:
+                description: Bid yield to worst
+                type: number
+                nullable: true
+        timestamp:
+          description: Timestamp in RFC-3339 format with nanosecond precision
+          type: string
+          format: date-time
+      title: FullOrderBookResponse
+  parameters:
+    instrument_id:
+      name: instrument_id
+      in: path
+      required: true
+      description: Instrument CUSIP or ISIN
+      schema:
+        type: string
+        example: US91915WAB81
+tags:
+- name: Hydrate Quotes
+- name: Unified Market
+- name: Order Book
+- name: Trade Price
+- name: Calendar
+- name: Fractional Universe
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getfractionaluniverse-1.md
+  - https://docs.moment.com/reference/getfullorderbook-1.md
+  - https://docs.moment.com/reference/gettopoforderbook-1.md
+  - https://docs.moment.com/reference/gettradeprice-1.md
+  - https://docs.moment.com/reference/gettradingcalendar-1.md
+  - https://docs.moment.com/reference/getunifiedmarket-1.md
+  - https://docs.moment.com/reference/hydratequotes-1.md
+  merge:
+    pages: 7
+    deduped: 4
+    conflicts_kept_first: 0

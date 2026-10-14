@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-external-trade-report-schema.json",
+  "title": "External Trade Report",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-orders-api-openapi.yml#/components/schemas/ExternalTradeReport",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "$ref": "#/$defs/OrderSize"
+    },
+    "annotation": {
+      "description": "Optional annotation for the trade.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "bypass_street_side_leg": {
+      "description": "Flag to bypass street side leg. If true, we will not send the street side to the custodian.",
+      "type": "boolean",
+      "default": false,
+      "x-go-type-skip-optional-pointer": true
+    },
+    "bypass_trade_booking": {
+      "description": "Flag to bypass trade booking. If true, the trade will not be booked in the system.",
+      "type": "boolean"
+    },
+    "client_external_trade_report_id": {
+      "description": "The client-provided idempotency key.",
+      "type": "string"
+    },
+    "counterparty_clearing_firm_id": {
+      "description": "DTC ID of the counterparty's clearing firm.",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "counterparty_id": {
+      "description": "MPID of the counterparty involved in the street trade.",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "execution_id": {
+      "description": "Trade ID. Often times this will be the ID of the execution made at an external venue.",
+      "type": "string"
+    },
+    "external_trade_report_id": {
+      "description": "Optional external trade report ID. If provided, this ID will be used instead of auto-generating one.\nMust start with 'etr_' followed by a valid ULID.\nIf not provided, the system will generate a unique ID automatically.\n",
+      "type": "string"
+    },
+    "price": {
+      "description": "The trade price. For mutual funds, if not provided, the backend will use the parent order's estimated price (NAV).",
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "settle_date": {
+      "description": "The settlement date for the trade.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "snapshot_id": {
+      "description": "Optional quote snapshot ID. If provided, this snapshot ID will be used instead of creating a new one.",
+      "type": "string"
+    },
+    "trade_time": {
+      "description": "The timestamp when the trade occurred.",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_external_trade_report_id",
+    "amount",
+    "trade_time",
+    "settle_date",
+    "bypass_trade_booking"
+  ],
+  "$defs": {
+    "OrderSize": {
+      "type": "object",
+      "title": "Amount",
+      "description": "The Amount of an order with a specified `type` indicating how the amount is represented.\n- **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).\n- **Notional:** Represents the order size in notional dollar value.\n- **Shares:** Represents the order size in number of shares (for equities).",
+      "properties": {
+        "value": {
+          "type": "number",
+          "x-go-type": "float64"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "par",
+            "notional",
+            "shares"
+          ],
+          "default": "par",
+          "x-enumNames": [
+            "SizeTypePar",
+            "SizeTypeNotional",
+            "SizeTypeShares"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ]
+    }
+  }
+}

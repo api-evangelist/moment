@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-cashflow-target-schema.json",
+  "title": "CashflowTarget",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-account-management-api-openapi.yml#/components/schemas/CashflowTarget",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "number",
+      "description": "The amount of cashflow to target per period"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date on which the cashflow target starts being applied. This date is inclusive. Must be in the format YYYYMMDD, i.e. 20250101. If not provided, the cashflow target will start on the current date."
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date on which the cashflow target stops being applied. This date is exclusive. Must be in the format YYYYMMDD, i.e. 20251231."
+    },
+    "frequency": {
+      "type": "string",
+      "description": "The frequency of the cashflow.\n\n* one_time: Cashflow is a one-time payment.\n* monthly: Cashflow is distributed monthly.\n* bimonthly: Cashflow is distributed every two months.\n* quarterly: Cashflow is distributed quarterly.\n* semiannually: Cashflow is distributed twice per year.\n* annually: Cashflow is distributed annually.",
+      "enum": [
+        "one_time",
+        "monthly",
+        "bimonthly",
+        "quarterly",
+        "semiannually",
+        "annually"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "The source of the cashflow.\n\n* coupon: Cashflow is derived from coupon payments.\n* principal: Cashflow is derived from principal payments.\n* coupon_and_principal: Cashflow is derived from both coupon and principal payments.",
+      "enum": [
+        "coupon",
+        "principal",
+        "coupon_and_principal"
+      ]
+    },
+    "call_assumption": {
+      "type": "string",
+      "description": "The assumption made about when bonds will be called.\n\n* maturity_date: Assumes bonds are held until maturity.\n* workout_date: Assumes bonds are called at the workout date.\n* next_call_date: Assumes bonds are called at the next call date.",
+      "enum": [
+        "maturity_date",
+        "workout_date",
+        "next_call_date"
+      ]
+    },
+    "overrides": {
+      "type": "object",
+      "description": "Custom cashflow amounts to override specific buckets. Keys are bucket date ranges in format\n\"YYYYMMDD_YYYYMMDD\" (start_end), values are the override amount.\nExample: {\"20250301_20250401\": 13000} overrides the March 2025 bucket for a monthly frequency starting on the 1st.",
+      "additionalProperties": true,
+      "x-go-type": "json.RawMessage"
+    }
+  },
+  "required": [
+    "amount",
+    "end_date",
+    "frequency",
+    "source",
+    "call_assumption",
+    "overrides"
+  ]
+}

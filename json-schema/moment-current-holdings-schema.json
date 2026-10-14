@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-current-holdings-schema.json",
+  "title": "Current Holdings",
+  "description": "The portfolio contents, including cash. Cash is specified using an `instrument_id` of `CASH`.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-analytics-api-openapi.yml#/components/schemas/CurrentHoldings",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/holding"
+  },
+  "$defs": {
+    "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument CUSIP or ISIN"
+    },
+    "PositionSize": {
+      "type": "object",
+      "title": "Size",
+      "description": "The size of the position, with a specified `type` indicating how the size is represented. Par sizes represent the size of the position in face value; most corporate bonds have a face value of $1000. Currently, only par sizes are supported.",
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "par"
+          ],
+          "default": "par"
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ]
+    },
+    "holding": {
+      "type": "object",
+      "title": "Holding",
+      "description": "An individual holding. Cash is specified using an `instrument_id` of `CASH`.",
+      "properties": {
+        "instrument_id": {
+          "$ref": "#/$defs/InstrumentID"
+        },
+        "size": {
+          "$ref": "#/$defs/PositionSize"
+        }
+      }
+    }
+  }
+}

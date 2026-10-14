@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-pre-fee-quote-schema.json",
+  "title": "PreFeeQuote",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-quotes-api-openapi.yml#/components/schemas/PreFeeQuote",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The ID of the quote.",
+      "type": "string"
+    },
+    "pre_fee_price": {
+      "description": "The pre fee price of the quote.",
+      "type": "number"
+    },
+    "side": {
+      "description": "The side of the quote.",
+      "type": "string",
+      "enum": [
+        "ask",
+        "bid"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "pre_fee_price",
+    "side"
+  ]
+}

@@ -1,0 +1,1507 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-preview-model-request-schema.json",
+  "title": "PreviewModelRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-models-api-openapi.yml#/components/schemas/PreviewModelRequest",
+  "type": "object",
+  "properties": {
+    "assignment_date": {
+      "description": "The date to assign the model",
+      "type": "string",
+      "format": "date",
+      "title": "Assignment Date",
+      "x-go-type": "string"
+    },
+    "cash": {
+      "description": "The amount of cash to invest in the model",
+      "type": "number",
+      "title": "Cash",
+      "x-go-type": "float64"
+    },
+    "customizations": {
+      "$ref": "#/$defs/Customizations"
+    },
+    "federal_tax_rate": {
+      "description": "The federal tax rate to apply to the model",
+      "type": "number",
+      "default": 0,
+      "title": "Federal Tax Rate",
+      "x-go-type": "float64"
+    },
+    "local_tax_rate": {
+      "description": "The local tax rate to apply to the model",
+      "type": "number",
+      "default": 0,
+      "title": "Local Tax Rate",
+      "x-go-type": "float64"
+    },
+    "risk_group_id": {
+      "description": "The ID of the risk group to apply to the model",
+      "type": "string",
+      "title": "Risk Group ID"
+    },
+    "state": {
+      "description": "The state that the user is in. This will alter the tax treatments of the portfolio.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/State"
+        }
+      ]
+    },
+    "state_tax_rate": {
+      "description": "The state tax rate to apply to the model",
+      "type": "number",
+      "default": 0,
+      "title": "State Tax Rate",
+      "x-go-type": "float64"
+    },
+    "strategy": {
+      "$ref": "#/$defs/FixedIncomeStrategy"
+    }
+  },
+  "required": [
+    "state",
+    "strategy"
+  ],
+  "$defs": {
+    "AllocationConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "max_market_value": {
+          "description": "The maximum market value for the allocation constraint, which can be specified instead of max_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Market Value"
+        },
+        "max_weight": {
+          "description": "The maximum weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Max Weight"
+        },
+        "min_market_value": {
+          "description": "The minimum market value for the allocation constraint, which can be specified instead of min_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Market Value"
+        },
+        "min_weight": {
+          "description": "The minimum weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Min Weight"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "rel_buffer": {
+          "description": "Relative buffer applied around the target. Half-open [0, 1).",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMaximum": true,
+          "maximum": 1,
+          "default": 0.01,
+          "title": "Rel Buffer"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "target_market_value": {
+          "description": "The target market value for the allocation constraint, which can be specified instead of target_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Target Market Value"
+        },
+        "target_weight": {
+          "description": "The target weight for the allocation constraint. Bounded to [0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1,
+          "title": "Target Weight"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "allocation"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "filter",
+        "type"
+      ],
+      "title": "AllocationConstraint"
+    },
+    "ApplicableSide": {
+      "description": "Which side(s) of a trade a constraint or filter applies to. Distinct from `Side`, which labels real executable order direction (`buy` or `sell` only); `ApplicableSide` adds `both` for cases like a universe filter that restricts buys, sells, or both.",
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell",
+        "both"
+      ],
+      "x-enum-varnames": [
+        "ApplicableSideBuy",
+        "ApplicableSideSell",
+        "ApplicableSideBoth"
+      ],
+      "title": "ApplicableSide"
+    },
+    "AverageValueConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "field": {
+          "description": "The field to apply the average value constraint to.",
+          "type": "string",
+          "title": "Field"
+        },
+        "max_average_value": {
+          "description": "The maximum average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Max Average Value"
+        },
+        "min_average_value": {
+          "description": "The minimum average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Min Average Value"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "target_average_value": {
+          "description": "The target average value for the field.",
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Target Average Value"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "average_value"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "AverageValueConstraint"
+    },
+    "BuyUniverseConstraint": {
+      "description": "The BuyUniverseConstraint is a constraint that specifies the universe of instruments that can be bought in the account. Within the filter field, you can specify filters based on reference data fields and live fields (this includes: `order_price`, `order_ytw`, `tax_effective_limit_ytw`, `post_tax_limit_ytw`, `fixed_transaction_cost_in_yield`, and `fixed_transaction_cost_in_price`).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "buy_universe"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filter"
+      ],
+      "title": "BuyUniverseConstraint"
+    },
+    "CashflowBandConstraint": {
+      "description": "Levels the recurring cashflow targets of every account on the strategy:\neach live bucket of a recurring target is held within\n±max_deviation_ratio of that target's post-trade mean bucket cashflow,\nin raw dollars, while the objective is still maximized. Buckets with\nan amount override are left out of the band, as are one_time targets\nand targets with fewer than two remaining buckets. Assigned accounts\ninherit it; per-account customizations may override or remove it by\nid.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "description": "Same as ConstraintPriority, but omitted defaults to 1, so the band relaxes before the cashflow floors (tier 2).",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ConstraintPriority"
+            }
+          ],
+          "default": 1
+        },
+        "max_deviation_ratio": {
+          "description": "Half-width of the band as a fraction of the target's mean bucket, in (0, 1].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "maximum": 1,
+          "title": "Max Deviation Ratio"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "cashflow_band"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "max_deviation_ratio"
+      ],
+      "title": "CashflowBandConstraint"
+    },
+    "ConcreteConstraint": {
+      "description": "Leaf-only discriminator union. Each variant carries its own `id`\nfield; no parent-level shared properties (so codegens emit a\nclean discriminator union, not intersection wrappers).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/AllocationConstraint"
+        },
+        {
+          "$ref": "#/$defs/UniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/DiversificationConstraint"
+        },
+        {
+          "$ref": "#/$defs/AverageValueConstraint"
+        },
+        {
+          "$ref": "#/$defs/TradeConstraint"
+        },
+        {
+          "$ref": "#/$defs/BuyUniverseConstraint"
+        }
+      ],
+      "x-go-type-skip-optional-pointer": true
+    },
+    "ConcreteObjectiveTerm": {
+      "description": "A leaf or operation node in an objective term tree — either a field reference or an operation applied to other nodes.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/FieldTerm"
+        },
+        {
+          "$ref": "#/$defs/OperationTerm"
+        }
+      ],
+      "title": "ConcreteObjectiveTerm"
+    },
+    "Constraint": {
+      "description": "Discriminator union of all constraint variants. The `id` field on\neach variant is the shared identifier; consumers extract it from\nthe resolved variant. (Removing the redundant parent-level `id`\nproperty lets the OpenAPI codegens emit a clean discriminator\nunion instead of intersection wrappers.)",
+      "nullable": true,
+      "oneOf": [
+        {
+          "$ref": "#/$defs/UniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/AllocationConstraint"
+        },
+        {
+          "$ref": "#/$defs/DiversificationConstraint"
+        },
+        {
+          "$ref": "#/$defs/AverageValueConstraint"
+        },
+        {
+          "$ref": "#/$defs/LadderPolicyConstraint"
+        },
+        {
+          "$ref": "#/$defs/TradeConstraint"
+        },
+        {
+          "$ref": "#/$defs/BuyUniverseConstraint"
+        },
+        {
+          "$ref": "#/$defs/PiecewiseConstraint"
+        },
+        {
+          "$ref": "#/$defs/SellPrecedenceConstraint"
+        },
+        {
+          "$ref": "#/$defs/OrderLimitConstraint"
+        },
+        {
+          "$ref": "#/$defs/CashflowBandConstraint"
+        }
+      ]
+    },
+    "ConstraintPriority": {
+      "description": "The priority of the constraint. Constraints with lower priority values will be relaxed first. Omitted defaults to 1 (lowest priority, relaxed first); -1 marks the constraint unrelaxable (never relaxed).",
+      "type": "number",
+      "format": "double",
+      "default": 1,
+      "title": "ConstraintPriority"
+    },
+    "Customizations": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/Constraint"
+      },
+      "title": "Customizations"
+    },
+    "DiversificationConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "equal_weight_tolerance": {
+          "description": "Keeps every held group within ±tolerance of a common size the optimizer picks, relative to the other held groups rather than a fixed bound (0.1 = each within 10%). In [0, 1). Must be the only limit on its rule; pair it with other limits through separate rules on the same field.",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "exclusiveMaximum": true,
+          "maximum": 1,
+          "title": "Equal Weight Tolerance"
+        },
+        "field": {
+          "description": "The field to apply the diversification constraint to.",
+          "type": "string",
+          "title": "field"
+        },
+        "max_instruments_per_unique_value": {
+          "description": "The maximum number of instruments per unique value for the diversification constraint, which is optional to specify.",
+          "type": "integer",
+          "title": "Max Instruments Per Unique Value"
+        },
+        "max_market_value_per_unique_value": {
+          "description": "The maximum market value per unique value for the diversification constraint.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Market Value Per Unique Value"
+        },
+        "max_unique_fields": {
+          "description": "The maximum number of unique values of this field that are allowed to exist.",
+          "type": "integer",
+          "title": "Max Unique Fields"
+        },
+        "max_weight_per_unique_value": {
+          "description": "The maximum weight per unique value for the diversification constraint.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Weight Per Unique Value"
+        },
+        "min_instruments_per_unique_value": {
+          "description": "The minimum number of instruments per unique value for the diversification constraint, which is optional to specify.",
+          "type": "integer",
+          "title": "Min Instruments Per Unique Value"
+        },
+        "min_market_value_per_unique_value": {
+          "description": "The minimum market value per unique value for the diversification constraint, which is optional to specify.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Market Value Per Unique Value"
+        },
+        "min_unique_fields": {
+          "description": "The minimum number of unique values of this field that are allowed to exist, which is optional to specify.",
+          "type": "integer",
+          "title": "Min Unique Fields"
+        },
+        "min_weight_per_unique_value": {
+          "description": "The minimum weight per unique value for the diversification constraint, which is optional to specify.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Weight Per Unique Value"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "diversification"
+          ],
+          "title": "Type"
+        }
+      },
+      "x-moment-required-any-of": [
+        "min_market_value_per_unique_value",
+        "max_market_value_per_unique_value",
+        "min_weight_per_unique_value",
+        "max_weight_per_unique_value",
+        "min_unique_fields",
+        "max_unique_fields",
+        "min_instruments_per_unique_value",
+        "max_instruments_per_unique_value",
+        "equal_weight_tolerance"
+      ],
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "DiversificationConstraint"
+    },
+    "FieldTerm": {
+      "description": "A term that references a field value from the instrument data.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the field value.",
+          "type": "number",
+          "format": "double",
+          "default": 1
+        },
+        "field": {
+          "description": "The name of the field to reference.",
+          "type": "string"
+        },
+        "filter": {
+          "description": "Optional filter applied to the field.",
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "field"
+          ],
+          "default": "field"
+        }
+      },
+      "required": [
+        "type",
+        "field"
+      ],
+      "title": "FieldTerm"
+    },
+    "Filter": {
+      "type": "object",
+      "properties": {
+        "equal_to": {
+          "description": "The value to be equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Equal To"
+        },
+        "greater_than": {
+          "description": "The value to be greater than.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Greater Than"
+        },
+        "greater_than_or_equal_to": {
+          "description": "The value to be greater than or equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Greater Than Or Equal To"
+        },
+        "in": {
+          "description": "The value to be in the list.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "In List"
+        },
+        "in_filter_list": {
+          "description": "The value to be in the filter list.",
+          "type": "string",
+          "title": "In Filter List"
+        },
+        "in_list": {
+          "description": "Alias for `in`. The value to be in the list. Supplying both `in` and `in_list` is an error.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "In List"
+        },
+        "includes": {
+          "description": "The value to include.",
+          "type": "string",
+          "title": "Includes"
+        },
+        "superset": {
+          "description": "Match a string-list column containing every element of this list. Elements match exactly and case-sensitively; leading and trailing whitespace is ignored. Null lists do not match.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Superset"
+        },
+        "subset": {
+          "description": "Match a string-list column whose every element is in this list. Elements match exactly and case-sensitively; leading and trailing whitespace is ignored. Empty lists match; null lists do not.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Subset"
+        },
+        "not_superset": {
+          "description": "Match a string-list column missing at least one element of this list. The negation of `superset`: null lists match.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Not Superset"
+        },
+        "not_subset": {
+          "description": "Match a string-list column with at least one element outside this list. The negation of `subset`: null lists match; empty lists do not.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Not Subset"
+        },
+        "is_null": {
+          "description": "Match values that are null.",
+          "type": "boolean",
+          "title": "Is Null"
+        },
+        "less_than": {
+          "description": "The value to be less than.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Less Than"
+        },
+        "less_than_or_equal_to": {
+          "description": "The value to be less than or equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Less Than Or Equal To"
+        },
+        "not_equal_to": {
+          "description": "The value to not be equal to.",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "title": "Not Equal To"
+        },
+        "not_in": {
+          "description": "The value to not be in the list.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Not In List"
+        },
+        "not_in_filter_list": {
+          "description": "The value to be not in the filter list.",
+          "type": "string",
+          "title": "Not In Filter List"
+        },
+        "not_in_list": {
+          "description": "Alias for `not_in`. The value to not be in the list. Supplying both `not_in` and `not_in_list` is an error.",
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Not In List"
+        },
+        "not_includes": {
+          "description": "The value to not include.",
+          "type": "string",
+          "title": "Not Includes"
+        },
+        "not_starts_with": {
+          "description": "The value to not start with.",
+          "type": "string",
+          "title": "Not Starts With"
+        },
+        "starts_with": {
+          "description": "The value to start with.",
+          "type": "string",
+          "title": "Starts With"
+        },
+        "ends_with": {
+          "description": "The value to end with.",
+          "type": "string",
+          "title": "Ends With"
+        }
+      },
+      "title": "Filter"
+    },
+    "FilterDictionary": {
+      "type": "object",
+      "properties": {
+        "and": {
+          "description": "A list of filters to be applied in an AND relationship.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "default": [],
+          "title": "And"
+        },
+        "and_list": {
+          "description": "Alias for `and`. A list of filters to be applied in an AND relationship. Supplying both `and` and `and_list` is an error.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "title": "And List"
+        },
+        "not": {
+          "description": "A filter to be applied in a NOT relationship.",
+          "$ref": "#/$defs/FilterDictionary",
+          "title": "Not"
+        },
+        "not_filter": {
+          "description": "Alias for `not`. A filter to be applied in a NOT relationship. Supplying both `not` and `not_filter` is an error.",
+          "$ref": "#/$defs/FilterDictionary",
+          "title": "Not Filter"
+        },
+        "or": {
+          "description": "A list of filters to be applied in an OR relationship.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "default": [],
+          "title": "Or"
+        },
+        "or_list": {
+          "description": "Alias for `or`. A list of filters to be applied in an OR relationship. Supplying both `or` and `or_list` is an error.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "title": "Or List"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/Filter"
+      },
+      "title": "FilterDictionary"
+    },
+    "FixedIncomeStrategy": {
+      "description": "Fixed income optimization strategy with constraints",
+      "type": "object",
+      "properties": {
+        "buy_objective_terms": {
+          "description": "The default objective terms for the model, scoring every trade leg, buy and sell.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectiveTerm"
+          },
+          "x-go-type-skip-optional-pointer": true
+        },
+        "cash_buffer": {
+          "description": "The cash buffer to maintain in the account.",
+          "type": "number",
+          "title": "Cash Buffer"
+        },
+        "constraints": {
+          "description": "The constraints to apply to the strategy.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Constraint"
+          },
+          "title": "Constraints"
+        },
+        "minimum_order_increment": {
+          "description": "The minimum order-size increment for trades in this strategy (face value). Sleeves and accounts can override.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "title": "Minimum Order Increment"
+        },
+        "scope_relative_weights": {
+          "description": "If true, a min or max weight bound on a scoped allocation or diversification constraint is a share of the scope's post-trade market value instead of the account's. Defaults to false.",
+          "type": "boolean",
+          "default": false,
+          "title": "Scope Relative Weights",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "objective_strategy": {
+          "description": "The default objective strategy for the model.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ObjectiveStrategy"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "schema_version": {
+          "type": "integer",
+          "enum": [
+            1
+          ],
+          "title": "Schema Version"
+        }
+      },
+      "required": [
+        "schema_version",
+        "constraints",
+        "cash_buffer"
+      ],
+      "title": "FixedIncomeStrategy"
+    },
+    "LadderPolicyConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "end_period": {
+          "description": "The ending period of the ladder. Required unless `num_periods` is provided.",
+          "type": "integer",
+          "title": "End Period"
+        },
+        "grace_period_months": {
+          "description": "The length of the grace period in months. The grace period is the time period after the assignment date where a dynamic ladder policy constraint are not yet being adjusted.",
+          "type": "integer",
+          "default": 1,
+          "title": "Grace Period Months"
+        },
+        "market_value_tolerance": {
+          "description": "The maximum market value deviation allowed for each bucket in the ladder, which can be specified instead of weight_tolerance.",
+          "type": "number",
+          "format": "double",
+          "title": "Market Value Tolerance"
+        },
+        "maturity_option": {
+          "description": "Which date a ladder bucket measures against. Nullable because persisted payloads carry an explicit null, which readers already treat as the default.",
+          "default": "maturity_date",
+          "nullable": true,
+          "x-omitempty": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/MaturityOption"
+            }
+          ]
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "num_periods": {
+          "description": "Alternative to `end_period`; sets `end_period` to `start_period + num_periods`. May be sent with `end_period` only when they agree (`end_period == start_period + num_periods`); conflicting values are rejected.",
+          "type": "integer",
+          "title": "Num Periods"
+        },
+        "period_length": {
+          "description": "The length of one ladder period in months.",
+          "type": "integer",
+          "title": "Period Length"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "start_period": {
+          "description": "The starting period of the ladder.",
+          "type": "integer",
+          "default": 0,
+          "title": "Start Period"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ladder_policy"
+          ],
+          "title": "Type"
+        },
+        "use_call_adjusted_maturity": {
+          "description": "The call adjusted maturity date is the terminal date of the bond implied by its yield to worst. If set to true then the ladder policy constraint will use the call adjusted maturity date instead of the maturity date.",
+          "type": "boolean",
+          "default": false,
+          "title": "Use Call Adjusted Maturity"
+        },
+        "use_assignment_date": {
+          "description": "When true, the assignment date anchors the ladder policy time-line; when false, the time-to-maturity mode is used (rolling buckets relative to today). Defaults to true.",
+          "type": "boolean",
+          "default": true,
+          "title": "Use Assignment Date"
+        },
+        "weight_tolerance": {
+          "description": "The maximum weight deviation allowed for each bucket in the ladder.",
+          "type": "number",
+          "format": "double",
+          "title": "Weight Tolerance"
+        }
+      },
+      "required": [
+        "type",
+        "period_length"
+      ],
+      "title": "LadderPolicyConstraint"
+    },
+    "MaturityOption": {
+      "description": "The maturity option for the ladder policy constraint.",
+      "type": "string",
+      "default": "maturity_date",
+      "enum": [
+        "maturity_date",
+        "workout_date",
+        "next_call_date"
+      ],
+      "title": "Maturity Option"
+    },
+    "ObjectiveStrategy": {
+      "description": "The objective strategy for the optimization.",
+      "type": "string",
+      "enum": [
+        "revenue",
+        "minimize_deployed_cash",
+        "maximize_cashflows"
+      ],
+      "title": "ObjectiveStrategy",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "ObjectiveTerm": {
+      "description": "Top-level wrapper for an objective function term with scaling factor.",
+      "type": "object",
+      "properties": {
+        "factor": {
+          "description": "The scaling factor applied to the term value.",
+          "type": "number",
+          "format": "double",
+          "default": 1
+        },
+        "term": {
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        }
+      },
+      "required": [
+        "term"
+      ],
+      "title": "ObjectiveTerm"
+    },
+    "ObjectiveTermOperation": {
+      "description": "The operation to apply between objective terms.",
+      "type": "string",
+      "enum": [
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "max",
+        "min"
+      ],
+      "title": "ObjectiveTermOperation"
+    },
+    "OperationTerm": {
+      "description": "A term that applies an operation to other terms.",
+      "type": "object",
+      "properties": {
+        "left": {
+          "description": "The left operand.",
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        },
+        "operation": {
+          "description": "The operation to apply.",
+          "$ref": "#/$defs/ObjectiveTermOperation"
+        },
+        "right": {
+          "description": "The right operand.",
+          "$ref": "#/$defs/ConcreteObjectiveTerm"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "operation"
+          ],
+          "default": "operation"
+        }
+      },
+      "required": [
+        "type",
+        "operation",
+        "left",
+        "right"
+      ],
+      "title": "OperationTerm"
+    },
+    "OrderLimitConstraint": {
+      "description": "Limits the number of unique securities traded in the account: the max_* fields cap, and the min_* fields floor, the count of distinct securities bought, sold, or traded in total. Helps control turnover and transaction costs.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "max_buy_orders": {
+          "description": "Maximum number of unique securities that may be bought.",
+          "type": "integer",
+          "title": "Max Buy Orders"
+        },
+        "max_sell_orders": {
+          "description": "Maximum number of unique securities that may be sold.",
+          "type": "integer",
+          "title": "Max Sell Orders"
+        },
+        "max_total_orders": {
+          "description": "Maximum number of unique securities that may be traded (bought or sold).",
+          "type": "integer",
+          "title": "Max Total Orders"
+        },
+        "min_buy_orders": {
+          "description": "Minimum number of unique securities that must be bought.",
+          "type": "integer",
+          "title": "Min Buy Orders"
+        },
+        "min_sell_orders": {
+          "description": "Minimum number of unique securities that must be sold.",
+          "type": "integer",
+          "title": "Min Sell Orders"
+        },
+        "min_total_orders": {
+          "description": "Minimum number of unique securities that must be traded (bought or sold).",
+          "type": "integer",
+          "title": "Min Total Orders"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "order_limit"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "OrderLimitConstraint"
+    },
+    "Piece": {
+      "type": "object",
+      "properties": {
+        "condition": {
+          "description": "the filter that we will use for the piecewise constraint.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/PiecewiseCondition"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "constraints": {
+          "description": "the constraints that we will use for the piecewise constraint.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConcreteConstraint"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        }
+      }
+    },
+    "PiecewiseCondition": {
+      "type": "object",
+      "properties": {
+        "account_market_value": {
+          "description": "the account market value that we will use for the piecewise constraint.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/Filter"
+            }
+          ],
+          "x-go-type-skip-optional-pointer": true
+        }
+      }
+    },
+    "PiecewiseConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "pieces": {
+          "description": "the pieces that we will use for the piecewise constraint.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Piece"
+          },
+          "default": [],
+          "x-go-type-skip-optional-pointer": true
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "piecewise"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "PiecewiseConstraint"
+    },
+    "SellPrecedenceConstraint": {
+      "description": "Enforces a trading-precedence ordering across an ordered list of security groups. Each entry in `filters` selects a group (the in-scope securities matching it); a group may only be traded once every higher-precedence (earlier) group has been fully consumed. Earlier filters are higher precedence. At least two filters are required — a single-group ordering is a no-op.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filters": {
+          "description": "Ordered list of group-membership filters. Index 0 is the highest-precedence group. At least two filters are required.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FilterDictionary"
+          },
+          "minItems": 2,
+          "title": "Filters"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sell_precedence"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filters"
+      ],
+      "title": "SellPrecedenceConstraint"
+    },
+    "State": {
+      "type": "string",
+      "enum": [
+        "AL",
+        "AK",
+        "AS",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "GU",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MP",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "PR",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VI",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY",
+        ""
+      ],
+      "title": "State"
+    },
+    "TradeConstraint": {
+      "description": "A trade constraint that limits trade sizes by notional value, par value, or portfolio weight. Exactly one minimum must be specified: either min_size or min_weight (not both). Max fields are optional, but max_size and max_weight cannot both be specified. Mutual exclusivity is per bound — you can mix across bounds (e.g., min_size with max_weight is valid). Weight fields must be in the range 0-1 (representing 0-100% of portfolio value).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "max_size": {
+          "description": "The maximum size of the trade, measured in the unit given by `size_basis` (market value or par). Cannot be specified together with max_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Max Size"
+        },
+        "max_weight": {
+          "description": "The maximum size of the trade as a percentage of the portfolio value (0-1). Cannot be specified together with max_size.",
+          "type": "number",
+          "format": "double",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Max Weight"
+        },
+        "min_size": {
+          "description": "The minimum size of the trade, measured in the unit given by `size_basis` (market value or par). Either min_size or min_weight must be specified. Cannot be specified together with min_weight.",
+          "type": "number",
+          "format": "double",
+          "title": "Min Size"
+        },
+        "min_weight": {
+          "description": "The minimum size of the trade as a percentage of the portfolio value (0-1). Either min_size or min_weight must be specified. Cannot be specified together with min_size.",
+          "type": "number",
+          "format": "double",
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Min Weight"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "size_basis": {
+          "$ref": "#/$defs/TradeSizeBasis"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "trade"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "TradeConstraint"
+    },
+    "TradeSizeBasis": {
+      "description": "The field a trade constraint's `min_size`/`max_size` bounds are evaluated on.",
+      "type": "string",
+      "default": "market_value",
+      "enum": [
+        "market_value",
+        "par"
+      ],
+      "x-enum-varnames": [
+        "TradeSizeBasisMarketValue",
+        "TradeSizeBasisPar"
+      ],
+      "title": "Trade Size Basis"
+    },
+    "UniverseConstraint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this constraint. Must match the `constraint_id` on the enclosing `ConstraintOperation`. Required.",
+          "type": "string",
+          "title": "ID"
+        },
+        "constraint_priority": {
+          "$ref": "#/$defs/ConstraintPriority"
+        },
+        "filter": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "force_close_violations": {
+          "type": "boolean",
+          "default": false,
+          "title": "Force Close Violations"
+        },
+        "name": {
+          "description": "Optional user-supplied display label for the constraint, shown in place of the generated description. Cosmetic only: never read by the solver and never part of the constraint's identity, so distinct constraints may share a name.",
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "penalty": {
+          "description": "Soft-constraint penalty weight applied per unit of violation. Bounded to [0, 100].",
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 10,
+          "title": "Penalty"
+        },
+        "scope": {
+          "$ref": "#/$defs/FilterDictionary"
+        },
+        "side": {
+          "default": "buy",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApplicableSide"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "universe"
+          ],
+          "title": "Type"
+        }
+      },
+      "required": [
+        "type",
+        "filter"
+      ],
+      "title": "UniverseConstraint"
+    }
+  }
+}

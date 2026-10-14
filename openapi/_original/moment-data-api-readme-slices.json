@@ -1,0 +1,4836 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/listinstruments.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Reference Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/instrument/": {
+     "get": {
+      "tags": [
+       "Reference Data"
+      ],
+      "summary": "All Securities",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/status"
+       },
+       {
+        "$ref": "#/components/parameters/page"
+       },
+       {
+        "$ref": "#/components/parameters/page_size"
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/InstrumentsResponse"
+          }
+         }
+        }
+       }
+      },
+      "operationId": "listInstruments",
+      "description": "List and filter reference data for all instruments."
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "isin": {
+      "type": "string",
+      "title": "ISIN",
+      "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+      "example": "US594918AD66",
+      "minLength": 12,
+      "maxLength": 12
+     },
+     "cusip": {
+      "type": "string",
+      "title": "CUSIP",
+      "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\n\nNote: Available to licensed users only.\nThe Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.\nCUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+      "nullable": true,
+      "example": "H00402625",
+      "minLength": 9,
+      "maxLength": 9
+     },
+     "Figi": {
+      "type": "string",
+      "title": "FIGI",
+      "description": "The Financial Instrument Global Identifier (FIGI) is a 12-character alphanumeric open-standard identifier assigned at the instrument level.\n\nSourced from the Bloomberg Global Id in ICE reference data.",
+      "nullable": true,
+      "example": "BBG00KTQXF60",
+      "minLength": 12,
+      "maxLength": 12
+     },
+     "BondType": {
+      "type": "string",
+      "description": "The type of fixed income security.",
+      "example": "agency",
+      "enum": [
+       "agency",
+       "cd",
+       "corporate",
+       "government",
+       "municipal",
+       "treasury"
+      ]
+     },
+     "TreasurySubtype": {
+      "type": "string",
+      "description": "The subtype of a treasury. Possible values include:\n* bond: long term i.e. 20, 30 years\n* note: intermediate term i.e. 2, 3, 5, 7, and 10 years\n* bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)\n* tips: treasury inflation-protected securities\n* strips: separate trading of registered interest and principal of securities\n* floating: floating rate notes",
+      "nullable": true,
+      "example": "bill",
+      "enum": [
+       "bond",
+       "bill",
+       "note",
+       "strips",
+       "tips",
+       "floating"
+      ]
+     },
+     "CountryIssue": {
+      "type": "string",
+      "description": "The country where the bond is issued in the 2-alpha country code format (e.g., US, CA).",
+      "nullable": true,
+      "example": "US"
+     },
+     "CountryDomicile": {
+      "type": "string",
+      "description": "The country where the bond is domiciled (where it legally resides) in the 2-alpha country code format (e.g., US, CA). An example of where this differs from country_issue is if a Brazilian bond is issued in the US (country of issue) for a corporation in Brazil (country of domicile).",
+      "nullable": true,
+      "example": "US"
+     },
+     "Currency": {
+      "type": "string",
+      "description": "The 3-alpha currency code of the currency the bond is denominated in (e.g., USD, CAD).",
+      "nullable": true,
+      "example": "USD"
+     },
+     "Ticker": {
+      "type": "string",
+      "description": "The stock ticker for publicly traded companies, or a similar styled abbreviation for securities issued by a company that is not publicly traded. This field is only populated for corporate bonds.",
+      "nullable": true,
+      "example": "AAPL"
+     },
+     "Seniority": {
+      "type": "string",
+      "description": "The order of priority in which bondholders are repaid in the event of a default by the issuing corporation such as bankruptcy or liquidation. This field is only populated for corporate bonds.",
+      "nullable": true,
+      "example": "senior_secured"
+     },
+     "Issuer": {
+      "type": "string",
+      "description": "Name of the bond issuer",
+      "example": "AAA United States Government Money Market Account Inc."
+     },
+     "Sector": {
+      "type": "string",
+      "description": "Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)",
+      "nullable": true,
+      "example": "Financial Services"
+     },
+     "NaicsSector": {
+      "type": "string",
+      "description": "North American Industry Classification System (NAICS) standard classification of the bond",
+      "nullable": true,
+      "example": "Finance And Insurance"
+     },
+     "NaicsSubsector": {
+      "type": "string",
+      "description": "North American Industry Classification System (NAICS) standard sub-classification of the bond",
+      "nullable": true,
+      "example": "Securities, Commodity Contracts, And Other Financial Investments And Related Activities"
+     },
+     "Description": {
+      "type": "string",
+      "description": "Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]",
+      "example": "AAA UNITED STATES GOVERNMENT MONEY MARKET ACCOUNT INC 2.6%, 11/30/2022"
+     },
+     "DescriptionShort": {
+      "type": "string",
+      "description": "Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]",
+      "nullable": true,
+      "example": "MI 5.0% 05/01/2034"
+     },
+     "Purpose": {
+      "type": "string",
+      "description": "The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus.",
+      "nullable": true,
+      "example": "Water & Sewer"
+     },
+     "MaturityDate": {
+      "type": "string",
+      "description": "The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds. For fully pre-refunded municipal bonds (see pre_refunded), this holds the refund (redemption) date rather than the original stated maturity, since the bond is redeemed from escrowed funds on that date; the stated maturity is available in original_maturity_date.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-01-15"
+     },
+     "TreasuryBenchmark": {
+      "type": "string",
+      "description": "ISIN that represents the reference U.S. Treasury security used as a benchmark for pricing and evaluating the fixed income instrument. Typically, this is the closest-maturity Treasury bond or note that serves as a basis for determining relative yield and spread.",
+      "nullable": true
+     },
+     "WorkoutDate": {
+      "type": "string",
+      "description": "Workout date, also know as the \"call adjusted maturity date\", is the terminal date of the bond implied by its yield to worst.\n\nIf a bond's yield to worst is equal to its yield to maturity, that means the market believes that it will not be redeemed until maturity. Hence, the workout date is the maturity date.\n\nIf a bond's yield to worst is less than the yield to maturity, that means that the market believes it will get called, and are evaluating the bond's yield according to that predicted call date. Hence, the workout date is the date the market believes the bond will be called."
+     },
+     "Coupon": {
+      "type": "number",
+      "description": "The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds.",
+      "nullable": true,
+      "example": 5
+     },
+     "CouponFrequency": {
+      "type": "string",
+      "description": "The frequency, or how often, the coupon is paid to the bondholder. There are a few standard coupon frequencies:\n* annual: Paid out once per year.\n* semi_annual: Paid out twice per year.\n* quarterly: Paid out four times per year, every quarter.\n* monthly: Paid out twelve times per year, every month.\n* zero: No coupon payments.\n* at_maturity: Coupon paid out once, at maturity. Interest accrues over the life of the bond, and is repaid with the principal. Note: this typically only applies for bonds with a total life of less than 1 year.",
+      "nullable": true,
+      "example": "annual",
+      "enum": [
+       "annual",
+       "semi_annual",
+       "quarterly",
+       "monthly",
+       "zero",
+       "at_maturity"
+      ]
+     },
+     "CouponType": {
+      "type": "string",
+      "description": "The type of coupon rate.\n* fixed: The coupon payment is a fixed percentage of the bond's par value.\n* floating: The coupon payment is pegged to some benchmark rate that frequently changes based off a benchmark, such as SOFR. Typically, the coupon payment is the benchmark rate plus a spread.\n* variable: The coupon payment changes over the life of the bond. Similar to a floating rate, but typically updates less frequently, such as once every coupon payment.\n* zero: Zero-coupon bonds do not pay a coupon over their lifetime.\n* complex: A coupon rate that does not belong in any of the above categories.\n\nSeveral distinct coupon structures share a single coupon_type — stepped-coupon bonds, for example, are reported as variable. See coupon_subtype for the finer-grained description.",
+      "nullable": true,
+      "example": "fixed",
+      "enum": [
+       "fixed",
+       "floating",
+       "variable",
+       "zero",
+       "complex"
+      ]
+     },
+     "CouponSubtype": {
+      "type": "string",
+      "description": "A more specific description of the coupon structure, refining coupon_type. Unlike coupon_type this is not a fixed set of values: it is a free-form descriptive string passed through from the data provider, so treat it as display text rather than matching against an enum. Null when the coupon data does not come with a subtype.",
+      "nullable": true,
+      "example": "Stepped Coupon"
+     },
+     "FirstCouponDate": {
+      "type": "string",
+      "description": "The date of the first coupon payment on the bond. Null for zero-coupon bonds.",
+      "nullable": true,
+      "example": "2017-11-01",
+      "format": "date"
+     },
+     "NextCouponDate": {
+      "type": "string",
+      "description": "The date of the next upcoming coupon payment. Null for zero-coupon bonds. Please note that this date may not be when the actual coupon is paid; most coupons will be paid on the following business day if the coupon date falls on a holiday or a weekend.",
+      "format": "date",
+      "nullable": true,
+      "example": "2024-05-01"
+     },
+     "LastCouponDate": {
+      "type": "string",
+      "description": "The date of the last coupon payment on the bond. Null for zero-coupon bonds.",
+      "nullable": true,
+      "example": "2033-11-03",
+      "format": "date"
+     },
+     "IssueSize": {
+      "type": "number",
+      "description": "The total size amount of the bond issue in the issuing currency.",
+      "nullable": true,
+      "example": 1625000
+     },
+     "IssueDate": {
+      "type": "string",
+      "description": "The date on which the bond was issued. In case of a reissue, this will be the latest issuance date.",
+      "format": "date",
+      "example": "2017-02-18"
+     },
+     "OriginalIssueDate": {
+      "type": "string",
+      "description": "The initial date of issuance for treasury bonds, used to differentiate between original and re-issued bonds.",
+      "nullable": true,
+      "format": "date",
+      "example": "2015-02-18"
+     },
+     "OriginalIssuePrice": {
+      "type": "number",
+      "description": "The price at which the bond was originally issued as a percentage of par value. This is populated for treasury bonds that were reissued.",
+      "nullable": true,
+      "example": 99.68
+     },
+     "OriginalIssueSize": {
+      "type": "number",
+      "description": "The size of the bond when it was originally issued. This is populated for treasury bonds that were reissued.",
+      "nullable": true,
+      "example": 1000000
+     },
+     "IssuePrice": {
+      "type": "number",
+      "description": "The price at which the bond was originally issued as a percentage of par value. In case of a reissue, this will be the latest issuance price.",
+      "nullable": true,
+      "example": 113.68
+     },
+     "IssueMinimumDenomination": {
+      "type": "number",
+      "description": "The smallest unit of the bond that can be purchased at its initial offering.",
+      "nullable": true,
+      "example": 5000
+     },
+     "ParValue": {
+      "type": "number",
+      "description": "The amount that the issuer of the bond will pay back to the bondholder upon maturity. Also known as face value or nominal value.",
+      "example": 5000
+     },
+     "PrincipalFactor": {
+      "type": "number",
+      "description": "The principal factor represents the remaining principal balance as a percentage of the original principal amount. Used primarily for mortgage-backed securities and other amortizing bonds.",
+      "nullable": true,
+      "example": 0.956234
+     },
+     "AccruedInterest": {
+      "type": "number",
+      "description": "The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.",
+      "nullable": true,
+      "example": 56.25
+     },
+     "Callable": {
+      "type": "boolean",
+      "description": "Whether the bond is callable, meaning the issuer has the right but not the obligation to redeem the bond before its maturity date at a set price (the call price). This field only reflects regular call provisions; make-whole or other special call features are not captured.",
+      "nullable": true,
+      "example": true
+     },
+     "CallType": {
+      "type": "string",
+      "description": "The type of call on the bond refers to one of a variety of circumstances under which a callable bond may be called. Null if the bond is not callable.\n* ordinary: The most common call type, which grants the issuer the ability to redeem the bond before its maturity date.\n* make_whole: A make whole call provision allows an issuer to redeem the bond before maturity at a price that is usually calculated based on the present value of future coupon payments and the redemption value, discounted at a specified rate.\n* regulatory: A regulatory call type gives the issuer the right to redeem the bond before its maturity due to changes in regulatory or tax laws that adversely affect the bond or its issuer.\n* special: A special call allows the issuer to call the bond before its maturity under specific circumstances, conditions, or events that are outside the typical operations of the issuer, as outlined in the bond's indenture.",
+      "nullable": true,
+      "example": "ordinary",
+      "enum": [
+       "ordinary",
+       "make_whole",
+       "regulatory",
+       "special"
+      ]
+     },
+     "NextCallDate": {
+      "type": "string",
+      "description": "The date of the next possible call on the bond. Null if the bond is not callable.",
+      "format": "date",
+      "nullable": true,
+      "example": "2027-05-01"
+     },
+     "NextCallPrice": {
+      "type": "number",
+      "description": "The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable.",
+      "nullable": true,
+      "example": 100
+     },
+     "Puttable": {
+      "type": "boolean",
+      "description": "Whether the bond is puttable, meaning the bondholder has the right, but not the obligation, to sell the security back to the issuer at a predetermined price and date.",
+      "nullable": true,
+      "example": false
+     },
+     "Convertible": {
+      "type": "boolean",
+      "description": "A flag indicating whether the bond is convertible. If a bond is convertible, the investor has the right or the obligation to exchange the bond for a predetermined number of shares in the issuing company at certain times throughout a bond's lifetime. Only specified for corporate bonds issued by publicly traded companies.",
+      "nullable": true,
+      "example": false
+     },
+     "ContingentConvertible": {
+      "type": "boolean",
+      "description": "Indicates whether the bond has loss-absorbing contingent convertible (CoCo) features, meaning it can be converted to equity or have its principal written down if a trigger event occurs. Most commonly applies to bank regulatory-capital instruments. False if the bond has no such features.",
+      "nullable": true,
+      "example": true
+     },
+     "TriggerEventType": {
+      "type": "string",
+      "description": "The type of event that would cause conversion or write-down. Null if the bond has no trigger event.",
+      "nullable": true,
+      "example": "Capital Adequacy"
+     },
+     "TriggerType": {
+      "type": "string",
+      "description": "The type of trigger for a conversion or write-down event. Null if the bond has no trigger event.",
+      "nullable": true,
+      "example": "Mechanical"
+     },
+     "TriggerAction": {
+      "type": "string",
+      "description": "The action taken when the trigger event occurs, such as conversion to equity or a principal write-down. Null if the bond has no trigger event.",
+      "nullable": true
+     },
+     "TriggerLevelType": {
+      "type": "string",
+      "description": "The type of threshold used to define the trigger level (for example, a regulatory capital ratio). Null if the bond has no trigger event.",
+      "nullable": true
+     },
+     "TriggerLevelValue": {
+      "type": "number",
+      "description": "For a trigger event, the threshold value at which conversion or write-down is activated, expressed in the units implied by trigger_level_type (for example, a percentage for a capital ratio). Null if the bond has no conversion trigger.",
+      "nullable": true
+     },
+     "BondWarrant": {
+      "type": "boolean",
+      "description": "A financial instrument that gives holder the right, but not the obligation, to purchase a certain number of shares of the issuer's stock at a specified price (the strike price) before the warrant expires.",
+      "nullable": true,
+      "example": false
+     },
+     "IsStructuredProduct": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is a structured product, which is a security derived from or linked to a pool of underlying assets, such as indices or derivatives.",
+      "nullable": true,
+      "example": false
+     },
+     "SinkingFund": {
+      "type": "boolean",
+      "description": "A sinking fund is a pool of money a bond issuer sets aside to repay the bond, typically through periodic buybacks, offering added security to bondholders. For bonds with a sinking fund provision, the bond issuer is obligated to retire or pay down a portion of the principal at specified intervals throughout the bond's lifetime. This means bondholders receive both periodic coupon payments and portions of the principal before maturity, rather than receiving the entire principal amount solely at maturity.",
+      "nullable": true,
+      "example": false
+     },
+     "Perpetual": {
+      "type": "boolean",
+      "description": "A flag representing whether a bond is perpetual, meaning it does not have a maturity date, and pays interest indefinitely. If this is set, the bond's maturity date will be null.",
+      "nullable": true,
+      "example": true
+     },
+     "Insured": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is insured, meaning a third-party insurance company will guarantee the payment of principal and interest in case the issuer defaults.",
+      "nullable": true,
+      "example": true
+     },
+     "PrivatePlacement": {
+      "type": "boolean",
+      "description": "Indicates whether the security was part of private placement, or issued directly to a limited pool of investors rather than through a public offering. These bonds are unregistered with the SEC and are not part of the open market. Note: retail investors may not be eligible to participate in bonds offered via private placement — please consult an attorney for more information.",
+      "nullable": true,
+      "example": false
+     },
+     "144A": {
+      "type": "boolean",
+      "description": "Indicates whether the security was part of Rule 144A, an SEC rule that provides a safe harbor exemption from the registration requirements for certain private resales of restricted securities to qualified institutional buyers. 144A applies to securities that are not registered with the SEC and are typically sold through private placements. Note: only qualified institutional buyers, such as those with with at least $100 million in investable assets, are eligible to purchase 144A securities.",
+      "nullable": true,
+      "example": false
+     },
+     "RegS": {
+      "type": "boolean",
+      "description": "Indicates whether the security falls under Regulation S, a rule that provides an exemption from the registration requirements for securities offerings made outside the United States. This regulation allows U.S. and foreign issuers to sell securities in non-U.S. markets without the need to register these securities with SEC.",
+      "nullable": true,
+      "example": false
+     },
+     "TraceEligible": {
+      "type": "boolean",
+      "description": "Indicates whether the security is TRACE eligible, meaning it is subject to the Trade Reporting and Compliance Engine (TRACE) reporting requirements. Trades on these instruments must be reported to FINRA within 15 minutes of execution.",
+      "nullable": true,
+      "example": true
+     },
+     "DayCount": {
+      "type": "string",
+      "description": "The day count convention used to calculate accrued interest.\n* A/360: calculates the daily interest using a 360-day year and then multiplies that by the actual number of days in each time period.\n* A/365: calculates the daily interest using a 365-day year and then multiplies that by the actual number of days in each time period.\n* 30/360: calculates the daily interest using a 360-day year and then multiplies that by 30 (standardized month).\n* 30/365: calculates the daily interest using a 365-day year and then multiplies that by 30 (standardized month).\n* A/A: calculates the daily interest using the actual number of days in the year and then multiplies that by the actual number of days in each time period.\n* 30E/360: number of days equals to the actual number of days (for February). If the start date or the end date of the period is the 31st of a month, that date is set to the 30th. The number of days in a year is 360.\n* B/252: calculates the daily interest using a 252-business-day year and then multiplies that by the actual number of days in each time period.\n* A/364: calculates the daily interest using a 364-day year and then multiplies that by the actual number of days in each time period.",
+      "nullable": true,
+      "example": "30/360",
+      "enum": [
+       "A/360",
+       "A/365",
+       "30/360",
+       "30/365",
+       "A/A",
+       "30E/360",
+       "B/252",
+       "A/364"
+      ]
+     },
+     "SettlementConvention": {
+      "type": "string",
+      "description": "The standard process through which the legal transfer of bonds from the seller to the buyer is completed, and payment is made by the buyer, including details like the timing and the specific procedures involved in the settlement of a trade.",
+      "nullable": true,
+      "example": "T+1"
+     },
+     "DatedDate": {
+      "type": "string",
+      "description": "The dated date marks the beginning of the period for which interest starts accruing on the bond.",
+      "format": "date",
+      "nullable": true,
+      "example": "2024-04-01"
+     },
+     "MunicipalState": {
+      "type": "string",
+      "description": "The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": "AZ"
+     },
+     "MunicipalType": {
+      "type": "string",
+      "description": "The type of revenue backing. General obligation bonds are not tied to any particular revenue-generating project. Revenue bonds, in contrast are repaid from the income generated by specific projects, enterprises, or sources, rather than from general taxation. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": "revenue",
+      "enum": [
+       "general_obligation",
+       "revenue"
+      ]
+     },
+     "MunicipalTaxableFederal": {
+      "type": "boolean",
+      "description": "Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "BankQualified": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is bank qualified, which is a type of municipal bond specifically designated for purchase by commercial banks. Bank qualified bonds can offer specific tax benefits because they allow banks to deduct interest costs of carrying the bond. For example, they must be issued by a small issuer who expects to issue no more than $10 million in bonds during a calendar year. Banks can also deduct 80% of the interest expense they incur to buy and carry these bonds.",
+      "nullable": true,
+      "example": true
+     },
+     "IsAMTApplicable": {
+      "type": "boolean",
+      "description": "A flag representing whether a bond is AMT (Alternative Minimum Tax) applicable, which means that the bond's interest may be subject to the alternative minimum tax. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "PreRefunded": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is pre-refunded or escrowed to maturity (ETM), meaning the issuer has set aside funds in an escrow account to redeem the bond. For fully pre-refunded bonds, maturity_date holds the refund (redemption) date rather than the original stated maturity (see original_maturity_date). Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "OriginalMaturityDate": {
+      "type": "string",
+      "description": "The stated maturity date of the bond, for bonds whose maturity_date has been overridden with the refund (redemption) date (see pre_refunded). Null when maturity_date already holds the stated maturity.",
+      "format": "date",
+      "nullable": true,
+      "example": "2038-04-01"
+     },
+     "SpRating": {
+      "type": "string",
+      "description": "Standard & Poor's rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor's (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor's Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor's or its affiliates.",
+      "nullable": true,
+      "example": "AAA"
+     },
+     "SpRatingDate": {
+      "type": "string",
+      "description": "The date in the timezone of the issuing country of the most recent Standard & Poor's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2018-07-24"
+     },
+     "SpCreditwatch": {
+      "type": "string",
+      "description": "S&P's CreditWatch highlights S&P's opinion regarding the potential direction of a short-term or long-term rating. Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "nullable": true,
+      "example": "positive",
+      "enum": [
+       "positive",
+       "negative",
+       "developing",
+       "not_meaningful"
+      ]
+     },
+     "SpCreditwatchDate": {
+      "type": "string",
+      "description": "The date of the most recent Standard & Poor's CreditWatch for the bond in YYYY-MM-DD format. This field will be null if no information about outlook is available or CreditWatch date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2020-07-22"
+     },
+     "SpOutlook": {
+      "type": "string",
+      "description": "A Standard & Poor's rating outlook indicates S&P's view regarding the potential direction of a long-term credit rating over the intermediate term (2 years for investment grade, 1 year for speculative grade). Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "nullable": true,
+      "example": "negative",
+      "enum": [
+       "positive",
+       "negative",
+       "developing",
+       "stable",
+       "not_rated",
+       "not_meaningful"
+      ]
+     },
+     "SpOutlookDate": {
+      "type": "string",
+      "description": "The date of the most recent Standard & Poor's outlook for the bond in YYYY-MM-DD format. Null if no information about outlook is available or outlook date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2022-06-15"
+     },
+     "MoodysRating": {
+      "type": "string",
+      "description": "Moody's rating for the bond in the standard Aaa - C format. NR if marked as not rated by the agency. Null if there is no rating (Aaa - C or NR) provided by the agency. Note: available to Moody's licensed users only. This data includes Moody's ratings and related financial information. Moody's ratings and data are proprietary to Moody's Investors Service, Inc. The information is used under license and is subject to copyright and other intellectual property rights held by Moody's or its affiliates.",
+      "nullable": true,
+      "example": "Baa1"
+     },
+     "MoodysRatingDate": {
+      "type": "string",
+      "description": "The date in the timezone of the issuing country of the most recent Moody's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to Moody's licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2018-07-24"
+     },
+     "Duration": {
+      "type": "number",
+      "description": "The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond's price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.",
+      "nullable": true,
+      "example": 0.71
+     },
+     "Convexity": {
+      "type": "number",
+      "description": "The convexity of a bond measures the degree to which the duration of a bond changes as interest rates change. While duration estimates a bond's price sensitivity to small interest rate movements, convexity accounts for the fact that this relationship is not linear—especially for larger rate changes. A bond with higher convexity will exhibit more price gain when interest rates fall and less price loss when rates rise, compared to a bond with lower convexity. Moment provides effective convexity, which approximates this curvature by comparing the bond's price change under small upward and downward shifts in yield. Note: this field is available to users licensed for pricing analytics only.",
+      "nullable": true,
+      "example": 0.41
+     },
+     "LiquidityMicroBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 if the bond is priced, or null if the bond is not tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have  offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 3
+     },
+     "LiquidityMicroSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 5
+     },
+     "LiquidityMicroAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 5
+     },
+     "LiquidityRetailBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $10,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 1
+     },
+     "LiquidityRetailSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 2
+     },
+     "LiquidityRetailAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 4
+     },
+     "LiquidityInstitutionalBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy (no minimum trading sizes). A higher score means that an order to buy will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 4
+     },
+     "LiquidityInstitutionalSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell (no minimum trading sizes). A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 3
+     },
+     "LiquidityInstitutionalAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell (no minimum trading sizes). A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 2
+     },
+     "ClosePrice": {
+      "type": "number",
+      "description": "The close price, or “end of day price” is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 100.2
+     },
+     "CloseYTW": {
+      "type": "number",
+      "description": "The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 5.486
+     },
+     "CloseYTM": {
+      "type": "number",
+      "description": "The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 5.486
+     },
+     "ClosePriceAsOf": {
+      "type": "string",
+      "description": "The timestamp on which the close price and yield were recorded in RFC-3339 format. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": "2023-12-06T18:09:07.441247Z",
+      "format": "date-time"
+     },
+     "BondStatus": {
+      "type": "string",
+      "description": "The status of the bond reflects many possible states a bond can be in.\n\n* called: The bond has been called by the issuer.\n* converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.\n* defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.\n* funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.\n* liquidated: The issuer has been liquidated.\n* matured: The bond has reached its maturity date and the bondholders have been repaid their principal.\n* outstanding: The bond is still active and has not reached its maturity date.\n* pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.\n* put: The bond has been put (sold back) to the issuer.\n* repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.\n* tendered: The bond has been tendered (offered for repurchase) by the issuer.\n* repurchased: The bond has been repurchased by the issuer.\n* restructured: The security has been restructured into a new security or into a security with materially different terms.\n* unknown: The status of the bond is unknown.",
+      "example": "called",
+      "enum": [
+       "called",
+       "converted",
+       "defaulted",
+       "funged",
+       "liquidated",
+       "matured",
+       "outstanding",
+       "pre_issuance",
+       "put",
+       "repaid",
+       "tendered",
+       "repurchased",
+       "restructured",
+       "unknown"
+      ]
+     },
+     "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp at which the bond was last updated in Moment's system in RFC-3339 format with nanosecond precision.",
+      "example": "2023-12-06T18:09:07.441248Z",
+      "format": "date-time"
+     },
+     "InstrumentsResponse": {
+      "title": "InstrumentsResponse",
+      "type": "object",
+      "description": "A model representing the result of hitting the Instruments api.\n\nProvides refdata for each bond in Moment's current and historical universes.",
+      "properties": {
+       "count": {
+        "type": "integer",
+        "description": "The total number of instruments found that match the query"
+       },
+       "next": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the next page of results (if any exist). Null if no more pages."
+       },
+       "prev": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the previous page of results (if any exist). Null if no earlier pages."
+       },
+       "data": {
+        "type": "array",
+        "description": "Array of instruments",
+        "items": {
+         "$ref": "#/components/schemas/InstrumentInfo"
+        }
+       }
+      },
+      "required": [
+       "updated_at",
+       "instruments"
+      ]
+     },
+     "InstrumentInfo": {
+      "title": "InstrumentInfo",
+      "type": "object",
+      "description": "Reference data base for bulk download and list",
+      "properties": {
+       "isin": {
+        "$ref": "#/components/schemas/isin"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/cusip"
+       },
+       "figi": {
+        "$ref": "#/components/schemas/Figi"
+       },
+       "type": {
+        "$ref": "#/components/schemas/BondType"
+       },
+       "treasury_subtype": {
+        "$ref": "#/components/schemas/TreasurySubtype"
+       },
+       "country_issue": {
+        "$ref": "#/components/schemas/CountryIssue"
+       },
+       "country_domicile": {
+        "$ref": "#/components/schemas/CountryDomicile"
+       },
+       "currency": {
+        "$ref": "#/components/schemas/Currency"
+       },
+       "ticker": {
+        "$ref": "#/components/schemas/Ticker"
+       },
+       "seniority": {
+        "$ref": "#/components/schemas/Seniority"
+       },
+       "issuer": {
+        "$ref": "#/components/schemas/Issuer"
+       },
+       "sector": {
+        "$ref": "#/components/schemas/Sector"
+       },
+       "naics_sector": {
+        "$ref": "#/components/schemas/NaicsSector"
+       },
+       "naics_subsector": {
+        "$ref": "#/components/schemas/NaicsSubsector"
+       },
+       "treasury_benchmark": {
+        "$ref": "#/components/schemas/TreasuryBenchmark"
+       },
+       "description": {
+        "$ref": "#/components/schemas/Description"
+       },
+       "description_short": {
+        "$ref": "#/components/schemas/DescriptionShort"
+       },
+       "purpose": {
+        "$ref": "#/components/schemas/Purpose"
+       },
+       "maturity_date": {
+        "$ref": "#/components/schemas/MaturityDate"
+       },
+       "workout_date": {
+        "$ref": "#/components/schemas/WorkoutDate"
+       },
+       "coupon": {
+        "$ref": "#/components/schemas/Coupon"
+       },
+       "coupon_frequency": {
+        "$ref": "#/components/schemas/CouponFrequency"
+       },
+       "coupon_type": {
+        "$ref": "#/components/schemas/CouponType"
+       },
+       "coupon_subtype": {
+        "$ref": "#/components/schemas/CouponSubtype"
+       },
+       "first_coupon_date": {
+        "$ref": "#/components/schemas/FirstCouponDate"
+       },
+       "next_coupon_date": {
+        "$ref": "#/components/schemas/NextCouponDate"
+       },
+       "last_coupon_date": {
+        "$ref": "#/components/schemas/LastCouponDate"
+       },
+       "issue_size": {
+        "$ref": "#/components/schemas/IssueSize"
+       },
+       "issue_date": {
+        "$ref": "#/components/schemas/IssueDate"
+       },
+       "original_issue_date": {
+        "$ref": "#/components/schemas/OriginalIssueDate"
+       },
+       "original_issue_price": {
+        "$ref": "#/components/schemas/OriginalIssuePrice"
+       },
+       "original_issue_size": {
+        "$ref": "#/components/schemas/OriginalIssueSize"
+       },
+       "issue_price": {
+        "$ref": "#/components/schemas/IssuePrice"
+       },
+       "issue_minimum_denomination": {
+        "$ref": "#/components/schemas/IssueMinimumDenomination"
+       },
+       "par_value": {
+        "$ref": "#/components/schemas/ParValue"
+       },
+       "principal_factor": {
+        "$ref": "#/components/schemas/PrincipalFactor"
+       },
+       "accrued_interest": {
+        "$ref": "#/components/schemas/AccruedInterest"
+       },
+       "callable": {
+        "$ref": "#/components/schemas/Callable"
+       },
+       "call_type": {
+        "$ref": "#/components/schemas/CallType"
+       },
+       "next_call_date": {
+        "$ref": "#/components/schemas/NextCallDate"
+       },
+       "next_call_price": {
+        "$ref": "#/components/schemas/NextCallPrice"
+       },
+       "puttable": {
+        "$ref": "#/components/schemas/Puttable"
+       },
+       "convertible": {
+        "$ref": "#/components/schemas/Convertible"
+       },
+       "contingent_convertible": {
+        "$ref": "#/components/schemas/ContingentConvertible"
+       },
+       "trigger_event_type": {
+        "$ref": "#/components/schemas/TriggerEventType"
+       },
+       "trigger_type": {
+        "$ref": "#/components/schemas/TriggerType"
+       },
+       "trigger_action": {
+        "$ref": "#/components/schemas/TriggerAction"
+       },
+       "trigger_level_type": {
+        "$ref": "#/components/schemas/TriggerLevelType"
+       },
+       "trigger_level_value": {
+        "$ref": "#/components/schemas/TriggerLevelValue"
+       },
+       "bond_warrant": {
+        "$ref": "#/components/schemas/BondWarrant"
+       },
+       "is_structured_product": {
+        "$ref": "#/components/schemas/IsStructuredProduct"
+       },
+       "sinking_fund": {
+        "$ref": "#/components/schemas/SinkingFund"
+       },
+       "perpetual": {
+        "$ref": "#/components/schemas/Perpetual"
+       },
+       "insured": {
+        "$ref": "#/components/schemas/Insured"
+       },
+       "private_placement": {
+        "$ref": "#/components/schemas/PrivatePlacement"
+       },
+       "144a": {
+        "$ref": "#/components/schemas/144A"
+       },
+       "reg_s": {
+        "$ref": "#/components/schemas/RegS"
+       },
+       "trace_eligible": {
+        "$ref": "#/components/schemas/TraceEligible"
+       },
+       "daycount": {
+        "$ref": "#/components/schemas/DayCount"
+       },
+       "settlement_convention": {
+        "$ref": "#/components/schemas/SettlementConvention"
+       },
+       "dated_date": {
+        "$ref": "#/components/schemas/DatedDate"
+       },
+       "municipal_state": {
+        "$ref": "#/components/schemas/MunicipalState"
+       },
+       "municipal_type": {
+        "$ref": "#/components/schemas/MunicipalType"
+       },
+       "municipal_taxable_federal": {
+        "$ref": "#/components/schemas/MunicipalTaxableFederal"
+       },
+       "bank_qualified": {
+        "$ref": "#/components/schemas/BankQualified"
+       },
+       "is_amt_applicable": {
+        "$ref": "#/components/schemas/IsAMTApplicable"
+       },
+       "pre_refunded": {
+        "$ref": "#/components/schemas/PreRefunded"
+       },
+       "original_maturity_date": {
+        "$ref": "#/components/schemas/OriginalMaturityDate"
+       },
+       "sp_rating": {
+        "$ref": "#/components/schemas/SpRating"
+       },
+       "sp_rating_date": {
+        "$ref": "#/components/schemas/SpRatingDate"
+       },
+       "sp_creditwatch": {
+        "$ref": "#/components/schemas/SpCreditwatch"
+       },
+       "sp_creditwatch_date": {
+        "$ref": "#/components/schemas/SpCreditwatchDate"
+       },
+       "sp_outlook": {
+        "$ref": "#/components/schemas/SpOutlook"
+       },
+       "sp_outlook_date": {
+        "$ref": "#/components/schemas/SpOutlookDate"
+       },
+       "moodys_rating": {
+        "$ref": "#/components/schemas/MoodysRating"
+       },
+       "moodys_rating_date": {
+        "$ref": "#/components/schemas/MoodysRatingDate"
+       },
+       "duration": {
+        "$ref": "#/components/schemas/Duration"
+       },
+       "convexity": {
+        "$ref": "#/components/schemas/Convexity"
+       },
+       "liquidity_micro_buy": {
+        "$ref": "#/components/schemas/LiquidityMicroBuy"
+       },
+       "liquidity_micro_sell": {
+        "$ref": "#/components/schemas/LiquidityMicroSell"
+       },
+       "liquidity_micro_aggregate": {
+        "$ref": "#/components/schemas/LiquidityMicroAggregate"
+       },
+       "liquidity_retail_buy": {
+        "$ref": "#/components/schemas/LiquidityRetailBuy"
+       },
+       "liquidity_retail_sell": {
+        "$ref": "#/components/schemas/LiquidityRetailSell"
+       },
+       "liquidity_retail_aggregate": {
+        "$ref": "#/components/schemas/LiquidityRetailAggregate"
+       },
+       "liquidity_institutional_buy": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalBuy"
+       },
+       "liquidity_institutional_sell": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalSell"
+       },
+       "liquidity_institutional_aggregate": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalAggregate"
+       },
+       "close_price": {
+        "$ref": "#/components/schemas/ClosePrice"
+       },
+       "close_ytw": {
+        "$ref": "#/components/schemas/CloseYTW"
+       },
+       "close_ytm": {
+        "$ref": "#/components/schemas/CloseYTM"
+       },
+       "close_price_asof": {
+        "$ref": "#/components/schemas/ClosePriceAsOf"
+       },
+       "status": {
+        "$ref": "#/components/schemas/BondStatus"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/UpdatedAt"
+       }
+      }
+     }
+    },
+    "parameters": {
+     "page": {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Page number of results to return. Defaults to 1."
+     },
+     "page_size": {
+      "name": "page_size",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000
+      },
+      "description": "Number of items to return. Must be in range 1-1000, defaults to 100."
+     },
+     "status": {
+      "name": "status",
+      "description": "Filter by a specific bond status.",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "called",
+        "converted",
+        "defaulted",
+        "funged",
+        "liquidated",
+        "matured",
+        "outstanding",
+        "pre_issuance",
+        "put",
+        "repaid",
+        "tendered",
+        "repurchased",
+        "restructured",
+        "unknown"
+       ],
+       "example": "outstanding"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/retrieveinstrument.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Reference Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/instrument/{instrument_id}/": {
+     "get": {
+      "tags": [
+       "Reference Data"
+      ],
+      "summary": "Single Security",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/instrument_id"
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/InstrumentInfoDetail"
+          }
+         }
+        }
+       }
+      },
+      "operationId": "retrieveInstrument",
+      "description": "Retrieve reference data for a single instrument."
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "isin": {
+      "type": "string",
+      "title": "ISIN",
+      "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+      "example": "US594918AD66",
+      "minLength": 12,
+      "maxLength": 12
+     },
+     "cusip": {
+      "type": "string",
+      "title": "CUSIP",
+      "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\n\nNote: Available to licensed users only.\nThe Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.\nCUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+      "nullable": true,
+      "example": "H00402625",
+      "minLength": 9,
+      "maxLength": 9
+     },
+     "Figi": {
+      "type": "string",
+      "title": "FIGI",
+      "description": "The Financial Instrument Global Identifier (FIGI) is a 12-character alphanumeric open-standard identifier assigned at the instrument level.\n\nSourced from the Bloomberg Global Id in ICE reference data.",
+      "nullable": true,
+      "example": "BBG00KTQXF60",
+      "minLength": 12,
+      "maxLength": 12
+     },
+     "BondType": {
+      "type": "string",
+      "description": "The type of fixed income security.",
+      "example": "agency",
+      "enum": [
+       "agency",
+       "cd",
+       "corporate",
+       "government",
+       "municipal",
+       "treasury"
+      ]
+     },
+     "TreasurySubtype": {
+      "type": "string",
+      "description": "The subtype of a treasury. Possible values include:\n* bond: long term i.e. 20, 30 years\n* note: intermediate term i.e. 2, 3, 5, 7, and 10 years\n* bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)\n* tips: treasury inflation-protected securities\n* strips: separate trading of registered interest and principal of securities\n* floating: floating rate notes",
+      "nullable": true,
+      "example": "bill",
+      "enum": [
+       "bond",
+       "bill",
+       "note",
+       "strips",
+       "tips",
+       "floating"
+      ]
+     },
+     "CountryIssue": {
+      "type": "string",
+      "description": "The country where the bond is issued in the 2-alpha country code format (e.g., US, CA).",
+      "nullable": true,
+      "example": "US"
+     },
+     "CountryDomicile": {
+      "type": "string",
+      "description": "The country where the bond is domiciled (where it legally resides) in the 2-alpha country code format (e.g., US, CA). An example of where this differs from country_issue is if a Brazilian bond is issued in the US (country of issue) for a corporation in Brazil (country of domicile).",
+      "nullable": true,
+      "example": "US"
+     },
+     "Currency": {
+      "type": "string",
+      "description": "The 3-alpha currency code of the currency the bond is denominated in (e.g., USD, CAD).",
+      "nullable": true,
+      "example": "USD"
+     },
+     "Ticker": {
+      "type": "string",
+      "description": "The stock ticker for publicly traded companies, or a similar styled abbreviation for securities issued by a company that is not publicly traded. This field is only populated for corporate bonds.",
+      "nullable": true,
+      "example": "AAPL"
+     },
+     "Seniority": {
+      "type": "string",
+      "description": "The order of priority in which bondholders are repaid in the event of a default by the issuing corporation such as bankruptcy or liquidation. This field is only populated for corporate bonds.",
+      "nullable": true,
+      "example": "senior_secured"
+     },
+     "Issuer": {
+      "type": "string",
+      "description": "Name of the bond issuer",
+      "example": "AAA United States Government Money Market Account Inc."
+     },
+     "Sector": {
+      "type": "string",
+      "description": "Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)",
+      "nullable": true,
+      "example": "Financial Services"
+     },
+     "NaicsSector": {
+      "type": "string",
+      "description": "North American Industry Classification System (NAICS) standard classification of the bond",
+      "nullable": true,
+      "example": "Finance And Insurance"
+     },
+     "NaicsSubsector": {
+      "type": "string",
+      "description": "North American Industry Classification System (NAICS) standard sub-classification of the bond",
+      "nullable": true,
+      "example": "Securities, Commodity Contracts, And Other Financial Investments And Related Activities"
+     },
+     "Description": {
+      "type": "string",
+      "description": "Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]",
+      "example": "AAA UNITED STATES GOVERNMENT MONEY MARKET ACCOUNT INC 2.6%, 11/30/2022"
+     },
+     "DescriptionShort": {
+      "type": "string",
+      "description": "Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]",
+      "nullable": true,
+      "example": "MI 5.0% 05/01/2034"
+     },
+     "Purpose": {
+      "type": "string",
+      "description": "The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus.",
+      "nullable": true,
+      "example": "Water & Sewer"
+     },
+     "MaturityDate": {
+      "type": "string",
+      "description": "The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds. For fully pre-refunded municipal bonds (see pre_refunded), this holds the refund (redemption) date rather than the original stated maturity, since the bond is redeemed from escrowed funds on that date; the stated maturity is available in original_maturity_date.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-01-15"
+     },
+     "TreasuryBenchmark": {
+      "type": "string",
+      "description": "ISIN that represents the reference U.S. Treasury security used as a benchmark for pricing and evaluating the fixed income instrument. Typically, this is the closest-maturity Treasury bond or note that serves as a basis for determining relative yield and spread.",
+      "nullable": true
+     },
+     "WorkoutDate": {
+      "type": "string",
+      "description": "Workout date, also know as the \"call adjusted maturity date\", is the terminal date of the bond implied by its yield to worst.\n\nIf a bond's yield to worst is equal to its yield to maturity, that means the market believes that it will not be redeemed until maturity. Hence, the workout date is the maturity date.\n\nIf a bond's yield to worst is less than the yield to maturity, that means that the market believes it will get called, and are evaluating the bond's yield according to that predicted call date. Hence, the workout date is the date the market believes the bond will be called."
+     },
+     "Coupon": {
+      "type": "number",
+      "description": "The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds.",
+      "nullable": true,
+      "example": 5
+     },
+     "CouponFrequency": {
+      "type": "string",
+      "description": "The frequency, or how often, the coupon is paid to the bondholder. There are a few standard coupon frequencies:\n* annual: Paid out once per year.\n* semi_annual: Paid out twice per year.\n* quarterly: Paid out four times per year, every quarter.\n* monthly: Paid out twelve times per year, every month.\n* zero: No coupon payments.\n* at_maturity: Coupon paid out once, at maturity. Interest accrues over the life of the bond, and is repaid with the principal. Note: this typically only applies for bonds with a total life of less than 1 year.",
+      "nullable": true,
+      "example": "annual",
+      "enum": [
+       "annual",
+       "semi_annual",
+       "quarterly",
+       "monthly",
+       "zero",
+       "at_maturity"
+      ]
+     },
+     "CouponType": {
+      "type": "string",
+      "description": "The type of coupon rate.\n* fixed: The coupon payment is a fixed percentage of the bond's par value.\n* floating: The coupon payment is pegged to some benchmark rate that frequently changes based off a benchmark, such as SOFR. Typically, the coupon payment is the benchmark rate plus a spread.\n* variable: The coupon payment changes over the life of the bond. Similar to a floating rate, but typically updates less frequently, such as once every coupon payment.\n* zero: Zero-coupon bonds do not pay a coupon over their lifetime.\n* complex: A coupon rate that does not belong in any of the above categories.\n\nSeveral distinct coupon structures share a single coupon_type — stepped-coupon bonds, for example, are reported as variable. See coupon_subtype for the finer-grained description.",
+      "nullable": true,
+      "example": "fixed",
+      "enum": [
+       "fixed",
+       "floating",
+       "variable",
+       "zero",
+       "complex"
+      ]
+     },
+     "CouponSubtype": {
+      "type": "string",
+      "description": "A more specific description of the coupon structure, refining coupon_type. Unlike coupon_type this is not a fixed set of values: it is a free-form descriptive string passed through from the data provider, so treat it as display text rather than matching against an enum. Null when the coupon data does not come with a subtype.",
+      "nullable": true,
+      "example": "Stepped Coupon"
+     },
+     "FirstCouponDate": {
+      "type": "string",
+      "description": "The date of the first coupon payment on the bond. Null for zero-coupon bonds.",
+      "nullable": true,
+      "example": "2017-11-01",
+      "format": "date"
+     },
+     "NextCouponDate": {
+      "type": "string",
+      "description": "The date of the next upcoming coupon payment. Null for zero-coupon bonds. Please note that this date may not be when the actual coupon is paid; most coupons will be paid on the following business day if the coupon date falls on a holiday or a weekend.",
+      "format": "date",
+      "nullable": true,
+      "example": "2024-05-01"
+     },
+     "LastCouponDate": {
+      "type": "string",
+      "description": "The date of the last coupon payment on the bond. Null for zero-coupon bonds.",
+      "nullable": true,
+      "example": "2033-11-03",
+      "format": "date"
+     },
+     "IssueSize": {
+      "type": "number",
+      "description": "The total size amount of the bond issue in the issuing currency.",
+      "nullable": true,
+      "example": 1625000
+     },
+     "IssueDate": {
+      "type": "string",
+      "description": "The date on which the bond was issued. In case of a reissue, this will be the latest issuance date.",
+      "format": "date",
+      "example": "2017-02-18"
+     },
+     "OriginalIssueDate": {
+      "type": "string",
+      "description": "The initial date of issuance for treasury bonds, used to differentiate between original and re-issued bonds.",
+      "nullable": true,
+      "format": "date",
+      "example": "2015-02-18"
+     },
+     "OriginalIssuePrice": {
+      "type": "number",
+      "description": "The price at which the bond was originally issued as a percentage of par value. This is populated for treasury bonds that were reissued.",
+      "nullable": true,
+      "example": 99.68
+     },
+     "OriginalIssueSize": {
+      "type": "number",
+      "description": "The size of the bond when it was originally issued. This is populated for treasury bonds that were reissued.",
+      "nullable": true,
+      "example": 1000000
+     },
+     "IssuePrice": {
+      "type": "number",
+      "description": "The price at which the bond was originally issued as a percentage of par value. In case of a reissue, this will be the latest issuance price.",
+      "nullable": true,
+      "example": 113.68
+     },
+     "IssueMinimumDenomination": {
+      "type": "number",
+      "description": "The smallest unit of the bond that can be purchased at its initial offering.",
+      "nullable": true,
+      "example": 5000
+     },
+     "ParValue": {
+      "type": "number",
+      "description": "The amount that the issuer of the bond will pay back to the bondholder upon maturity. Also known as face value or nominal value.",
+      "example": 5000
+     },
+     "PrincipalFactor": {
+      "type": "number",
+      "description": "The principal factor represents the remaining principal balance as a percentage of the original principal amount. Used primarily for mortgage-backed securities and other amortizing bonds.",
+      "nullable": true,
+      "example": 0.956234
+     },
+     "AccruedInterest": {
+      "type": "number",
+      "description": "The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.",
+      "nullable": true,
+      "example": 56.25
+     },
+     "Callable": {
+      "type": "boolean",
+      "description": "Whether the bond is callable, meaning the issuer has the right but not the obligation to redeem the bond before its maturity date at a set price (the call price). This field only reflects regular call provisions; make-whole or other special call features are not captured.",
+      "nullable": true,
+      "example": true
+     },
+     "CallType": {
+      "type": "string",
+      "description": "The type of call on the bond refers to one of a variety of circumstances under which a callable bond may be called. Null if the bond is not callable.\n* ordinary: The most common call type, which grants the issuer the ability to redeem the bond before its maturity date.\n* make_whole: A make whole call provision allows an issuer to redeem the bond before maturity at a price that is usually calculated based on the present value of future coupon payments and the redemption value, discounted at a specified rate.\n* regulatory: A regulatory call type gives the issuer the right to redeem the bond before its maturity due to changes in regulatory or tax laws that adversely affect the bond or its issuer.\n* special: A special call allows the issuer to call the bond before its maturity under specific circumstances, conditions, or events that are outside the typical operations of the issuer, as outlined in the bond's indenture.",
+      "nullable": true,
+      "example": "ordinary",
+      "enum": [
+       "ordinary",
+       "make_whole",
+       "regulatory",
+       "special"
+      ]
+     },
+     "NextCallDate": {
+      "type": "string",
+      "description": "The date of the next possible call on the bond. Null if the bond is not callable.",
+      "format": "date",
+      "nullable": true,
+      "example": "2027-05-01"
+     },
+     "NextCallPrice": {
+      "type": "number",
+      "description": "The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable.",
+      "nullable": true,
+      "example": 100
+     },
+     "CallSchedule": {
+      "title": "CallSchedule",
+      "type": "object",
+      "description": "The call schedule of the bond specifies the dates and prices at which the issuer can choose to redeem the bond before its maturity. Note: this data is subject to availability.",
+      "properties": {
+       "call_date": {
+        "type": "string",
+        "description": "The date of the call.",
+        "format": "date"
+       },
+       "call_price": {
+        "type": "number",
+        "description": "The price at which the bond can be called as a percentage of par."
+       }
+      }
+     },
+     "Puttable": {
+      "type": "boolean",
+      "description": "Whether the bond is puttable, meaning the bondholder has the right, but not the obligation, to sell the security back to the issuer at a predetermined price and date.",
+      "nullable": true,
+      "example": false
+     },
+     "Convertible": {
+      "type": "boolean",
+      "description": "A flag indicating whether the bond is convertible. If a bond is convertible, the investor has the right or the obligation to exchange the bond for a predetermined number of shares in the issuing company at certain times throughout a bond's lifetime. Only specified for corporate bonds issued by publicly traded companies.",
+      "nullable": true,
+      "example": false
+     },
+     "ContingentConvertible": {
+      "type": "boolean",
+      "description": "Indicates whether the bond has loss-absorbing contingent convertible (CoCo) features, meaning it can be converted to equity or have its principal written down if a trigger event occurs. Most commonly applies to bank regulatory-capital instruments. False if the bond has no such features.",
+      "nullable": true,
+      "example": true
+     },
+     "TriggerEventType": {
+      "type": "string",
+      "description": "The type of event that would cause conversion or write-down. Null if the bond has no trigger event.",
+      "nullable": true,
+      "example": "Capital Adequacy"
+     },
+     "TriggerType": {
+      "type": "string",
+      "description": "The type of trigger for a conversion or write-down event. Null if the bond has no trigger event.",
+      "nullable": true,
+      "example": "Mechanical"
+     },
+     "TriggerAction": {
+      "type": "string",
+      "description": "The action taken when the trigger event occurs, such as conversion to equity or a principal write-down. Null if the bond has no trigger event.",
+      "nullable": true
+     },
+     "TriggerLevelType": {
+      "type": "string",
+      "description": "The type of threshold used to define the trigger level (for example, a regulatory capital ratio). Null if the bond has no trigger event.",
+      "nullable": true
+     },
+     "TriggerLevelValue": {
+      "type": "number",
+      "description": "For a trigger event, the threshold value at which conversion or write-down is activated, expressed in the units implied by trigger_level_type (for example, a percentage for a capital ratio). Null if the bond has no conversion trigger.",
+      "nullable": true
+     },
+     "BondWarrant": {
+      "type": "boolean",
+      "description": "A financial instrument that gives holder the right, but not the obligation, to purchase a certain number of shares of the issuer's stock at a specified price (the strike price) before the warrant expires.",
+      "nullable": true,
+      "example": false
+     },
+     "IsStructuredProduct": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is a structured product, which is a security derived from or linked to a pool of underlying assets, such as indices or derivatives.",
+      "nullable": true,
+      "example": false
+     },
+     "SinkingFund": {
+      "type": "boolean",
+      "description": "A sinking fund is a pool of money a bond issuer sets aside to repay the bond, typically through periodic buybacks, offering added security to bondholders. For bonds with a sinking fund provision, the bond issuer is obligated to retire or pay down a portion of the principal at specified intervals throughout the bond's lifetime. This means bondholders receive both periodic coupon payments and portions of the principal before maturity, rather than receiving the entire principal amount solely at maturity.",
+      "nullable": true,
+      "example": false
+     },
+     "Perpetual": {
+      "type": "boolean",
+      "description": "A flag representing whether a bond is perpetual, meaning it does not have a maturity date, and pays interest indefinitely. If this is set, the bond's maturity date will be null.",
+      "nullable": true,
+      "example": true
+     },
+     "Insured": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is insured, meaning a third-party insurance company will guarantee the payment of principal and interest in case the issuer defaults.",
+      "nullable": true,
+      "example": true
+     },
+     "PrivatePlacement": {
+      "type": "boolean",
+      "description": "Indicates whether the security was part of private placement, or issued directly to a limited pool of investors rather than through a public offering. These bonds are unregistered with the SEC and are not part of the open market. Note: retail investors may not be eligible to participate in bonds offered via private placement — please consult an attorney for more information.",
+      "nullable": true,
+      "example": false
+     },
+     "144A": {
+      "type": "boolean",
+      "description": "Indicates whether the security was part of Rule 144A, an SEC rule that provides a safe harbor exemption from the registration requirements for certain private resales of restricted securities to qualified institutional buyers. 144A applies to securities that are not registered with the SEC and are typically sold through private placements. Note: only qualified institutional buyers, such as those with with at least $100 million in investable assets, are eligible to purchase 144A securities.",
+      "nullable": true,
+      "example": false
+     },
+     "RegS": {
+      "type": "boolean",
+      "description": "Indicates whether the security falls under Regulation S, a rule that provides an exemption from the registration requirements for securities offerings made outside the United States. This regulation allows U.S. and foreign issuers to sell securities in non-U.S. markets without the need to register these securities with SEC.",
+      "nullable": true,
+      "example": false
+     },
+     "TraceEligible": {
+      "type": "boolean",
+      "description": "Indicates whether the security is TRACE eligible, meaning it is subject to the Trade Reporting and Compliance Engine (TRACE) reporting requirements. Trades on these instruments must be reported to FINRA within 15 minutes of execution.",
+      "nullable": true,
+      "example": true
+     },
+     "DayCount": {
+      "type": "string",
+      "description": "The day count convention used to calculate accrued interest.\n* A/360: calculates the daily interest using a 360-day year and then multiplies that by the actual number of days in each time period.\n* A/365: calculates the daily interest using a 365-day year and then multiplies that by the actual number of days in each time period.\n* 30/360: calculates the daily interest using a 360-day year and then multiplies that by 30 (standardized month).\n* 30/365: calculates the daily interest using a 365-day year and then multiplies that by 30 (standardized month).\n* A/A: calculates the daily interest using the actual number of days in the year and then multiplies that by the actual number of days in each time period.\n* 30E/360: number of days equals to the actual number of days (for February). If the start date or the end date of the period is the 31st of a month, that date is set to the 30th. The number of days in a year is 360.\n* B/252: calculates the daily interest using a 252-business-day year and then multiplies that by the actual number of days in each time period.\n* A/364: calculates the daily interest using a 364-day year and then multiplies that by the actual number of days in each time period.",
+      "nullable": true,
+      "example": "30/360",
+      "enum": [
+       "A/360",
+       "A/365",
+       "30/360",
+       "30/365",
+       "A/A",
+       "30E/360",
+       "B/252",
+       "A/364"
+      ]
+     },
+     "SettlementConvention": {
+      "type": "string",
+      "description": "The standard process through which the legal transfer of bonds from the seller to the buyer is completed, and payment is made by the buyer, including details like the timing and the specific procedures involved in the settlement of a trade.",
+      "nullable": true,
+      "example": "T+1"
+     },
+     "DatedDate": {
+      "type": "string",
+      "description": "The dated date marks the beginning of the period for which interest starts accruing on the bond.",
+      "format": "date",
+      "nullable": true,
+      "example": "2024-04-01"
+     },
+     "MunicipalState": {
+      "type": "string",
+      "description": "The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": "AZ"
+     },
+     "MunicipalType": {
+      "type": "string",
+      "description": "The type of revenue backing. General obligation bonds are not tied to any particular revenue-generating project. Revenue bonds, in contrast are repaid from the income generated by specific projects, enterprises, or sources, rather than from general taxation. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": "revenue",
+      "enum": [
+       "general_obligation",
+       "revenue"
+      ]
+     },
+     "MunicipalTaxableFederal": {
+      "type": "boolean",
+      "description": "Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "BankQualified": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is bank qualified, which is a type of municipal bond specifically designated for purchase by commercial banks. Bank qualified bonds can offer specific tax benefits because they allow banks to deduct interest costs of carrying the bond. For example, they must be issued by a small issuer who expects to issue no more than $10 million in bonds during a calendar year. Banks can also deduct 80% of the interest expense they incur to buy and carry these bonds.",
+      "nullable": true,
+      "example": true
+     },
+     "IsAMTApplicable": {
+      "type": "boolean",
+      "description": "A flag representing whether a bond is AMT (Alternative Minimum Tax) applicable, which means that the bond's interest may be subject to the alternative minimum tax. Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "PreRefunded": {
+      "type": "boolean",
+      "description": "Indicates whether the bond is pre-refunded or escrowed to maturity (ETM), meaning the issuer has set aside funds in an escrow account to redeem the bond. For fully pre-refunded bonds, maturity_date holds the refund (redemption) date rather than the original stated maturity (see original_maturity_date). Only specified for municipal bonds.",
+      "nullable": true,
+      "example": false
+     },
+     "OriginalMaturityDate": {
+      "type": "string",
+      "description": "The stated maturity date of the bond, for bonds whose maturity_date has been overridden with the refund (redemption) date (see pre_refunded). Null when maturity_date already holds the stated maturity.",
+      "format": "date",
+      "nullable": true,
+      "example": "2038-04-01"
+     },
+     "SpRating": {
+      "type": "string",
+      "description": "Standard & Poor's rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor's (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor's Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor's or its affiliates.",
+      "nullable": true,
+      "example": "AAA"
+     },
+     "SpRatingDate": {
+      "type": "string",
+      "description": "The date in the timezone of the issuing country of the most recent Standard & Poor's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2018-07-24"
+     },
+     "SpCreditwatch": {
+      "type": "string",
+      "description": "S&P's CreditWatch highlights S&P's opinion regarding the potential direction of a short-term or long-term rating. Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "nullable": true,
+      "example": "positive",
+      "enum": [
+       "positive",
+       "negative",
+       "developing",
+       "not_meaningful"
+      ]
+     },
+     "SpCreditwatchDate": {
+      "type": "string",
+      "description": "The date of the most recent Standard & Poor's CreditWatch for the bond in YYYY-MM-DD format. This field will be null if no information about outlook is available or CreditWatch date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2020-07-22"
+     },
+     "SpOutlook": {
+      "type": "string",
+      "description": "A Standard & Poor's rating outlook indicates S&P's view regarding the potential direction of a long-term credit rating over the intermediate term (2 years for investment grade, 1 year for speculative grade). Null if no information is provided by the agency. Note: available to S&P licensed users only.",
+      "nullable": true,
+      "example": "negative",
+      "enum": [
+       "positive",
+       "negative",
+       "developing",
+       "stable",
+       "not_rated",
+       "not_meaningful"
+      ]
+     },
+     "SpOutlookDate": {
+      "type": "string",
+      "description": "The date of the most recent Standard & Poor's outlook for the bond in YYYY-MM-DD format. Null if no information about outlook is available or outlook date not available. Note: available to S&P licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2022-06-15"
+     },
+     "MoodysRating": {
+      "type": "string",
+      "description": "Moody's rating for the bond in the standard Aaa - C format. NR if marked as not rated by the agency. Null if there is no rating (Aaa - C or NR) provided by the agency. Note: available to Moody's licensed users only. This data includes Moody's ratings and related financial information. Moody's ratings and data are proprietary to Moody's Investors Service, Inc. The information is used under license and is subject to copyright and other intellectual property rights held by Moody's or its affiliates.",
+      "nullable": true,
+      "example": "Baa1"
+     },
+     "MoodysRatingDate": {
+      "type": "string",
+      "description": "The date in the timezone of the issuing country of the most recent Moody's rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to Moody's licensed users only.",
+      "format": "date",
+      "nullable": true,
+      "example": "2018-07-24"
+     },
+     "Duration": {
+      "type": "number",
+      "description": "The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond's price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.",
+      "nullable": true,
+      "example": 0.71
+     },
+     "Convexity": {
+      "type": "number",
+      "description": "The convexity of a bond measures the degree to which the duration of a bond changes as interest rates change. While duration estimates a bond's price sensitivity to small interest rate movements, convexity accounts for the fact that this relationship is not linear—especially for larger rate changes. A bond with higher convexity will exhibit more price gain when interest rates fall and less price loss when rates rise, compared to a bond with lower convexity. Moment provides effective convexity, which approximates this curvature by comparing the bond's price change under small upward and downward shifts in yield. Note: this field is available to users licensed for pricing analytics only.",
+      "nullable": true,
+      "example": 0.41
+     },
+     "LiquidityMicroBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 if the bond is priced, or null if the bond is not tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have  offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 3
+     },
+     "LiquidityMicroSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 5
+     },
+     "LiquidityMicroAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 5
+     },
+     "LiquidityRetailBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $10,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 1
+     },
+     "LiquidityRetailSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 2
+     },
+     "LiquidityRetailAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 4
+     },
+     "LiquidityInstitutionalBuy": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy (no minimum trading sizes). A higher score means that an order to buy will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 4
+     },
+     "LiquidityInstitutionalSell": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell (no minimum trading sizes). A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 3
+     },
+     "LiquidityInstitutionalAggregate": {
+      "type": "integer",
+      "description": "Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell (no minimum trading sizes). A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.",
+      "nullable": true,
+      "example": 2
+     },
+     "ClosePrice": {
+      "type": "number",
+      "description": "The close price, or “end of day price” is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 100.2
+     },
+     "CloseYTW": {
+      "type": "number",
+      "description": "The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 5.486
+     },
+     "CloseYTM": {
+      "type": "number",
+      "description": "The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": 5.486
+     },
+     "ClosePriceAsOf": {
+      "type": "string",
+      "description": "The timestamp on which the close price and yield were recorded in RFC-3339 format. Note: available to users licensed for end-of-day prices only.",
+      "nullable": true,
+      "example": "2023-12-06T18:09:07.441247Z",
+      "format": "date-time"
+     },
+     "BondStatus": {
+      "type": "string",
+      "description": "The status of the bond reflects many possible states a bond can be in.\n\n* called: The bond has been called by the issuer.\n* converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.\n* defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.\n* funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.\n* liquidated: The issuer has been liquidated.\n* matured: The bond has reached its maturity date and the bondholders have been repaid their principal.\n* outstanding: The bond is still active and has not reached its maturity date.\n* pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.\n* put: The bond has been put (sold back) to the issuer.\n* repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.\n* tendered: The bond has been tendered (offered for repurchase) by the issuer.\n* repurchased: The bond has been repurchased by the issuer.\n* restructured: The security has been restructured into a new security or into a security with materially different terms.\n* unknown: The status of the bond is unknown.",
+      "example": "called",
+      "enum": [
+       "called",
+       "converted",
+       "defaulted",
+       "funged",
+       "liquidated",
+       "matured",
+       "outstanding",
+       "pre_issuance",
+       "put",
+       "repaid",
+       "tendered",
+       "repurchased",
+       "restructured",
+       "unknown"
+      ]
+     },
+     "UpdatedAt": {
+      "type": "string",
+      "description": "The timestamp at which the bond was last updated in Moment's system in RFC-3339 format with nanosecond precision.",
+      "example": "2023-12-06T18:09:07.441248Z",
+      "format": "date-time"
+     },
+     "InstrumentInfo": {
+      "title": "InstrumentInfo",
+      "type": "object",
+      "description": "Reference data base for bulk download and list",
+      "properties": {
+       "isin": {
+        "$ref": "#/components/schemas/isin"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/cusip"
+       },
+       "figi": {
+        "$ref": "#/components/schemas/Figi"
+       },
+       "type": {
+        "$ref": "#/components/schemas/BondType"
+       },
+       "treasury_subtype": {
+        "$ref": "#/components/schemas/TreasurySubtype"
+       },
+       "country_issue": {
+        "$ref": "#/components/schemas/CountryIssue"
+       },
+       "country_domicile": {
+        "$ref": "#/components/schemas/CountryDomicile"
+       },
+       "currency": {
+        "$ref": "#/components/schemas/Currency"
+       },
+       "ticker": {
+        "$ref": "#/components/schemas/Ticker"
+       },
+       "seniority": {
+        "$ref": "#/components/schemas/Seniority"
+       },
+       "issuer": {
+        "$ref": "#/components/schemas/Issuer"
+       },
+       "sector": {
+        "$ref": "#/components/schemas/Sector"
+       },
+       "naics_sector": {
+        "$ref": "#/components/schemas/NaicsSector"
+       },
+       "naics_subsector": {
+        "$ref": "#/components/schemas/NaicsSubsector"
+       },
+       "treasury_benchmark": {
+        "$ref": "#/components/schemas/TreasuryBenchmark"
+       },
+       "description": {
+        "$ref": "#/components/schemas/Description"
+       },
+       "description_short": {
+        "$ref": "#/components/schemas/DescriptionShort"
+       },
+       "purpose": {
+        "$ref": "#/components/schemas/Purpose"
+       },
+       "maturity_date": {
+        "$ref": "#/components/schemas/MaturityDate"
+       },
+       "workout_date": {
+        "$ref": "#/components/schemas/WorkoutDate"
+       },
+       "coupon": {
+        "$ref": "#/components/schemas/Coupon"
+       },
+       "coupon_frequency": {
+        "$ref": "#/components/schemas/CouponFrequency"
+       },
+       "coupon_type": {
+        "$ref": "#/components/schemas/CouponType"
+       },
+       "coupon_subtype": {
+        "$ref": "#/components/schemas/CouponSubtype"
+       },
+       "first_coupon_date": {
+        "$ref": "#/components/schemas/FirstCouponDate"
+       },
+       "next_coupon_date": {
+        "$ref": "#/components/schemas/NextCouponDate"
+       },
+       "last_coupon_date": {
+        "$ref": "#/components/schemas/LastCouponDate"
+       },
+       "issue_size": {
+        "$ref": "#/components/schemas/IssueSize"
+       },
+       "issue_date": {
+        "$ref": "#/components/schemas/IssueDate"
+       },
+       "original_issue_date": {
+        "$ref": "#/components/schemas/OriginalIssueDate"
+       },
+       "original_issue_price": {
+        "$ref": "#/components/schemas/OriginalIssuePrice"
+       },
+       "original_issue_size": {
+        "$ref": "#/components/schemas/OriginalIssueSize"
+       },
+       "issue_price": {
+        "$ref": "#/components/schemas/IssuePrice"
+       },
+       "issue_minimum_denomination": {
+        "$ref": "#/components/schemas/IssueMinimumDenomination"
+       },
+       "par_value": {
+        "$ref": "#/components/schemas/ParValue"
+       },
+       "principal_factor": {
+        "$ref": "#/components/schemas/PrincipalFactor"
+       },
+       "accrued_interest": {
+        "$ref": "#/components/schemas/AccruedInterest"
+       },
+       "callable": {
+        "$ref": "#/components/schemas/Callable"
+       },
+       "call_type": {
+        "$ref": "#/components/schemas/CallType"
+       },
+       "next_call_date": {
+        "$ref": "#/components/schemas/NextCallDate"
+       },
+       "next_call_price": {
+        "$ref": "#/components/schemas/NextCallPrice"
+       },
+       "puttable": {
+        "$ref": "#/components/schemas/Puttable"
+       },
+       "convertible": {
+        "$ref": "#/components/schemas/Convertible"
+       },
+       "contingent_convertible": {
+        "$ref": "#/components/schemas/ContingentConvertible"
+       },
+       "trigger_event_type": {
+        "$ref": "#/components/schemas/TriggerEventType"
+       },
+       "trigger_type": {
+        "$ref": "#/components/schemas/TriggerType"
+       },
+       "trigger_action": {
+        "$ref": "#/components/schemas/TriggerAction"
+       },
+       "trigger_level_type": {
+        "$ref": "#/components/schemas/TriggerLevelType"
+       },
+       "trigger_level_value": {
+        "$ref": "#/components/schemas/TriggerLevelValue"
+       },
+       "bond_warrant": {
+        "$ref": "#/components/schemas/BondWarrant"
+       },
+       "is_structured_product": {
+        "$ref": "#/components/schemas/IsStructuredProduct"
+       },
+       "sinking_fund": {
+        "$ref": "#/components/schemas/SinkingFund"
+       },
+       "perpetual": {
+        "$ref": "#/components/schemas/Perpetual"
+       },
+       "insured": {
+        "$ref": "#/components/schemas/Insured"
+       },
+       "private_placement": {
+        "$ref": "#/components/schemas/PrivatePlacement"
+       },
+       "144a": {
+        "$ref": "#/components/schemas/144A"
+       },
+       "reg_s": {
+        "$ref": "#/components/schemas/RegS"
+       },
+       "trace_eligible": {
+        "$ref": "#/components/schemas/TraceEligible"
+       },
+       "daycount": {
+        "$ref": "#/components/schemas/DayCount"
+       },
+       "settlement_convention": {
+        "$ref": "#/components/schemas/SettlementConvention"
+       },
+       "dated_date": {
+        "$ref": "#/components/schemas/DatedDate"
+       },
+       "municipal_state": {
+        "$ref": "#/components/schemas/MunicipalState"
+       },
+       "municipal_type": {
+        "$ref": "#/components/schemas/MunicipalType"
+       },
+       "municipal_taxable_federal": {
+        "$ref": "#/components/schemas/MunicipalTaxableFederal"
+       },
+       "bank_qualified": {
+        "$ref": "#/components/schemas/BankQualified"
+       },
+       "is_amt_applicable": {
+        "$ref": "#/components/schemas/IsAMTApplicable"
+       },
+       "pre_refunded": {
+        "$ref": "#/components/schemas/PreRefunded"
+       },
+       "original_maturity_date": {
+        "$ref": "#/components/schemas/OriginalMaturityDate"
+       },
+       "sp_rating": {
+        "$ref": "#/components/schemas/SpRating"
+       },
+       "sp_rating_date": {
+        "$ref": "#/components/schemas/SpRatingDate"
+       },
+       "sp_creditwatch": {
+        "$ref": "#/components/schemas/SpCreditwatch"
+       },
+       "sp_creditwatch_date": {
+        "$ref": "#/components/schemas/SpCreditwatchDate"
+       },
+       "sp_outlook": {
+        "$ref": "#/components/schemas/SpOutlook"
+       },
+       "sp_outlook_date": {
+        "$ref": "#/components/schemas/SpOutlookDate"
+       },
+       "moodys_rating": {
+        "$ref": "#/components/schemas/MoodysRating"
+       },
+       "moodys_rating_date": {
+        "$ref": "#/components/schemas/MoodysRatingDate"
+       },
+       "duration": {
+        "$ref": "#/components/schemas/Duration"
+       },
+       "convexity": {
+        "$ref": "#/components/schemas/Convexity"
+       },
+       "liquidity_micro_buy": {
+        "$ref": "#/components/schemas/LiquidityMicroBuy"
+       },
+       "liquidity_micro_sell": {
+        "$ref": "#/components/schemas/LiquidityMicroSell"
+       },
+       "liquidity_micro_aggregate": {
+        "$ref": "#/components/schemas/LiquidityMicroAggregate"
+       },
+       "liquidity_retail_buy": {
+        "$ref": "#/components/schemas/LiquidityRetailBuy"
+       },
+       "liquidity_retail_sell": {
+        "$ref": "#/components/schemas/LiquidityRetailSell"
+       },
+       "liquidity_retail_aggregate": {
+        "$ref": "#/components/schemas/LiquidityRetailAggregate"
+       },
+       "liquidity_institutional_buy": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalBuy"
+       },
+       "liquidity_institutional_sell": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalSell"
+       },
+       "liquidity_institutional_aggregate": {
+        "$ref": "#/components/schemas/LiquidityInstitutionalAggregate"
+       },
+       "close_price": {
+        "$ref": "#/components/schemas/ClosePrice"
+       },
+       "close_ytw": {
+        "$ref": "#/components/schemas/CloseYTW"
+       },
+       "close_ytm": {
+        "$ref": "#/components/schemas/CloseYTM"
+       },
+       "close_price_asof": {
+        "$ref": "#/components/schemas/ClosePriceAsOf"
+       },
+       "status": {
+        "$ref": "#/components/schemas/BondStatus"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/UpdatedAt"
+       }
+      }
+     },
+     "InstrumentInfoDetail": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/InstrumentInfo"
+       },
+       {
+        "title": "InstrumentInfo"
+       },
+       {
+        "type": "object"
+       },
+       {
+        "description": "Reference data (detail)"
+       },
+       {
+        "properties": {
+         "call_schedule": {
+          "type": "array",
+          "description": "The call schedule of the bond.",
+          "items": {
+           "$ref": "#/components/schemas/CallSchedule"
+          }
+         }
+        }
+       }
+      ]
+     }
+    },
+    "parameters": {
+     "instrument_id": {
+      "name": "instrument_id",
+      "in": "path",
+      "required": true,
+      "description": "Instrument CUSIP or ISIN",
+      "schema": {
+       "type": "string",
+       "example": "US91915WAB81"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/bulkdownloadreference.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Reference Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/instrument/bulk-download/": {
+     "get": {
+      "tags": [
+       "Reference Data"
+      ],
+      "summary": "Bulk Download",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/status"
+       },
+       {
+        "$ref": "#/components/parameters/bond_type"
+       }
+      ],
+      "description": "The bulk download endpoint can be used to download all reference data for all securities in Moment's system at once as a zipped csv file. This endpoint is intended to be called once per day as a way to download and cache information on all existing securities. The schema matches that of the reference data list and retrieve endpoints.",
+      "responses": {
+       "200": {
+        "description": "Success",
+        "content": {
+         "application/zip": {
+          "schema": {
+           "type": "string",
+           "format": "binary"
+          },
+          "example": "isin,cusip,figi,type,treasury_subtype,country_issue,country_domicile,currency,ticker,seniority,issuer,sector,naics_sector,naics_subsector,treasury_benchmark,description,description_short,purpose,maturity_date,coupon,perpetual,coupon_frequency,coupon_type,coupon_subtype,first_coupon_date,next_coupon_date,last_coupon_date,daycount,settlement_convention,dated_date,issue_size,issue_price,issue_date,issue_minimum_denomination,par_value,principal_factor,accrued_interest,callable,call_type,next_call_date,next_call_price,puttable,convertible,contingent_convertible,trigger_event_type,trigger_type,trigger_action,trigger_level_type,trigger_level_value,sinking_fund,insured,bond_warrant,is_structured_product,private_placement,144a,reg_s,trace_eligible,municipal_state,municipal_type,municipal_taxable_federal,bank_qualified,is_amt_applicable,pre_refunded,original_maturity_date,sp_rating,sp_rating_date,sp_creditwatch,sp_creditwatch_date,sp_outlook,sp_outlook_date,moodys_rating,moodys_rating_date,duration,convexity,liquidity_micro_buy,liquidity_micro_sell,liquidity_micro_aggregate,liquidity_retail_buy,liquidity_retail_sell,liquidity_retail_aggregate,liquidity_institutional_buy,liquidity_institutional_sell,liquidity_institutional_aggregate,close_price,close_ytw,close_ytm,close_price_asof,status,updated_at\nUS91282CCX74,91282CCX7,,treasury,,US,,USD,,,\"UNITED STATES TREASURY\",SOVEREIGN,,,,\"United States Treasury 0.375%, 09/15/2024\",UST 0.375% 09/15/2024,,2024-09-15,0.375,,semi_annual,fixed,,,,,,,,64176071300,99.78,2021-09-15,,1000,,,false,,,,false,false,,,,,,,false,,,,,,,true,,,,,,,,,,positive,2023-11-29,positive,2024-03-28,A1,2024-03-23,0.49,0.32,,,,,,,,,,,,,,outstanding,2023-07-21T16:35:36.28329Z\n"
+         }
+        }
+       }
+      },
+      "operationId": "bulkDownloadReference"
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "parameters": {
+     "status": {
+      "name": "status",
+      "description": "Filter by a specific bond status.",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "called",
+        "converted",
+        "defaulted",
+        "funged",
+        "liquidated",
+        "matured",
+        "outstanding",
+        "pre_issuance",
+        "put",
+        "repaid",
+        "tendered",
+        "repurchased",
+        "restructured",
+        "unknown"
+       ],
+       "example": "outstanding"
+      }
+     },
+     "bond_type": {
+      "name": "type",
+      "description": "Filter by a specific bond type.",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "agency",
+        "cd",
+        "corporate",
+        "government",
+        "municipal",
+        "treasury"
+       ],
+       "example": "corporate"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/bulkdownloadinfo.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Reference Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/instrument/bulk-download/info/": {
+     "get": {
+      "tags": [
+       "Reference Data"
+      ],
+      "summary": "Latest Update",
+      "description": "The bulk download info endpoint can be used to get the timestamp of the last reference data update. This can be used to infer when there is new information available to download.",
+      "responses": {
+       "200": {
+        "description": "Success",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "last_updated": {
+             "type": "string",
+             "description": "The timestamp at which reference data was updated in Moment's system in UTC using the RFC-3339 format with nanosecond precision.",
+             "format": "date-time"
+            }
+           }
+          }
+         }
+        }
+       }
+      },
+      "operationId": "bulkDownloadInfo"
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getprices.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Market Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/instrument/{instrument_id}/price/": {
+     "get": {
+      "tags": [
+       "Market Data"
+      ],
+      "summary": "Historical Prices",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/instrument_id"
+       },
+       {
+        "name": "frequency",
+        "in": "query",
+        "required": true,
+        "schema": {
+         "type": "string",
+         "enum": [
+          "1day",
+          "15min",
+          "1min"
+         ],
+         "default": "1day"
+        },
+        "description": "Frequency of price observations. Each frequency has a pre-defined maximum time range. Currently supported frequencies and ranges are:\n\n- **1day**:\n  EOD close prices.\n\n  Maximum supported time range: daily price history since 2018.\n\n- **15min**:\n  15 minute interval prices.\n\n  Maximum supported time range: 15 days.\n\n- **1min**:\n  1 minute tick prices.\n\n  Maximum supported time range: 1 day."
+       },
+       {
+        "name": "start",
+        "in": "query",
+        "required": true,
+        "schema": {
+         "type": "string",
+         "format": "date",
+         "example": "2023-07-31"
+        },
+        "description": "Filter data equal to or after this time in YYYY-MM-DD format."
+       },
+       {
+        "name": "end",
+        "in": "query",
+        "required": true,
+        "schema": {
+         "type": "string",
+         "format": "date",
+         "example": "2021-08-04"
+        },
+        "description": "Filter data equal to or before this time in YYYY-MM-DD format."
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/PricesResponse"
+          }
+         }
+        }
+       }
+      },
+      "operationId": "getPrices",
+      "description": "The Price Chart API returns aggregate data for a given bond identifier over a specified time period. This should be queried on demand to provide users with a chart of prices for a given bond.\n\n### Usage Information\n\nIf the specified bond exists in our universe, you will receive a response with all available price data for the specified time frame. If there is no price data for the specified bond in the given time period, the response will contain an empty `data` array.\n\nIf the specified bond does not exist in our universe or is inactive, you will receive an `invalid_request` error.\n\nThe start and end days define a time range for retrieval. For example, to receive data for August 5, 2023, you would set `start=2023-08-05` and `end=2023-08-06`. This will _not_ return data for August 6, 2023.\n\n### Return Value Information\n\nReturned results are sorted by price timestamp in ascending order.\n\nNote that in rare cases, there may not be a price for every window. E.g., there may be prices for 12:00, 12:15, and 12:45, but not 12:30. If you are showing prices to end users and want to show a continuous dataset, you can carry forward the prices from the previous time window. E.g., if the 12:15 price was $80, you would use $80 for the 12:30 price as well.\n\nThe timestamp we return is a timestamp for the _start_ of an interval with the selected frequency. For example, if we return a timestamp of `2023-08-05T14:30:00Z`, then we are returning the aggregate price for the interval from `2023-08-05T14:30:00Z` to `2023-08-05T14:45:00Z`."
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "Price": {
+      "title": "Price",
+      "type": "object",
+      "description": "The prices API returns aggregate data for the requested security.\n",
+      "properties": {
+       "timestamp": {
+        "type": "string",
+        "description": "Timestamp in RFC-3339 format with nanosecond precision.",
+        "format": "date-time"
+       },
+       "price": {
+        "type": "number",
+        "description": "Evaluated price for market mid."
+       },
+       "yield_to_worst": {
+        "type": "number",
+        "description": "Evaluated yield to worst for market mid.",
+        "nullable": true
+       },
+       "yield_to_maturity": {
+        "type": "number",
+        "description": "Evaluated yield to maturity for market mid.",
+        "nullable": true
+       }
+      },
+      "required": [
+       "timestamp",
+       "price",
+       "yield_to_worst"
+      ]
+     },
+     "PricesResponse": {
+      "description": "",
+      "type": "object",
+      "title": "PricesResponse",
+      "properties": {
+       "count": {
+        "type": "integer",
+        "description": "The total number of price observations found that match the query."
+       },
+       "next": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the next page of results (if any exist). Null if no more pages."
+       },
+       "prev": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the previous page of results (if any exist). Null if no earlier pages."
+       },
+       "data": {
+        "type": "array",
+        "uniqueItems": true,
+        "description": "The array of price data",
+        "items": {
+         "$ref": "#/components/schemas/Price"
+        }
+       }
+      },
+      "required": [
+       "isin",
+       "cusip",
+       "data"
+      ]
+     }
+    },
+    "parameters": {
+     "instrument_id": {
+      "name": "instrument_id",
+      "in": "path",
+      "required": true,
+      "description": "Instrument CUSIP or ISIN",
+      "schema": {
+       "type": "string",
+       "example": "US91915WAB81"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getmarks.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Market Data"
+    }
+   ],
+   "paths": {
+    "/v1/data/marks/": {
+     "get": {
+      "tags": [
+       "Market Data"
+      ],
+      "summary": "Last Price",
+      "description": "The marks endpoint can be used to retrieve the most recently observed price for each ISIN in a collection of ISINs (up to 100 maximum). It is intended to be used to mark a portfolio's current value.\nThe response will contain a list of mark objects, ordered by ISIN ascending, corresponding to the requested list.\nEach mark object will either contain the mark details or an error message if the mark cannot be retrieved (not found, not tradable, not priced).\nIf the request is malformed, the endpoint will fail and return an error message.",
+      "responses": {
+       "200": {
+        "description": "Success",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/Mark"
+           }
+          }
+         }
+        }
+       }
+      },
+      "operationId": "getMarks",
+      "parameters": [
+       {
+        "description": "A comma-separated list of instruments to get marks for, capped at 100 ISINs/CUSIPs.",
+        "required": true,
+        "in": "query",
+        "name": "instruments",
+        "explode": false,
+        "schema": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        }
+       }
+      ]
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "isin": {
+      "type": "string",
+      "title": "ISIN",
+      "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+      "example": "US594918AD66",
+      "minLength": 12,
+      "maxLength": 12
+     },
+     "cusip": {
+      "type": "string",
+      "title": "CUSIP",
+      "description": "The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\n\nNote: Available to licensed users only.\nThe Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.\nCUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+      "nullable": true,
+      "example": "H00402625",
+      "minLength": 9,
+      "maxLength": 9
+     },
+     "MarkDetails": {
+      "type": "object",
+      "nullable": true,
+      "properties": {
+       "timestamp": {
+        "type": "string",
+        "description": "Timestamp of the most recent pricing estimate in RFC-3339 format with nanosecond precision.",
+        "format": "date-time"
+       },
+       "price": {
+        "type": "number",
+        "description": "Price estimation for the current instrument as a percentage of par."
+       },
+       "dirty_price": {
+        "type": "number",
+        "description": "The \"dirty price\" for an instrument. Defined as price + accrued interest as a percentage of par."
+       },
+       "accrued_interest": {
+        "type": "number",
+        "description": "Accrued interest for the instrument represented as dollar-per-bond at par value."
+       },
+       "yield_to_worst": {
+        "type": "number",
+        "description": "The instrument's worst possible yield, which is the minimum of the yield to maturity and all yield to call values.",
+        "nullable": true
+       },
+       "yield_to_maturity": {
+        "type": "number",
+        "description": "The yield to maturity is the annual rate of return that a bond has assuming it is held to maturity and does not default.",
+        "nullable": true
+       }
+      }
+     },
+     "Mark": {
+      "title": "Mark",
+      "type": "object",
+      "description": "The mark for a given security, containing the most recent observed price for an instrument, used for marking a portfolios current value.\nIf the mark can be retrieved, the details field will be populated with the mark details and the error field will be null.\nIf the mark cannot be retrieved, the error field will be populated with an error message and the details field will be null.",
+      "properties": {
+       "isin": {
+        "$ref": "#/components/schemas/isin"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/cusip"
+       },
+       "details": {
+        "$ref": "#/components/schemas/MarkDetails"
+       },
+       "error": {
+        "type": "string",
+        "description": "An error message if the mark cannot be retrieved (not found, not tradable, not priced), null otherwise.",
+        "nullable": true,
+        "example": null
+       }
+      },
+      "required": [
+       "isin",
+       "timestamp",
+       "details",
+       "error"
+      ]
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/listcorporateactions.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Corporate Actions"
+    }
+   ],
+   "paths": {
+    "/v1/data/corporate-actions/": {
+     "get": {
+      "tags": [
+       "Corporate Actions"
+      ],
+      "summary": "All Corporate Actions",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/corporate_action_start_date"
+       },
+       {
+        "$ref": "#/components/parameters/corporate_action_end_date"
+       },
+       {
+        "$ref": "#/components/parameters/corporate_action_instrument_ids"
+       },
+       {
+        "$ref": "#/components/parameters/corporate_action_event_types"
+       },
+       {
+        "$ref": "#/components/parameters/page"
+       },
+       {
+        "$ref": "#/components/parameters/page_size"
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/CorporateActionsResponse"
+          }
+         }
+        }
+       }
+      },
+      "operationId": "listCorporateActions",
+      "description": "List the corporate actions that occurred in a particular time period. Optionally filter by security and event type. The returned events will be sorted in descending order by the update time.\n\nCurrently, the supported event types are:\n\n* \"DRAW\" - Partial Call\n* \"MCAL\" - Full Call\n* \"BPUT\" - Partial Mandatory Put\n* \"PDEF\" - Pre-Refunding / Defeasance\n* \"PRED\" - Partial Redemption With Pool Factor Reduction\n* \"INTR\" - Interest Payment\n* \"REDM\" - Redemption (Final Maturity)\n* \"TEND\" - Tender Offer\n* \"BIDS\" - Repurchase Offer\n* \"CAPI\" - Capitalization\n\nEach event will have a different set of fields, depending on the event type. These are detailed in the schema for each event type."
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "CorporateActionsResponse": {
+      "title": "CorporateActionsResponse",
+      "type": "object",
+      "description": "Provides corporate action details for every event that matches the query.",
+      "properties": {
+       "count": {
+        "type": "integer",
+        "description": "The total number of corporate actions found that match the query."
+       },
+       "next": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the next page of results (if any exist). Null if no more pages."
+       },
+       "prev": {
+        "type": "string",
+        "nullable": true,
+        "format": "URL",
+        "description": "The URL to the previous page of results (if any exist). Null if no earlier pages."
+       },
+       "corporate_actions": {
+        "type": "array",
+        "description": "Array of corporate action events requested.",
+        "items": {
+         "anyOf": [
+          {
+           "$ref": "#/components/schemas/CorporateActionFullCallInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPartialCallInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPutInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPreRefundingInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPartialRedemptionWithPoolFactorReductionInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionInterestInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionRedemptionInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionTenderInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionBidsInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionCapitalizationInfo"
+          }
+         ]
+        }
+       }
+      },
+      "required": [
+       "corporate_actions"
+      ]
+     },
+     "CorporateActionFullCallInfo": {
+      "title": "full_call",
+      "type": "object",
+      "description": "MCAL (Full Call) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "MCAL"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "earliest_payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventEarliestPaymentDate"
+       }
+      }
+     },
+     "CorporateActionPartialCallInfo": {
+      "title": "partial_call",
+      "type": "object",
+      "description": "DRAW (Partial Call) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "DRAW"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "results_publication_date": {
+        "$ref": "#/components/schemas/CorporateActionEventResultsPublicationDate"
+       },
+       "record_date": {
+        "$ref": "#/components/schemas/CorporateActionEventRecordDate"
+       },
+       "lottery_type": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryType"
+       },
+       "lottery_date": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryDate"
+       }
+      }
+     },
+     "CorporateActionPutInfo": {
+      "title": "put",
+      "type": "object",
+      "description": "BPUT (Put) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "BPUT"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "market_deadline": {
+        "$ref": "#/components/schemas/CorporateActionEventMarketDeadline"
+       },
+       "response_deadline": {
+        "$ref": "#/components/schemas/CorporateActionEventResponseDeadline"
+       },
+       "put_min_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventPutMinQuantity"
+       },
+       "put_min_increment": {
+        "$ref": "#/components/schemas/CorporateActionEventPutMinIncrement"
+       }
+      }
+     },
+     "CorporateActionPreRefundingInfo": {
+      "title": "pre_refunding",
+      "type": "object",
+      "description": "PDEF (Pre-Refunding / Defeasance) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "PDEF"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "results_publication_date": {
+        "$ref": "#/components/schemas/CorporateActionEventResultsPublicationDate"
+       },
+       "lottery_type": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryType"
+       },
+       "lottery_date": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryDate"
+       },
+       "refunded_security": {
+        "$ref": "#/components/schemas/CorporateActionEventRefundedSecurity"
+       },
+       "non_refunded_security": {
+        "$ref": "#/components/schemas/CorporateActionEventNonRefundedSecurity"
+       }
+      }
+     },
+     "CorporateActionRedemptionInfo": {
+      "title": "redemption",
+      "type": "object",
+      "description": "REDM (Redemption) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "REDM"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "earliest_payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventEarliestPaymentDate"
+       }
+      }
+     },
+     "CorporateActionInterestInfo": {
+      "title": "interest",
+      "type": "object",
+      "description": "INTR (Interest) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "INTR"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "rate_type": {
+        "$ref": "#/components/schemas/CorporateActionEventRateType"
+       },
+       "rate_amount": {
+        "$ref": "#/components/schemas/CorporateActionEventRateAmount"
+       }
+      }
+     },
+     "CorporateActionTenderInfo": {
+      "title": "tender",
+      "type": "object",
+      "description": "TEND (Tender) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "TEND"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "instruction_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventInstructionExpirationDate"
+       },
+       "withdrawal_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventWithdrawalExpirationDate"
+       },
+       "actual_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventActualExpirationDate"
+       },
+       "dispursed_security": {
+        "$ref": "#/components/schemas/CorporateActionEventDispursedSecurity"
+       },
+       "option_price": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionPrice"
+       },
+       "option_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionQuantity"
+       }
+      }
+     },
+     "CorporateActionBidsInfo": {
+      "title": "bids",
+      "type": "object",
+      "description": "BIDS (Bid) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "BIDS"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "instruction_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventInstructionExpirationDate"
+       },
+       "withdrawal_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventWithdrawalExpirationDate"
+       },
+       "actual_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventActualExpirationDate"
+       },
+       "dispursed_security": {
+        "$ref": "#/components/schemas/CorporateActionEventDispursedSecurity"
+       },
+       "option_price": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionPrice"
+       },
+       "option_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionQuantity"
+       }
+      }
+     },
+     "CorporateActionPartialRedemptionWithPoolFactorReductionInfo": {
+      "title": "pred",
+      "type": "object",
+      "description": "Partial Redemption With Pool Factor Reduction Info (PRED) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "PRED"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "position_capture_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPositionCaptureDate"
+       }
+      }
+     },
+     "CorporateActionCapitalizationInfo": {
+      "title": "capitalization",
+      "type": "object",
+      "description": "Capitalization (CAPI) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "CAPI"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "rate_amount": {
+        "$ref": "#/components/schemas/CorporateActionEventRateAmount"
+       }
+      }
+     },
+     "CorporateActionId": {
+      "type": "string",
+      "description": "Unique corporate action event ID.",
+      "example": "US144595949"
+     },
+     "CorporateActionUpdateId": {
+      "type": "string",
+      "description": "Unique message identifier.",
+      "example": "2024072434604568"
+     },
+     "CorporateActionUpdatedAt": {
+      "type": "string",
+      "description": "The time at which the corporate action event was last updated in RFC-3339 format.",
+      "example": "2023-12-06T18:09:07Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventCategory": {
+      "type": "string",
+      "description": "The category of the corporate action event.\n\n  * \"MAND\" - Mandatory\n  * \"VOLU\" - Voluntary\n  * \"CHOS\" - Mandatory with Options",
+      "example": "MAND",
+      "enum": [
+       "MAND",
+       "VOLU",
+       "CHOS"
+      ]
+     },
+     "CorporateActionEventStatus": {
+      "type": "string",
+      "description": "The status of the corporate action event.\n\n* \"COMP\" - Complete\n* \"INCO\" - Incomplete",
+      "example": "COMP",
+      "enum": [
+       "COMP",
+       "INCO"
+      ]
+     },
+     "CorporateActionEventConfirmation": {
+      "type": "string",
+      "description": "The confirmation status of the corporate action event.\n\n* \"CONF\" - Confirmed\n* \"UCON\" - Unconfirmed",
+      "example": "CONF",
+      "enum": [
+       "CONF",
+       "UCON"
+      ]
+     },
+     "CorporateActionEventISIN": {
+      "type": "string",
+      "description": "The instrument ISIN of the corporate action event.",
+      "example": "US594918AD66"
+     },
+     "CorporateActionEventCusip": {
+      "type": "string",
+      "description": "The instrument Cusip of the corporate action event.",
+      "example": "594918AD6"
+     },
+     "CorporateActionEventRecordDate": {
+      "type": "string",
+      "description": "The record date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-12-06"
+     },
+     "CorporateActionEventLotteryDate": {
+      "type": "string",
+      "description": "The lottery date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-12-06"
+     },
+     "CorporateActionEventLotteryType": {
+      "type": "string",
+      "description": "The lottery type of the corporate action event, if applicable.\n\n* \"ORIG\" - Original, As Announced\n* \"SUPP\" - Supplemental, Additional",
+      "example": "ORIG",
+      "enum": [
+       "ORIG",
+       "SUPP"
+      ]
+     },
+     "CorporateActionEventRefundedSecurity": {
+      "type": "string",
+      "description": "The refunded security of a PDEF corporate action event.",
+      "example": "US594918AD60"
+     },
+     "CorporateActionEventNonRefundedSecurity": {
+      "type": "string",
+      "description": "The non-refunded security of a PDEF corporate action event.",
+      "example": "US594918AE71"
+     },
+     "CorporateActionEventPaymentDate": {
+      "type": "string",
+      "description": "The payment date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventAdditionalInfo": {
+      "type": "string",
+      "description": "Additional information provided by the issuer.",
+      "format": "string",
+      "nullable": true,
+      "example": "Contact Number: 123-456-7890\n"
+     },
+     "CorporateActionEventCancelInfo": {
+      "type": "string",
+      "description": "Additional information provided by the issuer, only populated when the corporate action is a cancellation.",
+      "format": "string",
+      "nullable": true,
+      "example": "As of the current date, the variable rate CMO has a normal payment structure, and interest is paid monthly.\n"
+     },
+     "CorporateActionEventCancelType": {
+      "type": "string",
+      "description": "The cancellation type of the corporate action event. Only populated when the corporate action is a cancellation.\n\n* \"PROC\" - Canceled due to processing error\n* \"WITH\" - Withdrawn/canceled by the issuer",
+      "example": "PROC",
+      "enum": [
+       "PROC",
+       "WITH"
+      ]
+     },
+     "CorporateActionEventCancelDate": {
+      "type": "string",
+      "description": "Record date of the cancellation, optionally present when corporate action is a cancellation. YYYY-MM-DD.",
+      "format": "string",
+      "nullable": true,
+      "example": "2010-08-18\n"
+     },
+     "CorporateActionEventResultsPublicationDate": {
+      "type": "string",
+      "description": "The lottery results publication date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventEarliestPaymentDate": {
+      "type": "string",
+      "description": "The earliest payment date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventPrice": {
+      "type": "number",
+      "description": "The price that applies for the corporate action event.",
+      "example": 103.25
+     },
+     "CorporateActionEventMarketDeadline": {
+      "type": "string",
+      "description": "The deadline for an issuer or agent to respond to an outstanding offer by account servicer.",
+      "example": "2023-12-06T18:00:00Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventResponseDeadline": {
+      "type": "string",
+      "description": "The deadline for an account servicer to respond to an outstanding event.",
+      "example": "2023-12-06T18:00:00Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventPutMinQuantity": {
+      "type": "number",
+      "description": "The minimum put quantity of the corporate action event.",
+      "example": 10000
+     },
+     "CorporateActionEventPutMinIncrement": {
+      "type": "number",
+      "description": "The minimum put increment of the corporate action event.",
+      "example": 1000
+     },
+     "CorporateActionEventPayout": {
+      "type": "string",
+      "description": "The payout type of the corporate action event.\n\n* \"CASH\" - Cash\n* \"SECU\" - Securities\n* \"CASE\" - Cash and Securities",
+      "example": "CASH",
+      "enum": [
+       "CASH",
+       "SECU",
+       "CASE"
+      ]
+     },
+     "CorporateActionEventRateType": {
+      "type": "string",
+      "nullable": true,
+      "description": "Type of the corporate action event rate."
+     },
+     "CorporateActionEventRateAmount": {
+      "type": "string",
+      "nullable": true,
+      "description": "Rate of the corporate action event."
+     },
+     "CorporateActionEventInstructionExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Date/time that the account servicer has set as the deadline to respond, with instructions, to an outstanding event, giving the holder eligibility to incentives."
+     },
+     "CorporateActionEventWithdrawalExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Period during which the participant of the account servicer can revoke change or withdraw its instructions."
+     },
+     "CorporateActionEventActualExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Issuer or issuer's agent deadline to respond with an instruction to an outstanding offer or privilege."
+     },
+     "CorporateActionEventDispursedSecurity": {
+      "type": "string",
+      "nullable": true,
+      "description": "The security that is being distributed as a result of a corporate action as declared by the issuer or offeror on the market."
+     },
+     "CorporateActionEventOptionPrice": {
+      "type": "string",
+      "nullable": true,
+      "description": "Price of financial instruments that can be actioned upon."
+     },
+     "CorporateActionEventOptionQuantity": {
+      "type": "string",
+      "nullable": true,
+      "description": "Quantity of financial instruments that can be actioned upon."
+     },
+     "CorporateActionEventPositionCaptureDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2024-10-14",
+      "nullable": true,
+      "description": "Date when positions are captured and entitlements are calculated in the system at DTC."
+     }
+    },
+    "parameters": {
+     "page": {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Page number of results to return. Defaults to 1."
+     },
+     "page_size": {
+      "name": "page_size",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 1000
+      },
+      "description": "Number of items to return. Must be in range 1-1000, defaults to 100."
+     },
+     "corporate_action_start_date": {
+      "name": "start",
+      "in": "query",
+      "required": true,
+      "description": "The inclusive start of the date range when searching corporate action announcements, formatted as YYYY-MM-DD.\n\nThe maximum range is 31 days.",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2024-08-01"
+      }
+     },
+     "corporate_action_end_date": {
+      "name": "end",
+      "in": "query",
+      "required": true,
+      "description": "The inclusive end of the date range when searching corporate action announcements, formatted as YYYY-MM-DD.\n\nThe maximum range is 31 days.",
+      "schema": {
+       "type": "string",
+       "format": "date",
+       "example": "2024-09-01"
+      }
+     },
+     "corporate_action_instrument_ids": {
+      "name": "instrument_ids",
+      "in": "query",
+      "required": false,
+      "description": "Comma separated list of ISINs to filter on.\n\nAt most 1000 ISINs may be specified.",
+      "schema": {
+       "type": "string",
+       "example": "US84858WAA45,US17298CHQ42"
+      }
+     },
+     "corporate_action_event_types": {
+      "name": "event_types",
+      "in": "query",
+      "required": false,
+      "description": "Comma separated list of corporate action event types to filter on.\n\nThese follow the standard ISO 20022 event types.",
+      "schema": {
+       "type": "string",
+       "example": "MCAL,DRAW"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/retrievecorporateaction.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Data API",
+    "description": "Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Corporate Actions"
+    }
+   ],
+   "paths": {
+    "/v1/data/corporate-actions/{event_id}/": {
+     "get": {
+      "tags": [
+       "Corporate Actions"
+      ],
+      "summary": "Single Corporate Action",
+      "parameters": [
+       {
+        "$ref": "#/components/parameters/corporate_action_event_id"
+       }
+      ],
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/CorporateActionDetailResponse"
+          }
+         }
+        }
+       }
+      },
+      "operationId": "retrieveCorporateAction",
+      "description": "Retrieve complete details for the specified corporate action event including event details, past lifecycle details, and associated instruments. These will all have the same event ID and event type.\n\nThe returned events will be sorted in descending order by the update time."
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "CorporateActionDetailResponse": {
+      "title": "CorporateActionDetailResponse",
+      "type": "object",
+      "description": "Provides corporate action details for a single corporate action.",
+      "properties": {
+       "corporate_actions": {
+        "type": "array",
+        "items": {
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/CorporateActionFullCallInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPartialCallInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPutInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPreRefundingInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionPartialRedemptionWithPoolFactorReductionInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionInterestInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionRedemptionInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionTenderInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionBidsInfo"
+          },
+          {
+           "$ref": "#/components/schemas/CorporateActionCapitalizationInfo"
+          }
+         ]
+        }
+       }
+      }
+     },
+     "CorporateActionFullCallInfo": {
+      "title": "full_call",
+      "type": "object",
+      "description": "MCAL (Full Call) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "MCAL"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "earliest_payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventEarliestPaymentDate"
+       }
+      }
+     },
+     "CorporateActionPartialCallInfo": {
+      "title": "partial_call",
+      "type": "object",
+      "description": "DRAW (Partial Call) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "DRAW"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "results_publication_date": {
+        "$ref": "#/components/schemas/CorporateActionEventResultsPublicationDate"
+       },
+       "record_date": {
+        "$ref": "#/components/schemas/CorporateActionEventRecordDate"
+       },
+       "lottery_type": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryType"
+       },
+       "lottery_date": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryDate"
+       }
+      }
+     },
+     "CorporateActionPutInfo": {
+      "title": "put",
+      "type": "object",
+      "description": "BPUT (Put) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "BPUT"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "market_deadline": {
+        "$ref": "#/components/schemas/CorporateActionEventMarketDeadline"
+       },
+       "response_deadline": {
+        "$ref": "#/components/schemas/CorporateActionEventResponseDeadline"
+       },
+       "put_min_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventPutMinQuantity"
+       },
+       "put_min_increment": {
+        "$ref": "#/components/schemas/CorporateActionEventPutMinIncrement"
+       }
+      }
+     },
+     "CorporateActionPreRefundingInfo": {
+      "title": "pre_refunding",
+      "type": "object",
+      "description": "PDEF (Pre-Refunding / Defeasance) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "PDEF"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "results_publication_date": {
+        "$ref": "#/components/schemas/CorporateActionEventResultsPublicationDate"
+       },
+       "lottery_type": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryType"
+       },
+       "lottery_date": {
+        "$ref": "#/components/schemas/CorporateActionEventLotteryDate"
+       },
+       "refunded_security": {
+        "$ref": "#/components/schemas/CorporateActionEventRefundedSecurity"
+       },
+       "non_refunded_security": {
+        "$ref": "#/components/schemas/CorporateActionEventNonRefundedSecurity"
+       }
+      }
+     },
+     "CorporateActionRedemptionInfo": {
+      "title": "redemption",
+      "type": "object",
+      "description": "REDM (Redemption) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "REDM"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "earliest_payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventEarliestPaymentDate"
+       }
+      }
+     },
+     "CorporateActionInterestInfo": {
+      "title": "interest",
+      "type": "object",
+      "description": "INTR (Interest) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "INTR"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "rate_type": {
+        "$ref": "#/components/schemas/CorporateActionEventRateType"
+       },
+       "rate_amount": {
+        "$ref": "#/components/schemas/CorporateActionEventRateAmount"
+       }
+      }
+     },
+     "CorporateActionTenderInfo": {
+      "title": "tender",
+      "type": "object",
+      "description": "TEND (Tender) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "TEND"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "instruction_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventInstructionExpirationDate"
+       },
+       "withdrawal_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventWithdrawalExpirationDate"
+       },
+       "actual_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventActualExpirationDate"
+       },
+       "dispursed_security": {
+        "$ref": "#/components/schemas/CorporateActionEventDispursedSecurity"
+       },
+       "option_price": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionPrice"
+       },
+       "option_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionQuantity"
+       }
+      }
+     },
+     "CorporateActionBidsInfo": {
+      "title": "bids",
+      "type": "object",
+      "description": "BIDS (Bid) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "BIDS"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "instruction_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventInstructionExpirationDate"
+       },
+       "withdrawal_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventWithdrawalExpirationDate"
+       },
+       "actual_expiration_date": {
+        "$ref": "#/components/schemas/CorporateActionEventActualExpirationDate"
+       },
+       "dispursed_security": {
+        "$ref": "#/components/schemas/CorporateActionEventDispursedSecurity"
+       },
+       "option_price": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionPrice"
+       },
+       "option_quantity": {
+        "$ref": "#/components/schemas/CorporateActionEventOptionQuantity"
+       }
+      }
+     },
+     "CorporateActionPartialRedemptionWithPoolFactorReductionInfo": {
+      "title": "pred",
+      "type": "object",
+      "description": "Partial Redemption With Pool Factor Reduction Info (PRED) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "PRED"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "position_capture_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPositionCaptureDate"
+       }
+      }
+     },
+     "CorporateActionCapitalizationInfo": {
+      "title": "capitalization",
+      "type": "object",
+      "description": "Capitalization (CAPI) corporate action event details",
+      "properties": {
+       "id": {
+        "$ref": "#/components/schemas/CorporateActionId"
+       },
+       "update_id": {
+        "$ref": "#/components/schemas/CorporateActionUpdateId"
+       },
+       "updated_at": {
+        "$ref": "#/components/schemas/CorporateActionUpdatedAt"
+       },
+       "type": {
+        "type": "string",
+        "description": "The ISO event code of the corporate action event.",
+        "example": "CAPI"
+       },
+       "isin": {
+        "$ref": "#/components/schemas/CorporateActionEventISIN"
+       },
+       "cusip": {
+        "$ref": "#/components/schemas/CorporateActionEventCusip"
+       },
+       "status": {
+        "$ref": "#/components/schemas/CorporateActionEventStatus"
+       },
+       "confirmation": {
+        "$ref": "#/components/schemas/CorporateActionEventConfirmation"
+       },
+       "category": {
+        "$ref": "#/components/schemas/CorporateActionEventCategory"
+       },
+       "price": {
+        "$ref": "#/components/schemas/CorporateActionEventPrice"
+       },
+       "payout": {
+        "$ref": "#/components/schemas/CorporateActionEventPayout"
+       },
+       "payment_date": {
+        "$ref": "#/components/schemas/CorporateActionEventPaymentDate"
+       },
+       "additional_info": {
+        "$ref": "#/components/schemas/CorporateActionEventAdditionalInfo"
+       },
+       "cancel_info": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelInfo"
+       },
+       "cancel_type": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelType"
+       },
+       "cancel_date": {
+        "$ref": "#/components/schemas/CorporateActionEventCancelDate"
+       },
+       "rate_amount": {
+        "$ref": "#/components/schemas/CorporateActionEventRateAmount"
+       }
+      }
+     },
+     "CorporateActionId": {
+      "type": "string",
+      "description": "Unique corporate action event ID.",
+      "example": "US144595949"
+     },
+     "CorporateActionUpdateId": {
+      "type": "string",
+      "description": "Unique message identifier.",
+      "example": "2024072434604568"
+     },
+     "CorporateActionUpdatedAt": {
+      "type": "string",
+      "description": "The time at which the corporate action event was last updated in RFC-3339 format.",
+      "example": "2023-12-06T18:09:07Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventCategory": {
+      "type": "string",
+      "description": "The category of the corporate action event.\n\n  * \"MAND\" - Mandatory\n  * \"VOLU\" - Voluntary\n  * \"CHOS\" - Mandatory with Options",
+      "example": "MAND",
+      "enum": [
+       "MAND",
+       "VOLU",
+       "CHOS"
+      ]
+     },
+     "CorporateActionEventStatus": {
+      "type": "string",
+      "description": "The status of the corporate action event.\n\n* \"COMP\" - Complete\n* \"INCO\" - Incomplete",
+      "example": "COMP",
+      "enum": [
+       "COMP",
+       "INCO"
+      ]
+     },
+     "CorporateActionEventConfirmation": {
+      "type": "string",
+      "description": "The confirmation status of the corporate action event.\n\n* \"CONF\" - Confirmed\n* \"UCON\" - Unconfirmed",
+      "example": "CONF",
+      "enum": [
+       "CONF",
+       "UCON"
+      ]
+     },
+     "CorporateActionEventISIN": {
+      "type": "string",
+      "description": "The instrument ISIN of the corporate action event.",
+      "example": "US594918AD66"
+     },
+     "CorporateActionEventCusip": {
+      "type": "string",
+      "description": "The instrument Cusip of the corporate action event.",
+      "example": "594918AD6"
+     },
+     "CorporateActionEventRecordDate": {
+      "type": "string",
+      "description": "The record date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-12-06"
+     },
+     "CorporateActionEventLotteryDate": {
+      "type": "string",
+      "description": "The lottery date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-12-06"
+     },
+     "CorporateActionEventLotteryType": {
+      "type": "string",
+      "description": "The lottery type of the corporate action event, if applicable.\n\n* \"ORIG\" - Original, As Announced\n* \"SUPP\" - Supplemental, Additional",
+      "example": "ORIG",
+      "enum": [
+       "ORIG",
+       "SUPP"
+      ]
+     },
+     "CorporateActionEventRefundedSecurity": {
+      "type": "string",
+      "description": "The refunded security of a PDEF corporate action event.",
+      "example": "US594918AD60"
+     },
+     "CorporateActionEventNonRefundedSecurity": {
+      "type": "string",
+      "description": "The non-refunded security of a PDEF corporate action event.",
+      "example": "US594918AE71"
+     },
+     "CorporateActionEventPaymentDate": {
+      "type": "string",
+      "description": "The payment date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventAdditionalInfo": {
+      "type": "string",
+      "description": "Additional information provided by the issuer.",
+      "format": "string",
+      "nullable": true,
+      "example": "Contact Number: 123-456-7890\n"
+     },
+     "CorporateActionEventCancelInfo": {
+      "type": "string",
+      "description": "Additional information provided by the issuer, only populated when the corporate action is a cancellation.",
+      "format": "string",
+      "nullable": true,
+      "example": "As of the current date, the variable rate CMO has a normal payment structure, and interest is paid monthly.\n"
+     },
+     "CorporateActionEventCancelType": {
+      "type": "string",
+      "description": "The cancellation type of the corporate action event. Only populated when the corporate action is a cancellation.\n\n* \"PROC\" - Canceled due to processing error\n* \"WITH\" - Withdrawn/canceled by the issuer",
+      "example": "PROC",
+      "enum": [
+       "PROC",
+       "WITH"
+      ]
+     },
+     "CorporateActionEventCancelDate": {
+      "type": "string",
+      "description": "Record date of the cancellation, optionally present when corporate action is a cancellation. YYYY-MM-DD.",
+      "format": "string",
+      "nullable": true,
+      "example": "2010-08-18\n"
+     },
+     "CorporateActionEventResultsPublicationDate": {
+      "type": "string",
+      "description": "The lottery results publication date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventEarliestPaymentDate": {
+      "type": "string",
+      "description": "The earliest payment date of the corporate action event.",
+      "format": "date",
+      "nullable": true,
+      "example": "2023-09-06"
+     },
+     "CorporateActionEventPrice": {
+      "type": "number",
+      "description": "The price that applies for the corporate action event.",
+      "example": 103.25
+     },
+     "CorporateActionEventMarketDeadline": {
+      "type": "string",
+      "description": "The deadline for an issuer or agent to respond to an outstanding offer by account servicer.",
+      "example": "2023-12-06T18:00:00Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventResponseDeadline": {
+      "type": "string",
+      "description": "The deadline for an account servicer to respond to an outstanding event.",
+      "example": "2023-12-06T18:00:00Z",
+      "format": "date-time"
+     },
+     "CorporateActionEventPutMinQuantity": {
+      "type": "number",
+      "description": "The minimum put quantity of the corporate action event.",
+      "example": 10000
+     },
+     "CorporateActionEventPutMinIncrement": {
+      "type": "number",
+      "description": "The minimum put increment of the corporate action event.",
+      "example": 1000
+     },
+     "CorporateActionEventPayout": {
+      "type": "string",
+      "description": "The payout type of the corporate action event.\n\n* \"CASH\" - Cash\n* \"SECU\" - Securities\n* \"CASE\" - Cash and Securities",
+      "example": "CASH",
+      "enum": [
+       "CASH",
+       "SECU",
+       "CASE"
+      ]
+     },
+     "CorporateActionEventRateType": {
+      "type": "string",
+      "nullable": true,
+      "description": "Type of the corporate action event rate."
+     },
+     "CorporateActionEventRateAmount": {
+      "type": "string",
+      "nullable": true,
+      "description": "Rate of the corporate action event."
+     },
+     "CorporateActionEventInstructionExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Date/time that the account servicer has set as the deadline to respond, with instructions, to an outstanding event, giving the holder eligibility to incentives."
+     },
+     "CorporateActionEventWithdrawalExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Period during which the participant of the account servicer can revoke change or withdraw its instructions."
+     },
+     "CorporateActionEventActualExpirationDate": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-09-30T17:00:00-04:00",
+      "nullable": true,
+      "description": "Issuer or issuer's agent deadline to respond with an instruction to an outstanding offer or privilege."
+     },
+     "CorporateActionEventDispursedSecurity": {
+      "type": "string",
+      "nullable": true,
+      "description": "The security that is being distributed as a result of a corporate action as declared by the issuer or offeror on the market."
+     },
+     "CorporateActionEventOptionPrice": {
+      "type": "string",
+      "nullable": true,
+      "description": "Price of financial instruments that can be actioned upon."
+     },
+     "CorporateActionEventOptionQuantity": {
+      "type": "string",
+      "nullable": true,
+      "description": "Quantity of financial instruments that can be actioned upon."
+     },
+     "CorporateActionEventPositionCaptureDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2024-10-14",
+      "nullable": true,
+      "description": "Date when positions are captured and entitlements are calculated in the system at DTC."
+     }
+    },
+    "parameters": {
+     "corporate_action_event_id": {
+      "name": "event_id",
+      "in": "path",
+      "required": true,
+      "description": "Corporate action event ID.",
+      "schema": {
+       "type": "string",
+       "example": "US144543665"
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ }
+]

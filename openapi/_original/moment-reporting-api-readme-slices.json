@@ -1,0 +1,1939 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/generateproposalpdf.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Reporting API",
+    "description": "Moment's Reporting API allows Clients to generate PDF reports with their data.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com",
+     "url": "https://withmoment.com/support"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Reports"
+    }
+   ],
+   "paths": {
+    "/v1/report/": {
+     "post": {
+      "tags": [
+       "Reports"
+      ],
+      "summary": "Generate a PDF report for an account's proposal",
+      "description": "Creates and returns a PDF report containing account details, statistics, compliance information, and holdings for a proposal",
+      "operationId": "generateProposalPDF",
+      "requestBody": {
+       "description": "Proposal generation request",
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "type": "object",
+          "properties": {
+           "proposal_id": {
+            "type": "string",
+            "description": "ID of an existing proposal. When provided, Reporter fetches\nthe full proposal payload server-side from the upstream\nproposal API (configured via MOM_INTERNAL_ALB_ENDPOINT) and\nuses one of its accounts as `proposal_account`. Either\n`proposal_id` or an inline `proposal_account` must be\nsupplied. If the proposal has more than one account, also\nsupply `account_id` to pick which one to report on.\n"
+           },
+           "account_id": {
+            "type": "string",
+            "description": "Optional. When `proposal_id` is provided and the upstream\nproposal has more than one account, this picks which one to\nreport on. Required for multi-account proposals; ignored if\n`proposal_account` is supplied inline.\n"
+           },
+           "proposal_account": {
+            "$ref": "#/components/schemas/ProposalAccount"
+           },
+           "logo_url": {
+            "type": "string",
+            "format": "url",
+            "description": "A url of the JPG image to be included in the generated PDF report"
+           },
+           "reporter": {
+            "type": "string",
+            "description": "The name of the reporter (deprecated, use prepared_by instead)"
+           },
+           "prepared_by": {
+            "type": "string",
+            "description": "The name to display as the preparer of the report",
+            "default": "Your Advisor"
+           },
+           "disclaimer": {
+            "type": "string",
+            "description": "Custom disclaimer text to include in the report",
+            "default": ""
+           },
+           "cover_page_disclaimer": {
+            "type": "string",
+            "description": "Custom disclaimer text to display on the cover page",
+            "default": ""
+           },
+           "color_palette": {
+            "type": "array",
+            "items": {
+             "type": "string"
+            },
+            "description": "Array of hex color codes for the report color scheme",
+            "default": [
+             "#3c5e5c"
+            ]
+           },
+           "sort_by": {
+            "type": "string",
+            "description": "Optional parameter to specify the key to sort holdings by",
+            "enum": [
+             "cusip",
+             "issuer",
+             "state",
+             "coupon",
+             "maturity",
+             "call_date",
+             "sp_rating",
+             "price",
+             "ytm",
+             "ytw",
+             "quantity",
+             "weight",
+             "market_value"
+            ],
+            "default": "weight"
+           },
+           "sort_order": {
+            "type": "string",
+            "description": "Optional parameter to specify the order to sort holdings by",
+            "enum": [
+             "asc",
+             "desc"
+            ],
+            "default": "desc"
+           }
+          },
+          "required": [
+           "logo_url"
+          ]
+         }
+        }
+       }
+      },
+      "responses": {
+       "200": {
+        "description": "PDF report generated successfully",
+        "content": {
+         "application/pdf": {
+          "schema": {
+           "type": "string",
+           "format": "binary"
+          }
+         }
+        }
+       },
+       "422": {
+        "description": "Validation error - invalid request body",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "detail": {
+             "type": "array",
+             "items": {
+              "type": "object",
+              "properties": {
+               "loc": {
+                "type": "array",
+                "items": {
+                 "type": "string"
+                }
+               },
+               "msg": {
+                "type": "string"
+               },
+               "type": {
+                "type": "string"
+               }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+       },
+       "500": {
+        "description": "Internal server error",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "detail": {
+             "type": "string"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "schemas": {
+     "AccountDetail": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/AccountInformation"
+       },
+       {
+        "type": "object",
+        "properties": {
+         "statistics": {
+          "$ref": "#/components/schemas/AccountStatistics"
+         },
+         "compliance": {
+          "$ref": "#/components/schemas/ComplianceFull"
+         },
+         "lots": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/Lot"
+          }
+         },
+         "cash": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/CashLot"
+          }
+         },
+         "sleeves": {
+          "description": "An object containing all of the account's sleeves keyed by sleeve ID",
+          "type": "object",
+          "additionalProperties": {
+           "$ref": "#/components/schemas/SleeveWithStatisticsAndCompliance"
+          }
+         }
+        },
+        "required": [
+         "lots",
+         "cash",
+         "sleeves",
+         "statistics",
+         "compliance"
+        ]
+       }
+      ]
+     },
+     "AccountDistribution": {
+      "type": "object",
+      "properties": {
+       "monthly_cashflows": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CashFlowEvent"
+        }
+       },
+       "yearly_cashflows": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CashFlowEvent"
+        }
+       },
+       "municipal_state_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "sp_rating_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "maturity_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "sector_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "issuer_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "coupon_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "municipal_type_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       }
+      },
+      "required": [
+       "monthly_cashflows",
+       "yearly_cashflows",
+       "municipal_state_distribution",
+       "sp_rating_distribution",
+       "maturity_distribution",
+       "sector_distribution",
+       "issuer_distribution",
+       "coupon_distribution",
+       "municipal_type_distribution"
+      ]
+     },
+     "AccountInformation": {
+      "type": "object",
+      "properties": {
+       "account_id": {
+        "type": "string",
+        "description": "The ID of the account"
+       },
+       "minimum_cash_balance": {
+        "description": "The minimum cash balance of the account",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "custodian_account_id": {
+        "type": "string",
+        "description": "The Custodian-tracked ID of the account"
+       },
+       "short_positions_enabled": {
+        "type": "boolean",
+        "description": "Whether short positions are enabled for the account"
+       },
+       "moment_organization_id": {
+        "type": "string",
+        "description": "The ID of the Moment organization that the account belongs to"
+       },
+       "moment_trading_group_id": {
+        "type": "string",
+        "description": "The ID of the Moment trading group that the account belongs to"
+       },
+       "custodian": {
+        "$ref": "#/components/schemas/Custodian"
+       },
+       "advisor": {
+        "$ref": "#/components/schemas/Advisor"
+       },
+       "household": {
+        "$ref": "#/components/schemas/Household"
+       },
+       "is_taxable": {
+        "type": "boolean",
+        "description": "Whether the account is taxable"
+       },
+       "account_type": {
+        "type": "string",
+        "description": "The type of the account"
+       },
+       "management_type": {
+        "$ref": "#/components/schemas/ManagementType"
+       },
+       "prime_brokerage_enabled": {
+        "type": "boolean",
+        "description": "Whether the account is eligible for prime brokerage services."
+       },
+       "status": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/Status"
+         }
+        ],
+        "description": "The current status of the account."
+       },
+       "desired_status": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/Status"
+         }
+        ],
+        "description": "The desired status of the account"
+       },
+       "custodial_status": {
+        "type": "string",
+        "description": "The custodial status of the account"
+       },
+       "investor": {
+        "$ref": "#/components/schemas/Investor"
+       },
+       "account_name": {
+        "type": "string",
+        "description": "The name of the account"
+       },
+       "extra": {
+        "type": "object",
+        "description": "Extra information about the account",
+        "additionalProperties": {
+         "type": "string"
+        }
+       },
+       "last_updated_at": {
+        "type": "string",
+        "description": "The last time the account was updated",
+        "format": "date-time"
+       }
+      },
+      "required": [
+       "account_id",
+       "minimum_cash_balance",
+       "custodian_account_id",
+       "short_positions_enabled",
+       "moment_organization_id",
+       "moment_trading_group_id",
+       "custodian",
+       "advisor",
+       "household",
+       "is_taxable",
+       "account_type",
+       "management_type",
+       "status",
+       "desired_status",
+       "custodial_status",
+       "investor",
+       "account_name",
+       "prime_brokerage_enabled",
+       "extra",
+       "last_updated_at"
+      ]
+     },
+     "AccountSnapshot": {
+      "type": "object",
+      "properties": {
+       "timestamp": {
+        "type": "string",
+        "description": "The timestamp of the snapshot in RFC-3339 format with nanosecond precision.",
+        "format": "date-time"
+       },
+       "total_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of the account"
+       },
+       "cash_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The cash market value of the account"
+       },
+       "other_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The market value of all holdings that are not tracked by Moment. This includes all non-fixed income holdings and fixed income holdings that are not present in Moment's security master."
+       },
+       "tracked_fixed_income_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The tracked fixed income market value of the account -- this should be equal to the sum of treasury_market_value, corporate_market_value, agency_market_value, cd_market_value, municipal_market_value, government_market_value, and total_accrued_interest"
+       },
+       "fund_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The market value of mutual fund and ETF holdings in the account, excluding those Moment classifies as money market (reported in money_market_market_value)"
+       },
+       "treasury_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The treasury market value of the account"
+       },
+       "corporate_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The corporate market value of the account"
+       },
+       "agency_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The agency market value of the account"
+       },
+       "government_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The government market value of the account"
+       },
+       "municipal_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The municipal market value of the account"
+       },
+       "cd_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The CD market value of the account"
+       },
+       "total_accrued_interest": {
+        "type": "number",
+        "format": "double",
+        "description": "The total accrued interest of the account"
+       },
+       "average_ytw": {
+        "type": "number",
+        "format": "double",
+        "description": "The average yield to worst of the account"
+       },
+       "average_maturity": {
+        "type": "number",
+        "format": "double",
+        "description": "The average maturity of the account"
+       },
+       "average_duration": {
+        "type": "number",
+        "format": "double",
+        "description": "The average duration of the account"
+       },
+       "average_sp_rating": {
+        "type": "string",
+        "description": "The average SP rating of the account"
+       },
+       "average_lowest_rating": {
+        "type": "string",
+        "description": "Market-value-weighted average of each holding's lowest agency rating, on the S&P scale"
+       },
+       "average_coupon": {
+        "type": "number",
+        "format": "double",
+        "description": "The average coupon rate across all bonds in the account"
+       }
+      },
+      "required": [
+       "timestamp",
+       "total_market_value",
+       "cash_market_value",
+       "other_market_value",
+       "tracked_fixed_income_market_value",
+       "treasury_market_value",
+       "corporate_market_value",
+       "agency_market_value",
+       "government_market_value",
+       "municipal_market_value",
+       "cd_market_value",
+       "total_accrued_interest",
+       "average_ytw",
+       "average_maturity",
+       "average_duration",
+       "average_sp_rating",
+       "average_coupon"
+      ]
+     },
+     "AccountStatistics": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/AccountSnapshot"
+       },
+       {
+        "$ref": "#/components/schemas/AccountDistribution"
+       }
+      ]
+     },
+     "WeightComplianceCheckFull": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "type": "string",
+        "enum": [
+         "weight_compliance"
+        ]
+       },
+       "sleeve_id": {
+        "type": "string",
+        "description": "The ID of the sleeve."
+       },
+       "min_weight": {
+        "type": "number",
+        "description": "The minimum weight of the sleeve."
+       },
+       "target_weight": {
+        "type": "number",
+        "description": "The target weight of the sleeve."
+       },
+       "max_weight": {
+        "type": "number",
+        "description": "The maximum weight of the sleeve."
+       },
+       "current_weight": {
+        "type": "number",
+        "description": "The current weight of the sleeve."
+       },
+       "compliant": {
+        "type": "boolean",
+        "description": "Whether the sleeve weight is compliant with the limits"
+       }
+      },
+      "required": [
+       "type",
+       "sleeve_id",
+       "min_weight",
+       "target_weight",
+       "max_weight",
+       "current_weight"
+      ]
+     },
+     "ModelComplianceCheckFull": {
+      "type": "object",
+      "properties": {
+       "type": {
+        "type": "string",
+        "enum": [
+         "model_compliance"
+        ]
+       },
+       "sleeve_id": {
+        "type": "string",
+        "description": "The ID of the sleeve."
+       },
+       "model_id": {
+        "type": "string",
+        "description": "The ID of the model."
+       },
+       "compliant": {
+        "type": "boolean",
+        "description": "Whether the sleeve is in compliance with the model."
+       },
+       "constraints": {
+        "type": "object",
+        "additionalProperties": {
+         "$ref": "#/components/schemas/ConstraintValidation"
+        }
+       }
+      },
+      "required": [
+       "type",
+       "sleeve_id",
+       "model_id",
+       "constraints"
+      ]
+     },
+     "ComplianceCheckFull": {
+      "properties": {
+       "compliant": {
+        "type": "boolean",
+        "description": "Whether the account is in compliance."
+       }
+      },
+      "discriminator": {
+       "propertyName": "type",
+       "mapping": {
+        "weight_compliance": "#/components/schemas/WeightComplianceCheckFull",
+        "model_compliance": "#/components/schemas/ModelComplianceCheckFull"
+       }
+      },
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/WeightComplianceCheckFull"
+       },
+       {
+        "$ref": "#/components/schemas/ModelComplianceCheckFull"
+       }
+      ],
+      "required": [
+       "compliant"
+      ]
+     },
+     "ComplianceFull": {
+      "type": "object",
+      "properties": {
+       "compliant": {
+        "type": "boolean",
+        "description": "Whether the account is in compliance."
+       },
+       "checks": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/ComplianceCheckFull"
+        }
+       }
+      },
+      "required": [
+       "compliant",
+       "checks"
+      ]
+     },
+     "Advisor": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The ID of the advisor"
+       },
+       "name": {
+        "type": "string",
+        "description": "The name of the advisor"
+       }
+      },
+      "required": [
+       "id",
+       "name"
+      ]
+     },
+     "Custodian": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The ID of the custodian"
+       },
+       "name": {
+        "type": "string",
+        "description": "The name of the custodian"
+       }
+      },
+      "required": [
+       "id",
+       "name"
+      ]
+     },
+     "Household": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The ID of the household"
+       }
+      },
+      "required": [
+       "id"
+      ]
+     },
+     "Instrument": {
+      "type": "object",
+      "properties": {
+       "isin": {
+        "type": "string",
+        "title": "ISIN",
+        "description": "The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.",
+        "example": "US594918AD66",
+        "minLength": 12,
+        "maxLength": 12
+       },
+       "cusip": {
+        "type": "string",
+        "title": "CUSIP",
+        "description": "CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.\nNote: Available to licensed users only. The Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds. CUSIPs are unique security identifiers managed by The CUSIP Service Bureau.",
+        "nullable": true,
+        "example": "H00402625",
+        "minLength": 9,
+        "maxLength": 9
+       },
+       "status": {
+        "type": "string",
+        "description": "The status of the bond reflects many possible states a bond can be in.\n\n* called: The bond has been called by the issuer.\n* converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.\n* defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.\n* funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.\n* liquidated: The issuer has been liquidated.\n* matured: The bond has reached its maturity date and the bondholders have been repaid their principal.\n* outstanding: The bond is still active and has not reached its maturity date.\n* pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.\n* put: The bond has been put (sold back) to the issuer.\n* repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.\n* tendered: The bond has been tendered (offered for repurchase) by the issuer.\n* repurchased: The bond has been repurchased by the issuer.\n* restructured: The security has been restructured into a new security or into a security with materially different terms.\n* unknown: The status of the bond is unknown.",
+        "example": "called",
+        "x-go-type": "string"
+       },
+       "type": {
+        "type": "string",
+        "description": "The type of fixed income security.",
+        "example": "agency",
+        "x-go-type": "string"
+       },
+       "treasury_subtype": {
+        "type": "string",
+        "description": "The subtype of a treasury. Possible values include:\n* bond: long term i.e. 20, 30 years\n* note: intermediate term i.e. 2, 3, 5, 7, and 10 years\n* bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)\n* tips: treasury inflation-protected securities\n* strips: separate trading of registered interest and principal of securities\n* floating: floating rate notes",
+        "nullable": true,
+        "example": "bill",
+        "x-go-type": "string"
+       },
+       "maturity_date": {
+        "type": "string",
+        "format": "date",
+        "description": "The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds.",
+        "nullable": true,
+        "example": "2023-01-15"
+       },
+       "coupon": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds.",
+        "example": 5
+       },
+       "close_price": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The close price, or 'end of day price' is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only.",
+        "example": 100.2
+       },
+       "close_yield_to_worst": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+        "example": 5.486
+       },
+       "close_yield_to_maturity": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.",
+        "example": 5.486
+       },
+       "description_short": {
+        "type": "string",
+        "description": "Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]",
+        "example": "MI 5.0% 05/01/2034"
+       },
+       "issuer": {
+        "type": "string",
+        "description": "Name of the bond issuer",
+        "example": "AAA United States Government Money Market Account Inc."
+       },
+       "callable": {
+        "type": "boolean",
+        "description": "Whether the bond is callable, meaning the issuer has the right, but not the obligation to redeem the bond — in other words, pay out the bondholder — before its maturity date at a set price (the call price).",
+        "nullable": true,
+        "example": true
+       },
+       "next_call_date": {
+        "type": "string",
+        "format": "date",
+        "description": "The date of the next possible call on the bond. Null if the bond is not callable.",
+        "nullable": true,
+        "example": "2027-05-01"
+       },
+       "next_call_price": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable.",
+        "example": 100
+       },
+       "municipal_taxable_federal": {
+        "type": "boolean",
+        "description": "Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.",
+        "nullable": true,
+        "example": false
+       },
+       "municipal_state": {
+        "type": "string",
+        "description": "The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds.",
+        "nullable": true,
+        "example": "AZ"
+       },
+       "purpose": {
+        "type": "string",
+        "description": "The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus.",
+        "nullable": true,
+        "example": "Water & Sewer"
+       },
+       "use_of_proceeds": {
+        "type": "string",
+        "description": "A more detailed explanation of how the issuer will use the money raised from the bond issuance. For example: Construction of new facilities, refinancing existing debt, general corporate purposes, etc.",
+        "nullable": true,
+        "example": "Construction of water treatment plant and related infrastructure improvements"
+       },
+       "accrued_interest": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.",
+        "example": 56.25
+       },
+       "price": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The latest evaluated price of the instrument, as a percentage of par."
+       },
+       "yield_to_worst": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The latest evaluated yield to worst of the instrument."
+       },
+       "yield_to_maturity": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The latest evaluated yield to maturity of the instrument."
+       },
+       "par_value": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/Decimal"
+         }
+        ],
+        "description": "The instrument's par value. Usually 1000 for most bond types. Usually 5000 for municipal bonds."
+       },
+       "description": {
+        "type": "string",
+        "description": "Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]",
+        "example": "AAA UNITED STATES GOVERNMENT MONEY MARKET ACCOUNT INC 2.6%, 11/30/2022"
+       },
+       "principal_factor": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The principal factor of the bond.",
+        "example": 1
+       },
+       "sp_rating": {
+        "type": "string",
+        "description": "Standard & Poor's rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor's (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor's Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor's or its affiliates.",
+        "nullable": true,
+        "example": "AAA"
+       },
+       "duration": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond's price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.",
+        "example": 0.69
+       },
+       "sector": {
+        "type": "string",
+        "description": "Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)",
+        "example": "Financial Services"
+       }
+      },
+      "required": [
+       "isin",
+       "description",
+       "status",
+       "par_value",
+       "type",
+       "issuer",
+       "accrued_interest",
+       "close_price",
+       "close_yield_to_maturity",
+       "close_yield_to_worst",
+       "coupon",
+       "duration",
+       "next_call_price",
+       "price",
+       "principal_factor",
+       "yield_to_maturity",
+       "yield_to_worst"
+      ]
+     },
+     "Investor": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The ID of the investor"
+       },
+       "name": {
+        "type": "string",
+        "description": "The name of the investor"
+       },
+       "address": {
+        "type": "string",
+        "description": "The address of the investor"
+       },
+       "marginal_long_term_taxes": {
+        "$ref": "#/components/schemas/TaxRates"
+       },
+       "marginal_ordinary_taxes": {
+        "$ref": "#/components/schemas/TaxRates"
+       },
+       "tax_state": {
+        "type": "string",
+        "description": "The state of the investor"
+       }
+      },
+      "required": [
+       "id",
+       "name",
+       "address",
+       "tax_state",
+       "marginal_long_term_taxes",
+       "marginal_ordinary_taxes"
+      ]
+     },
+     "Lot": {
+      "type": "object",
+      "properties": {
+       "moment_lot_id": {
+        "type": "string",
+        "description": "The ID of the lot"
+       },
+       "custodian_lot_id": {
+        "type": "string",
+        "description": "The ID of the lot in the custodian's system"
+       },
+       "sleeve_id": {
+        "type": "string",
+        "description": "The ID of the sleeve that the lot belongs to"
+       },
+       "instrument": {
+        "$ref": "#/components/schemas/Instrument"
+       },
+       "accrued_interest": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The amount of interest that has accrued, but not yet been paid to to the bondholder since the last interest payment. The size of the interest payment we'd make or receive if we were to trade this this entire lot right now."
+       },
+       "basis_date": {
+        "type": "string",
+        "format": "date",
+        "description": "The basis date of the lot"
+       },
+       "basis_quantity": {
+        "description": "The basis quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "basis_price": {
+        "description": "The basis price of the lot in percentage of par",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "is_short_position": {
+        "type": "boolean",
+        "description": "Whether the lot is a short position"
+       },
+       "settled_closed_quantity": {
+        "description": "The settled closed quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "settled_open_quantity": {
+        "description": "The settled open quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "unsettled_closed_quantity": {
+        "description": "The unsettled closed quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "unsettled_open_quantity": {
+        "description": "The unsettled open quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "moment_reserved_quantity": {
+        "description": "The reserved quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "open_quantity": {
+        "description": "The total open quantity of the lot. Equal to the sum of settled_open_quantity, unsettled_open_quantity, and moment_reserved_quantity.",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "long_term": {
+        "type": "boolean",
+        "description": "Whether the lot is long-term"
+       },
+       "wash_sale": {
+        "type": "boolean",
+        "description": "Whether the lot is a wash sale"
+       }
+      },
+      "required": [
+       "accrued_interest",
+       "moment_lot_id",
+       "custodian_lot_id",
+       "sleeve_id",
+       "instrument",
+       "basis_date",
+       "basis_quantity",
+       "basis_price",
+       "is_short_position",
+       "settled_closed_quantity",
+       "settled_open_quantity",
+       "unsettled_closed_quantity",
+       "unsettled_open_quantity",
+       "moment_reserved_quantity",
+       "open_quantity",
+       "long_term",
+       "wash_sale"
+      ]
+     },
+     "CashLot": {
+      "type": "object",
+      "properties": {
+       "moment_lot_id": {
+        "type": "string",
+        "description": "The ID of the lot"
+       },
+       "custodian_lot_id": {
+        "type": "string",
+        "description": "The ID of the lot in the custodian's system"
+       },
+       "currency": {
+        "type": "string",
+        "description": "The currency of the lot"
+       },
+       "moment_reserved_quantity": {
+        "description": "The reserved quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "unsettled_open_quantity": {
+        "description": "The unsettled open quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "settled_open_quantity": {
+        "description": "The settled open quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "settled_closed_quantity": {
+        "description": "The settled closed quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "unsettled_closed_quantity": {
+        "description": "The unsettled closed quantity of the lot",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "open_quantity": {
+        "description": "The total open quantity of the lot. Equal to the sum of settled_open_quantity, unsettled_open_quantity, and moment_reserved_quantity.",
+        "$ref": "#/components/schemas/Decimal"
+       }
+      },
+      "required": [
+       "moment_lot_id",
+       "custodian_lot_id",
+       "currency",
+       "moment_reserved_quantity",
+       "unsettled_open_quantity",
+       "settled_open_quantity",
+       "settled_closed_quantity",
+       "unsettled_closed_quantity",
+       "open_quantity"
+      ]
+     },
+     "Decimal": {
+      "type": "number",
+      "format": "double",
+      "title": "Decimal",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+       "path": "github.com/shopspring/decimal",
+       "name": "decimal"
+      }
+     },
+     "NullDecimal": {
+      "type": "number",
+      "format": "double",
+      "title": "Decimal",
+      "x-go-type": "decimal.NullDecimal",
+      "x-go-type-import": {
+       "path": "github.com/shopspring/decimal",
+       "name": "decimal"
+      }
+     },
+     "ModelAssignment": {
+      "type": "object",
+      "properties": {
+       "model_id": {
+        "type": "string",
+        "description": "The ID of the model to of which the sleeve should be assigned"
+       },
+       "assignment_date": {
+        "type": "string",
+        "format": "date",
+        "description": "Assignment dates are used to align ladders and determine grace periods for the first ladder bucket before dynamic ladder rebalancing kicks in"
+       },
+       "customizations": {
+        "type": "object",
+        "description": "Customizations to apply to the model's constraints",
+        "additionalProperties": true
+       },
+       "meta": {
+        "type": "object",
+        "description": "Arbitrary key-value store for additional metadata",
+        "additionalProperties": {
+         "type": "string"
+        }
+       }
+      },
+      "required": [
+       "model_id",
+       "assignment_date",
+       "customizations",
+       "meta"
+      ]
+     },
+     "Sleeve": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "description": "A unique identifier for this sleeve",
+        "type": "string"
+       },
+       "name": {
+        "description": "A descriptive name for the sleeve",
+        "type": "string"
+       },
+       "min_allocation": {
+        "description": "The lowest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "target_allocation": {
+        "description": "The desired proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "max_allocation": {
+        "description": "The highest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve",
+        "$ref": "#/components/schemas/Decimal"
+       },
+       "extra": {
+        "type": "object",
+        "description": "Arbitrary user-specified sleeve metadata",
+        "additionalProperties": {
+         "type": "string"
+        }
+       },
+       "is_default": {
+        "description": "Whether the sleeve is the default sleeve. There is exactly one default sleeve. The default sleeve may not be assigned a model or deleted.",
+        "type": "boolean"
+       },
+       "model_assignment": {
+        "$ref": "#/components/schemas/ModelAssignment"
+       }
+      },
+      "required": [
+       "id",
+       "name",
+       "min_allocation",
+       "target_allocation",
+       "max_allocation",
+       "extra",
+       "is_default"
+      ]
+     },
+     "SleeveStatistics": {
+      "type": "object",
+      "properties": {
+       "timestamp": {
+        "type": "string",
+        "description": "RFC-3339 timestamp with nanosecond precision representing the time at which these statistics were generated",
+        "format": "date-time"
+       },
+       "monthly_cashflows": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CashFlowEvent"
+        }
+       },
+       "yearly_cashflows": {
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/CashFlowEvent"
+        }
+       },
+       "total_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of the holdings in the sleeve. Equal to the sum of treasury_market_value, corporate_market_value, agency_market_value, cd_market_value, municipal_market_value, government_market_value, and total_accrued_interest."
+       },
+       "total_accrued_interest": {
+        "type": "number",
+        "format": "double",
+        "description": "The total accrued interest of the holdings in the sleeve."
+       },
+       "treasury_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all U.S. Treasury bond holdings in the sleeve"
+       },
+       "corporate_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all corporate bond holdings in the sleeve"
+       },
+       "agency_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all agency bond holdings in the sleeve"
+       },
+       "government_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all foreign government bond holdings in the sleeve"
+       },
+       "municipal_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all municipal bond holdings in the sleeve"
+       },
+       "cd_market_value": {
+        "type": "number",
+        "format": "double",
+        "description": "The total market value of all CD holdings in the sleeve"
+       },
+       "average_ytw": {
+        "type": "number",
+        "format": "double",
+        "description": "The average yield to worst across all holdings in the sleeve"
+       },
+       "average_maturity": {
+        "type": "number",
+        "format": "double",
+        "description": "The average time to maturity across all holdings in the sleeve"
+       },
+       "average_duration": {
+        "type": "number",
+        "format": "double",
+        "description": "The average duration of the holdings in the sleeve"
+       },
+       "average_sp_rating": {
+        "type": "string",
+        "description": "The average S&P credit rating across all holdings in the sleeve"
+       },
+       "average_coupon": {
+        "type": "number",
+        "format": "double",
+        "description": "The average coupon rate across all holdings in the sleeve"
+       },
+       "municipal_state_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "sp_rating_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "maturity_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "sector_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "issuer_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "coupon_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       },
+       "municipal_type_distribution": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "format": "double"
+        }
+       }
+      },
+      "required": [
+       "timestamp",
+       "monthly_cashflows",
+       "yearly_cashflows",
+       "total_market_value",
+       "treasury_market_value",
+       "corporate_market_value",
+       "agency_market_value",
+       "government_market_value",
+       "municipal_market_value",
+       "cd_market_value",
+       "total_accrued_interest",
+       "average_ytw",
+       "average_maturity",
+       "average_duration",
+       "average_sp_rating",
+       "average_coupon",
+       "municipal_state_distribution",
+       "sp_rating_distribution",
+       "maturity_distribution",
+       "sector_distribution",
+       "issuer_distribution",
+       "coupon_distribution",
+       "municipal_type_distribution"
+      ]
+     },
+     "SleeveWithStatisticsAndCompliance": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/Sleeve"
+       },
+       {
+        "type": "object",
+        "properties": {
+         "statistics": {
+          "$ref": "#/components/schemas/SleeveStatistics"
+         },
+         "compliance": {
+          "$ref": "#/components/schemas/ComplianceFull"
+         }
+        },
+        "required": [
+         "statistics",
+         "compliance"
+        ]
+       }
+      ]
+     },
+     "Status": {
+      "type": "string"
+     },
+     "TaxRates": {
+      "type": "object",
+      "properties": {
+       "federal_tax_rate": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/Decimal"
+         }
+        ],
+        "description": "The federal tax rate of the investor"
+       },
+       "state_tax_rate": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/Decimal"
+         }
+        ],
+        "description": "The state tax rate of the investor"
+       },
+       "local_tax_rate": {
+        "allOf": [
+         {
+          "$ref": "#/components/schemas/NullDecimal"
+         }
+        ],
+        "description": "The local tax rate of the investor",
+        "x-go-type-skip-optional-pointer": true
+       }
+      },
+      "required": [
+       "federal_tax_rate",
+       "state_tax_rate"
+      ]
+     },
+     "AllocationReference": {
+      "type": "object",
+      "properties": {
+       "proposal_allocation_id": {
+        "type": "string",
+        "description": "The ID of the allocation in the portfolio management system"
+       },
+       "moment_order_id": {
+        "type": "string",
+        "description": "The ID of the order in Moment's trading system"
+       }
+      },
+      "required": [
+       "proposal_allocation_id",
+       "moment_order_id"
+      ]
+     },
+     "ProposalAccount": {
+      "type": "object",
+      "properties": {
+       "allocations": {
+        "type": "array",
+        "description": "The proposed allocations for the account. Each of these allocations is associated with a proposed order, which may have other allocations. The allocation object contains both the ID of the allocation, as well as the ID of the proposed order that the allocation is associated with.",
+        "items": {
+         "$ref": "#/components/schemas/AllocationReference"
+        }
+       },
+       "num_allocations": {
+        "type": "integer",
+        "description": "The total number of allocations for the account."
+       },
+       "num_filled_allocations": {
+        "type": "integer",
+        "description": "The number of allocations that have been filled."
+       },
+       "before": {
+        "$ref": "#/components/schemas/AccountDetail"
+       },
+       "after": {
+        "$ref": "#/components/schemas/AccountDetail",
+        "nullable": true
+       }
+      },
+      "required": [
+       "before",
+       "allocations"
+      ]
+     },
+     "AllocationConstraintValidation": {
+      "type": "object",
+      "properties": {
+       "valid": {
+        "title": "Valid",
+        "type": "boolean"
+       },
+       "constraint": {
+        "type": "object",
+        "properties": {
+         "type": {
+          "type": "string",
+          "enum": [
+           "allocation"
+          ],
+          "title": "Type"
+         },
+         "filter": {
+          "type": "object"
+         },
+         "min_weight": {
+          "type": "number",
+          "title": "Min Weight",
+          "description": "The minimum weight for the allocation constraint."
+         },
+         "max_weight": {
+          "type": "number",
+          "title": "Max Weight",
+          "description": "The maximum weight for the allocation constraint."
+         },
+         "target_weight": {
+          "type": "number",
+          "title": "Target Weight",
+          "description": "The target weight for the allocation constraint."
+         },
+         "min_market_value": {
+          "type": "number",
+          "title": "Min Market Value",
+          "description": "The minimum market value for the allocation constraint, which can be specified instead of min_weight."
+         },
+         "max_market_value": {
+          "type": "number",
+          "title": "Max Market Value",
+          "description": "The maximum market value for the allocation constraint, which can be specified instead of max_weight."
+         },
+         "target_market_value": {
+          "type": "number",
+          "title": "Target Market Value",
+          "description": "The target market value for the allocation constraint, which can be specified instead of target_weight."
+         }
+        },
+        "title": "AllocationConstraint"
+       },
+       "market_value": {
+        "title": "Market Value",
+        "type": "number"
+       },
+       "weight": {
+        "title": "Weight",
+        "type": "number"
+       },
+       "holdings_in_allocation": {
+        "title": "Holdings in Allocation",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       }
+      }
+     },
+     "AverageValueConstraint": {
+      "properties": {
+       "type": {
+        "type": "string",
+        "enum": [
+         "average_value"
+        ],
+        "title": "Type"
+       },
+       "field": {
+        "type": "string",
+        "title": "Field",
+        "description": "The field to apply the average value constraint to."
+       },
+       "min_average_value": {
+        "anyOf": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "string"
+         }
+        ],
+        "title": "Min Average Value",
+        "description": "The minimum average value for the field."
+       },
+       "target_average_value": {
+        "anyOf": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "string"
+         }
+        ],
+        "title": "Target Average Value",
+        "description": "The target average value for the field."
+       },
+       "max_average_value": {
+        "anyOf": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "string"
+         }
+        ],
+        "title": "Max Average Value",
+        "description": "The maximum average value for the field."
+       },
+       "constraint_priority": {
+        "$ref": "#/components/schemas/ConstraintPriority"
+       }
+      },
+      "type": "object",
+      "required": [
+       "type",
+       "field",
+       "min_average_value",
+       "target_average_value",
+       "max_average_value"
+      ],
+      "title": "AverageValueConstraint"
+     },
+     "AverageValueConstraintValidation": {
+      "type": "object",
+      "properties": {
+       "valid": {
+        "title": "Valid",
+        "type": "boolean"
+       },
+       "constraint": {
+        "$ref": "#/components/schemas/AverageValueConstraint"
+       },
+       "holdings_average_value": {
+        "title": "Holdings Average Value",
+        "type": "number"
+       },
+       "holdings_in_bounds": {
+        "title": "Holdings in Bounds",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       }
+      }
+     },
+     "CashFlowEvent": {
+      "type": "object",
+      "properties": {
+       "date": {
+        "type": "string",
+        "format": "date"
+       },
+       "amount": {
+        "type": "number",
+        "format": "double"
+       },
+       "type": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "amount",
+       "date",
+       "type"
+      ]
+     },
+     "ConstraintPriority": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 3,
+      "default": 1,
+      "title": "ConstraintPriority",
+      "description": "The priority of the constraint. Constraints with lower priority values will be relaxed first."
+     },
+     "ConstraintValidation": {
+      "title": "ConstraintValidation",
+      "type": "object",
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/UniverseConstraintValidation"
+       },
+       {
+        "$ref": "#/components/schemas/AllocationConstraintValidation"
+       },
+       {
+        "$ref": "#/components/schemas/DiversificationConstraintValidation"
+       },
+       {
+        "$ref": "#/components/schemas/AverageValueConstraintValidation"
+       },
+       {
+        "$ref": "#/components/schemas/LadderPolicyConstraintValidation"
+       }
+      ]
+     },
+     "DiversificationConstraint": {
+      "properties": {
+       "type": {
+        "type": "string",
+        "enum": [
+         "diversification"
+        ],
+        "title": "Type"
+       },
+       "field": {
+        "type": "string",
+        "title": "field",
+        "description": "The field to apply the diversification constraint to."
+       },
+       "max_weight_per_unique_value": {
+        "type": "number",
+        "title": "Max Weight Per Unique Value",
+        "description": "The maximum weight per unique value for the diversification constraint."
+       },
+       "max_market_value_per_unique_value": {
+        "type": "number",
+        "title": "Max Market Value Per Unique Value",
+        "description": "The maximum market value per unique value for the diversification constraint."
+       },
+       "min_weight_per_unique_value": {
+        "type": "number",
+        "title": "Min Weight Per Unique Value",
+        "description": "The minimum weight per unique value for the diversification constraint, which is optional to specify."
+       },
+       "min_market_value_per_unique_value": {
+        "type": "number",
+        "title": "Min Market Value Per Unique Value",
+        "description": "The minimum market value per unique value for the diversification constraint, which is optional to specify."
+       },
+       "constraint_priority": {
+        "$ref": "#/components/schemas/ConstraintPriority"
+       }
+      },
+      "type": "object",
+      "required": [
+       "type",
+       "field"
+      ],
+      "title": "DiversificationConstraint"
+     },
+     "DiversificationConstraintValidation": {
+      "type": "object",
+      "properties": {
+       "valid": {
+        "title": "Valid",
+        "type": "boolean"
+       },
+       "constraint": {
+        "$ref": "#/components/schemas/DiversificationConstraint"
+       },
+       "invalid_fields": {
+        "title": "Invalid Fields",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/FieldValidation"
+        }
+       }
+      }
+     },
+     "FieldValidation": {
+      "type": "object",
+      "properties": {
+       "field_value": {
+        "type": "string"
+       },
+       "invalid_holdings": {
+        "items": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       },
+       "market_value": {
+        "type": "number"
+       },
+       "weight": {
+        "type": "number"
+       }
+      }
+     },
+     "InstrumentID": {
+      "type": "string",
+      "title": "Instrument ID",
+      "description": "Instrument ISIN",
+      "example": "US594918AD66"
+     },
+     "LadderPolicyConstraint": {
+      "properties": {
+       "type": {
+        "type": "string",
+        "enum": [
+         "ladder_policy"
+        ],
+        "title": "Type"
+       },
+       "period_length": {
+        "type": "number",
+        "title": "Period Length",
+        "description": "The length of one ladder period in months.",
+        "example": 12
+       },
+       "start_period": {
+        "type": "number",
+        "title": "Start Period",
+        "description": "The starting period of the ladder.",
+        "example": 0,
+        "default": 0
+       },
+       "end_period": {
+        "type": "number",
+        "title": "End Period",
+        "description": "The ending period of the ladder.",
+        "example": 1,
+        "default": 1
+       },
+       "weight_tolerance": {
+        "type": "number",
+        "title": "Weight Tolerance",
+        "description": "The maximum weight deviation allowed for each bucket in the ladder.",
+        "example": 0.05
+       },
+       "market_value_tolerance": {
+        "type": "number",
+        "title": "Market Value Tolerance",
+        "description": "The maximum market value deviation allowed for each bucket in the ladder, which can be specified instead of weight_tolerance."
+       },
+       "grace_period_months": {
+        "type": "number",
+        "title": "Grace Period Months",
+        "description": "The length of the grace period in months. The grace period is the time period after the assignment date where a dynamic ladder policy constraint are not yet being adjusted.",
+        "default": 1
+       },
+       "use_call_adjusted_maturity": {
+        "type": "boolean",
+        "title": "Use Call Adjusted Maturity",
+        "description": "The call adjusted maturity date is the terminal date of the bond implied by its yield to worst. If set to true then the ladder policy constraint will use the call adjusted maturity date instead of the maturity date.",
+        "default": false
+       },
+       "constraint_priority": {
+        "$ref": "#/components/schemas/ConstraintPriority"
+       }
+      },
+      "type": "object",
+      "required": [
+       "type",
+       "period_length"
+      ],
+      "title": "LadderPolicyConstraint"
+     },
+     "LadderPolicyConstraintValidation": {
+      "type": "object",
+      "properties": {
+       "valid": {
+        "title": "Valid",
+        "type": "boolean"
+       },
+       "constraint": {
+        "$ref": "#/components/schemas/LadderPolicyConstraint"
+       },
+       "additional_constraints": {
+        "title": "Additional Constraints",
+        "type": "array",
+        "items": {
+         "anyOf": [
+          {
+           "$ref": "#/components/schemas/AllocationConstraintValidation"
+          },
+          {
+           "$ref": "#/components/schemas/UniverseConstraintValidation"
+          }
+         ]
+        }
+       }
+      }
+     },
+     "ManagementType": {
+      "type": "string",
+      "description": "\"sma\" for separately managed accounts. \"uma\" for unified managed accounts. null for accounts that are not classified as either an SMA or a UMA.",
+      "nullable": true
+     },
+     "UniverseConstraintValidation": {
+      "type": "object",
+      "properties": {
+       "valid": {
+        "title": "Valid",
+        "type": "boolean"
+       },
+       "constraint": {
+        "properties": {
+         "type": {
+          "type": "string",
+          "enum": [
+           "universe"
+          ],
+          "title": "Type"
+         },
+         "filter": {
+          "type": "object",
+          "title": "Filter"
+         }
+        },
+        "type": "object",
+        "required": [
+         "type",
+         "filter"
+        ],
+        "title": "UniverseConstraint"
+       },
+       "invalid_holdings": {
+        "title": "Invalid Holdings",
+        "type": "array",
+        "items": {
+         "$ref": "#/components/schemas/InstrumentID"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+]

@@ -1,0 +1,554 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-live-inventory-request-schema.json",
+  "title": "LiveInventoryRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-live-inventory-api-openapi.yml#/components/schemas/LiveInventoryRequest",
+  "type": "object",
+  "properties": {
+    "custom_capital_gains_tax": {
+      "description": "Capital gains tax rate as a decimal between 0 and 1. Meaningful\nwhen `tax_profile` is `custom_taxable` or `uk_taxable`; under\n`uk_taxable` it is overridden to 0 for Gilts and QCBs. The\n`us_taxable` profile does not apply a capital-gains adjustment —\npost-tax yield under `us_taxable` is computed multiplicatively from\nthe effective income tax rate alone, deferring real capgain\nhandling until a dedicated US capital-gains field is added.",
+      "type": "number",
+      "format": "double",
+      "maximum": 1,
+      "minimum": 0
+    },
+    "custom_income_tax": {
+      "description": "Marginal income tax rate as a decimal between 0 and 1. Meaningful\nwhen `tax_profile` is `custom_taxable` or `uk_taxable`; ignored\nunder `us_taxable`, which uses `federal_tax_rate` + `state_tax_rate`\n+ `residing_state` per-bond rules instead.",
+      "type": "number",
+      "format": "double",
+      "maximum": 1,
+      "minimum": 0
+    },
+    "federal_tax_rate": {
+      "description": "Investor's marginal federal income tax rate, as a decimal 0-1.\nUsed only under the `us_taxable` profile (alongside\n`state_tax_rate` + `residing_state`); ignored under\n`custom_taxable`/`uk_taxable`, which use `custom_income_tax`.\nDefault 0.37.",
+      "type": "number",
+      "format": "double",
+      "default": 0.37,
+      "maximum": 1,
+      "minimum": 0
+    },
+    "filters": {
+      "description": "The filters to apply, as a JSON object whose keys are fields to filter on or\noperators. Send the object itself: this field is a nested object in the request\nbody, not a JSON-encoded string (`objective_function` is the only field on this\nbody that takes a JSON-encoded string).\nExample: {\"cusip\": {\"in\": [\"035240AQ3\"]}, \"maturity_date\": {\"less_than\": \"2030-01-01\"}}",
+      "$ref": "#/$defs/InventoryFilter"
+    },
+    "objective_function": {
+      "description": "JSON-encoded objective function that defines the scoring formula for ranking bonds.\nContains a list of weighted terms, each referencing a field or an arithmetic expression.\nUnlike `filters`, this field is a string: serialize the objective to JSON and send\nthe resulting string.\nExample: {\"terms\": [{\"term\": {\"type\": \"field\", \"field\": \"duration\", \"factor\": 0.01}, \"factor\": 1.0}]}\n\n`order_price`, `order_ytw` and `order_ytm` score the top of the book on the\nscoring side (`objective_side`, or `side` when absent), falling back to price\nestimates; an objective referencing them requires a scoring side (400 otherwise)\nand risk group headers. `spread_to_benchmark` is an accepted optimizer alias for\n`mid_ytw_spread_bps`, valid only inside the objective.",
+      "type": "string"
+    },
+    "objective_side": {
+      "description": "Which side of the book `objective_function`'s order fields score: 'sell' the\nasks, 'buy' the bids ('both' is not accepted). Scoring-only — unlike `side` it\nnever filters the results, and it takes precedence over `side` for scoring.\nScoring order fields reads the live order book, so risk group headers are\nstill required.",
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell"
+      ]
+    },
+    "page": {
+      "description": "The page number of the results to return. If not provided, the default is page 1.",
+      "type": "integer"
+    },
+    "page_size": {
+      "description": "The number of results to return per page. If not provided, the default is 100.",
+      "type": "integer"
+    },
+    "residing_state": {
+      "description": "Two-letter state code of the investor's state of residence.\nExample: \"CA\", \"NY\", \"TX\". Used only under the `us_taxable`\nprofile (drives per-bond state-tax exemptions); ignored under\n`custom_taxable`/`uk_taxable`.",
+      "type": "string",
+      "maxLength": 2,
+      "minLength": 2
+    },
+    "returns": {
+      "description": "The fields to return in the response.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/InventoryReturnField"
+      }
+    },
+    "risk_group_id": {
+      "description": "The risk group ID to filter for tradable inventory. If left null,\nand a single risk group exists for the organization, it will be\nused as the default risk group. If left null, and more than one\nrisk group exists, the request will fail.",
+      "type": "string"
+    },
+    "side": {
+      "description": "Specify a side for inventory filters. Possible values:\n\n- 'buy' will limit the results to bonds that have quotes to buy\n  the instrument.\n- 'sell' will limit the results to bonds that have quotes to sell\n  the instrument.\n- 'both' will limit the results to bonds that have quotes on both\n  sides of the market, i.e. at least one quote to buy and one to sell.\n\nImportant note: If you are building a UI that leverages this API, you should be\nespecially cognizant that this value represents inventory side, not trade side.\n\nA client who wants to purchase a bond will look for asks/offers where the\ncounterparty wants to sell. Hence, they should pass 'sell' to the API.\n\nA client who wants to sell a bond will look for bids where the counterparty\nwants to buy. Hence, they should pass 'buy' to the API.\n\nWhen `objective_function` references `order_*` fields and `objective_side` is\nabsent, `side` also selects which side of the book those fields score ('both'\nor no side is rejected with a 400). Use `objective_side` to choose the scoring\nside independently of this filter.",
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell",
+        "both"
+      ]
+    },
+    "sort_by": {
+      "description": "The fields to sort the results by. Each field can optionally specify a direction\nby appending '.asc' or '.desc'. If no direction is specified, defaults to ascending order.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state_tax_rate": {
+      "description": "Investor's marginal state income tax rate, as a decimal 0-1.\nUsed only under the `us_taxable` profile; ignored under\n`custom_taxable`/`uk_taxable`.",
+      "type": "number",
+      "format": "double",
+      "default": 0,
+      "maximum": 1,
+      "minimum": 0
+    },
+    "tax_profile": {
+      "description": "Tax profile classification controlling how post-tax yield fields\nand the post-tax objective term are computed.\n\n- `us_taxable` (default): post-tax yield is the pre-tax yield\n  multiplied by `(1 - effective_tax_rate)`, where\n  `effective_tax_rate` is the per-bond combination of\n  `federal_tax_rate` + `state_tax_rate` + `residing_state` with\n  treasury, US-territory, state-exempt-agency, and muni\n  federal/state exemption carve-outs applied per bond. Capital\n  gains is not applied under this profile (deferred until a real\n  US capgain field is defined).\n- `custom_taxable`: post-tax yield is the bivariate Taylor\n  expansion of after-tax YTW evaluated at constants\n  (`s = custom_income_tax`, `g = custom_capital_gains_tax`).\n  Federal/state/residing-state are ignored.\n- `uk_taxable`: same Taylor expansion as `custom_taxable`\n  (using `custom_income_tax` and `custom_capital_gains_tax`), but\n  the capital-gains rate is forced to 0 for instruments exempt from\n  UK capital gains tax — Gilts (`ice_sector_1 = Sovereign` and\n  `currency = GBP`) and QCBs (`qcb_indicator = true`). Income tax\n  still applies to exempt instruments.\n- `non_taxable`: no tax is applied to any instrument. Post-tax yield\n  equals the pre-tax yield and tax-equivalent yield receives no\n  gross-up. All rate fields are ignored.",
+      "type": "string",
+      "default": "us_taxable",
+      "enum": [
+        "us_taxable",
+        "custom_taxable",
+        "uk_taxable",
+        "non_taxable"
+      ]
+    },
+    "trade_size": {
+      "description": "Filtering by trade_size will only return `asks` and `bids` that\nwould completely fill an order of the specified quantity. More\nspecifically, it will return quotes where the minimum quantity is\nless than or equal to the specified trade_size and the total\nquantity is greater than or equal to the specified trade_size.\nOptionally, set value to \"lowest\" to get all the quotes sorted from\nleast to greatest `min_quantity`.",
+      "type": "string"
+    },
+    "use_close_data_after_hours": {
+      "description": "Whether to use close data after market hours. When false (default),\nonly reference data is returned when market is closed. When true,\norders are shown as available even after market close (9:30 AM - 4:00 PM EST/EDT, Monday-Friday).",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "returns"
+  ],
+  "$defs": {
+    "InventoryFilter": {
+      "description": "In a filter object, each key is either a field to filter on or an operator.\nEach value is either a filter condition object or, in the case of certain\noperators, an array of filter objects.\n\nSome of the fields which can be filtered on are explicitly defined on this schema.\nAny of the other fields in the reference data model can be used as an\nInventoryFilter key.",
+      "type": "object",
+      "properties": {
+        "and": {
+          "description": "Filter operator key with array value of filter objects to be combined with AND.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryFilter"
+          }
+        },
+        "country_issue": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "country_of_risk": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "coupon": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "currency": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "cusip": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "description": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "emerging_status": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "isin": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "issue_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "issuer": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_institutional_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_micro_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_aggregate": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_buy": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "liquidity_retail_sell": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "lowest_rating": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "maturity_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "min_trade_market_value": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "naics_sector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "naics_subsector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "not": {
+          "description": "Filter operator key with a filter object to be negated.",
+          "$ref": "#/$defs/InventoryFilter"
+        },
+        "objective_score": {
+          "description": "Filter on the computed objective score. Requires an\n`objective_function` in the request — the score is computed from\nit per bond. Supports only the numeric comparison operators\n(equal_to, not_equal_to, greater_than, greater_than_or_equal_to,\nless_than, less_than_or_equal_to) and is_null, with numeric\nvalues. Combine with `sort_by: [\"objective_score.desc\"]` to rank\nand threshold in one query.",
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "or": {
+          "description": "Filter operator key with array value of filter objects to be combined with OR.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InventoryFilter"
+          }
+        },
+        "pre_fee_price": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "pre_fee_yield_to_maturity": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "pre_fee_yield_to_worst": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "price": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "sector": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "sp_rating": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "treasury_benchmark": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "type": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "workout_date": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "yield_to_maturity": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        },
+        "yield_to_worst": {
+          "$ref": "#/$defs/InventoryFilterCondition"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/InventoryFilterCondition"
+      }
+    },
+    "InventoryFilterCondition": {
+      "type": "object",
+      "properties": {
+        "ends_with": {
+          "description": "String to end with in the filter.",
+          "type": "string"
+        },
+        "equal_to": {
+          "description": "Exact value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "greater_than": {
+          "description": "Greater than value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "greater_than_or_equal_to": {
+          "description": "Greater than or equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "in": {
+          "description": "Array of values for the filter.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "in_filter_list": {
+          "description": "Filter by values from a named filter list. The value is the filter list ID (e.g., \"list_01ABC123\").",
+          "type": "string"
+        },
+        "includes": {
+          "description": "String to include in the filter.",
+          "type": "string"
+        },
+        "is_null": {
+          "description": "Boolean to filter for null / not-null values.",
+          "type": "boolean"
+        },
+        "less_than": {
+          "description": "Less than value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "less_than_or_equal_to": {
+          "description": "Less than or equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "not_equal_to": {
+          "description": "Not equal to value for the filter.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "not_in": {
+          "description": "Array of values not to include in the filter.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "not_in_filter_list": {
+          "description": "Exclude values that are in a named filter list. The value is the filter list ID (e.g., \"list_01ABC123\").",
+          "type": "string"
+        },
+        "not_includes": {
+          "description": "String not to include in the filter.",
+          "type": "string"
+        },
+        "starts_with": {
+          "description": "String to start with in the filter.",
+          "type": "string"
+        }
+      }
+    },
+    "InventoryReturnField": {
+      "description": "A field that can be requested in the `returns` array. Fields come from\nthree distinct sources — choose based on whether you want the live\nmarket or an evaluated model price:\n\n1. LIVE ORDER BOOK (real, executable quotes from dealers):\n   - `bids` / `asks`: full depth — every individual quote with its own\n     price, quantity, min_quantity, and yield_to_worst.\n   - `best_ask_ytw`: the live top-of-book ask yield — the YTW of the\n     best offer (lowest price, i.e. highest yield). Use this (or read\n     `asks`) for \"what's the yield on this bond / the best offer to buy\n     at\".\n   - `best_bid_ytw`: the live top-of-book bid yield — the YTW of the\n     best bid (highest price, i.e. lowest yield). Use this (or read\n     `bids`) for \"what could I sell this at\".\n   - `best_ask_price` / `best_bid_price`: the live top-of-book ask/bid\n     PRICE — the price of the same best offer/bid as `best_ask_ytw` /\n     `best_bid_ytw`. Use these (or read `asks` / `bids`) for \"what's the\n     price of the best offer / what could I sell this at\"; do NOT use the\n     deprecated `ask_price` / `bid_price`, which are evaluated-model\n     values, not live quotes.\n   - `best_ask_post_tax_ytw` / `best_bid_post_tax_ytw`,\n     `best_ask_tax_equivalent_yield` / `best_bid_tax_equivalent_yield`,\n     `market_spread_*`: derived from the live order book.\n\n2. EVALUATED MODEL (price-estimates feed — a modeled valuation, NOT a\n   live tradable quote):\n   - `eval_price` / `eval_ytw` / `eval_ytm`: the mid evaluated value.\n   - `eval_bid_*` / `eval_ask_*` / `eval_mid_*` (price, ytw, ytm, ytc,\n     spreads, oas): the evaluated curve's bid/ask/mid values. These are\n     model outputs, not order-book quotes.\n   - `ask_eval_ytw_diff` / `bid_eval_ytw_diff` (and the `_price_diff`\n     variants): live best book yield/price MINUS the evaluated value.\n\n3. REFERENCE / STATIC DATA: identifiers, descriptive, ratings, dates,\n   call schedule, etc. (`isin`, `cusip`, `issuer`, `coupon`, ...).\n\nDEPRECATED — a non-deprecated alternative always exists, so always find\nit and use it instead: the bare `bid_*` / `ask_*` / `mid_*` families\n(`ask_ytw`, `bid_ytw`, `mid_ytw`, `ask_price`, `bid_price`, `ask_oas`,\n`ask_ytw_spread_bps`, ...) are EVALUATED-MODEL values, NOT live\norder-book quotes despite the bid/ask naming. Each is an exact alias of\nits `eval_`-prefixed counterpart (e.g. `ask_ytw` == `eval_ask_ytw`,\n`ask_price` == `eval_ask_price`). They are retained only for backward\ncompatibility and will be removed. For the evaluated value use the\nexplicit `eval_*` name (`eval_ask_price`, `eval_ask_ytw`, ...); for the\nlive top-of-book use `best_ask_price` / `best_bid_price` /\n`best_ask_ytw` / `best_bid_ytw` or the `asks` / `bids` arrays.\n",
+      "type": "string",
+      "enum": [
+        "bids",
+        "asks",
+        "isin",
+        "cusip",
+        "issuer",
+        "sector",
+        "naics_sector",
+        "naics_subsector",
+        "treasury_benchmark",
+        "description",
+        "type",
+        "issue_size",
+        "issue_price",
+        "issue_date",
+        "maturity_date",
+        "workout_date",
+        "sp_rating",
+        "duration",
+        "convexity",
+        "coupon",
+        "coupon_frequency",
+        "next_coupon_date",
+        "callable",
+        "call_type",
+        "next_call_date",
+        "next_call_price",
+        "convertible",
+        "par_value",
+        "principal_factor",
+        "insured",
+        "accrued_interest",
+        "municipal_state",
+        "municipal_type",
+        "purpose",
+        "municipal_taxable_federal",
+        "bank_qualified",
+        "is_amt_applicable",
+        "treasury_subtype",
+        "ticker",
+        "coupon_type",
+        "description_short",
+        "sp_rating_date",
+        "sinking_fund",
+        "is_144a",
+        "reg_s",
+        "private_placement",
+        "daycount",
+        "first_coupon_date",
+        "last_coupon_date",
+        "perpetual",
+        "fdic_insured",
+        "country_issue",
+        "country_domicile",
+        "country_of_risk",
+        "emerging_status",
+        "currency",
+        "sp_creditwatch",
+        "sp_creditwatch_date",
+        "sp_outlook",
+        "sp_outlook_date",
+        "lowest_rating",
+        "close_price",
+        "close_ytw",
+        "close_ytm",
+        "liquidity_micro_buy",
+        "liquidity_micro_sell",
+        "liquidity_micro_aggregate",
+        "liquidity_retail_buy",
+        "liquidity_retail_sell",
+        "liquidity_retail_aggregate",
+        "liquidity_institutional_buy",
+        "liquidity_institutional_sell",
+        "liquidity_institutional_aggregate",
+        "issue_minimum",
+        "seniority",
+        "bond_warrant",
+        "is_structured_product",
+        "puttable",
+        "dated_date",
+        "settlement_convention",
+        "trace_eligible",
+        "market_spread_price",
+        "market_spread_ytw",
+        "market_spread_ytm",
+        "eval_price",
+        "eval_ytw",
+        "eval_ytm",
+        "ask_eval_price_diff",
+        "bid_eval_price_diff",
+        "ask_eval_ytw_diff",
+        "bid_eval_ytw_diff",
+        "min_trade_market_value",
+        "best_ask_tax_equivalent_yield",
+        "best_bid_tax_equivalent_yield",
+        "best_ask_post_tax_ytw",
+        "best_bid_post_tax_ytw",
+        "best_ask_ytw",
+        "best_bid_ytw",
+        "best_ask_price",
+        "best_bid_price",
+        "bid_price",
+        "ask_price",
+        "mid_price",
+        "bid_ytm",
+        "ask_ytm",
+        "mid_ytm",
+        "bid_ytw",
+        "ask_ytw",
+        "mid_ytw",
+        "bid_ytc",
+        "ask_ytc",
+        "mid_ytc",
+        "eval_bid_price",
+        "eval_ask_price",
+        "eval_mid_price",
+        "eval_bid_ytm",
+        "eval_ask_ytm",
+        "eval_mid_ytm",
+        "eval_bid_ytw",
+        "eval_ask_ytw",
+        "eval_mid_ytw",
+        "eval_bid_ytc",
+        "eval_ask_ytc",
+        "eval_mid_ytc",
+        "eval_bid_ytw_spread_bps",
+        "eval_ask_ytw_spread_bps",
+        "eval_mid_ytw_spread_bps",
+        "eval_bid_g_spread",
+        "eval_ask_g_spread",
+        "eval_mid_g_spread",
+        "eval_bid_z_spread",
+        "eval_ask_z_spread",
+        "eval_mid_z_spread",
+        "eval_bid_oas",
+        "eval_ask_oas",
+        "eval_mid_oas",
+        "eval_bid_i_spread",
+        "eval_ask_i_spread",
+        "eval_mid_i_spread",
+        "benchmark_isin",
+        "benchmark_yield",
+        "bid_ytw_spread_bps",
+        "ask_ytw_spread_bps",
+        "mid_ytw_spread_bps",
+        "bid_g_spread",
+        "ask_g_spread",
+        "mid_g_spread",
+        "bid_z_spread",
+        "ask_z_spread",
+        "mid_z_spread",
+        "bid_oas",
+        "ask_oas",
+        "mid_oas",
+        "bid_i_spread",
+        "ask_i_spread",
+        "mid_i_spread",
+        "effective_duration",
+        "duration_times_spread",
+        "objective_score",
+        "objective_score_decomposition",
+        "filter_lists"
+      ]
+    }
+  }
+}

@@ -1,0 +1,418 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-execution-order-request-custodian-manual-schema.json",
+  "title": "ExecutionOrderRequest_CustodianManual",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-orders-api-openapi.yml#/components/schemas/ExecutionOrderRequest_CustodianManual",
+  "type": "object",
+  "properties": {
+    "algo_parameters": {
+      "$ref": "#/$defs/AlgoParameters"
+    },
+    "all_or_none": {
+      "description": "Flag to indicate if the order should be executed as an All or None order.",
+      "type": "boolean",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "amount": {
+      "$ref": "#/$defs/OrderSize"
+    },
+    "annotation": {
+      "description": "Optional annotation for the execution order.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "client_execution_order_id": {
+      "description": "Idempotency key for the execution order request.",
+      "type": "string"
+    },
+    "limit_price": {
+      "description": "Limit price (per share) of the execution order request. If omitted, the execution order inherits its price and order type from the parent order: market parent orders ship as market orders, limit parent orders use the parent limit price.",
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "principal_account_id": {
+      "$ref": "#/$defs/PrincipalAccountID"
+    },
+    "suppress_pmp_check": {
+      "description": "Flag to toggle if the Prevailing Market Price (PMP) check should be suppressed for the execution order.",
+      "type": "boolean",
+      "default": false,
+      "x-go-type-skip-optional-pointer": true
+    },
+    "time_in_force": {
+      "description": "Time in force for the execution order. Absence is interpreted as day.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/TimeInForce"
+        }
+      ],
+      "nullable": true,
+      "x-go-type-skip-optional-pointer": true
+    },
+    "trader_id": {
+      "description": "an option to supply with a new trader ID",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    }
+  },
+  "required": [
+    "client_execution_order_id",
+    "amount"
+  ],
+  "$defs": {
+    "AggressivenessLevel": {
+      "title": "Aggressiveness Level",
+      "type": "string",
+      "description": "Execution aggressiveness for a custodian algo. Required by some custodians (e.g. Fidelity);\nignored by custodians without an equivalent concept (e.g. Schwab).",
+      "enum": [
+        "passive",
+        "neutral",
+        "aggressive"
+      ],
+      "x-enumNames": [
+        "AggressivenessLevelPassive",
+        "AggressivenessLevelNeutral",
+        "AggressivenessLevelAggressive"
+      ]
+    },
+    "AlgoParameters": {
+      "title": "Algo Parameters",
+      "type": "object",
+      "description": "Execution parameters for custodian algos. Exactly one of `twap`, `vwap`, `pov`, or `is` must be set.\nOnly supported on the custodian protocol with the manual strategy. Fields or values not accepted\nby a given custodian are rejected downstream.",
+      "properties": {
+        "twap": {
+          "$ref": "#/$defs/TwapParameters"
+        },
+        "vwap": {
+          "$ref": "#/$defs/VwapParameters"
+        },
+        "pov": {
+          "$ref": "#/$defs/PovParameters"
+        },
+        "is": {
+          "$ref": "#/$defs/IsParameters"
+        }
+      }
+    },
+    "Decimal": {
+      "title": "Decimal",
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Decimal number.",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal"
+      }
+    },
+    "IsParameters": {
+      "title": "IS Parameters",
+      "type": "object",
+      "description": "Parameters for an implementation-shortfall (arrival price) algo. The algo balances market\nimpact against timing risk to minimize slippage versus the arrival price, working more or\nless aggressively based on the aggressiveness level. Order type and limit price are carried\non the order itself, not in these parameters.",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start of the absolute window to work the order."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End of the absolute window to work the order."
+        },
+        "would": {
+          "$ref": "#/$defs/WouldParameters"
+        },
+        "participate_opening_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the opening auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "participate_closing_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the closing auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "aggressiveness": {
+          "$ref": "#/$defs/AggressivenessLevel"
+        },
+        "max_participation_percent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%)."
+        }
+      }
+    },
+    "OrderSize": {
+      "type": "object",
+      "title": "Amount",
+      "description": "The Amount of an order with a specified `type` indicating how the amount is represented.\n- **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).\n- **Notional:** Represents the order size in notional dollar value.\n- **Shares:** Represents the order size in number of shares (for equities).",
+      "properties": {
+        "value": {
+          "type": "number",
+          "x-go-type": "float64"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "par",
+            "notional",
+            "shares"
+          ],
+          "default": "par",
+          "x-enumNames": [
+            "SizeTypePar",
+            "SizeTypeNotional",
+            "SizeTypeShares"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ]
+    },
+    "PovParameters": {
+      "title": "POV Parameters",
+      "type": "object",
+      "description": "Parameters for a percentage-of-volume (POV) algo. The algo participates in the market at a\ntarget percentage of the traded volume, speeding up or slowing down as market volume changes\nrather than working to a fixed time schedule.",
+      "required": [
+        "target_participation_percent"
+      ],
+      "properties": {
+        "target_participation_percent": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Target participation rate of market volume, as a percent (e.g. 20 = 20%)."
+        },
+        "max_participation_percent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Hard ceiling on participation, distinct from the target percent."
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start of the absolute window to work the order."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End of the absolute window to work the order."
+        },
+        "would": {
+          "$ref": "#/$defs/WouldParameters"
+        },
+        "participate_opening_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the opening auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "participate_closing_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the closing auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "aggressiveness": {
+          "$ref": "#/$defs/AggressivenessLevel"
+        }
+      }
+    },
+    "Price": {
+      "title": "Price",
+      "type": "object",
+      "description": "Price value with type specification for different pricing methods.",
+      "required": [
+        "value",
+        "type"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/Decimal"
+        },
+        "type": {
+          "$ref": "#/$defs/PriceValueType"
+        },
+        "benchmark_isin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The ISIN of the benchmark security, required when type is 'spread'."
+        }
+      }
+    },
+    "PriceValueType": {
+      "title": "Price Value Type",
+      "type": "string",
+      "description": "The method used to represent the price value.",
+      "enum": [
+        "percent",
+        "discount_yield",
+        "spread",
+        "money_market_yield",
+        "per_share"
+      ],
+      "x-enumNames": [
+        "PriceValueTypePercent",
+        "PriceValueTypeDiscountYield",
+        "PriceValueTypeSpread",
+        "PriceValueTypeMMYield",
+        "PriceValueTypePerShare"
+      ],
+      "default": "percent"
+    },
+    "PrincipalAccountID": {
+      "description": "Moment account ID of the principal account (book) the execution order is booked to.",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "TimeInForce": {
+      "title": "Time In Force",
+      "type": "string",
+      "description": "Specifies how long the order remains in effect. Absence of this field is interpreted as DAY.",
+      "enum": [
+        "day",
+        "good_till_date",
+        "at_the_opening",
+        "at_the_close"
+      ],
+      "x-enumNames": [
+        "Day",
+        "GoodTillDate",
+        "AtTheOpening",
+        "AtTheClose"
+      ]
+    },
+    "TwapParameters": {
+      "title": "TWAP Parameters",
+      "type": "object",
+      "description": "Parameters for a time-weighted average price (TWAP) algo. The algo slices the order into\nsmaller pieces and works them evenly over the specified time window, aiming to match the\ntime-weighted average price of the instrument over that window.",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start of the absolute window to work the order."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End of the absolute window to work the order."
+        },
+        "would": {
+          "$ref": "#/$defs/WouldParameters"
+        },
+        "participate_opening_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the opening auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "participate_closing_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the closing auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "aggressiveness": {
+          "$ref": "#/$defs/AggressivenessLevel"
+        },
+        "max_participation_percent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%)."
+        }
+      }
+    },
+    "VwapParameters": {
+      "title": "VWAP Parameters",
+      "type": "object",
+      "description": "Parameters for a volume-weighted average price (VWAP) algo. The algo works the order in\nproportion to the expected market volume profile over the specified time window, aiming to\nmatch the volume-weighted average price of the instrument over that window.",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start of the absolute window to work the order."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End of the absolute window to work the order."
+        },
+        "would": {
+          "$ref": "#/$defs/WouldParameters"
+        },
+        "participate_opening_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the opening auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "participate_closing_auction": {
+          "type": "boolean",
+          "description": "Whether the algo should participate in the closing auction.",
+          "default": false,
+          "x-go-type-skip-optional-pointer": true
+        },
+        "aggressiveness": {
+          "$ref": "#/$defs/AggressivenessLevel"
+        },
+        "max_participation_percent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%)."
+        }
+      }
+    },
+    "WouldParameters": {
+      "title": "Would Parameters",
+      "type": "object",
+      "description": "Models the \"I-Would\" trigger: a price at which the algo becomes aggressive / completes.",
+      "properties": {
+        "price": {
+          "$ref": "#/$defs/Price"
+        },
+        "trigger_quantity": {
+          "$ref": "#/$defs/OrderSize"
+        },
+        "trigger_percent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int64",
+          "description": "Percentage of the order quantity to complete when the trigger price is reached."
+        }
+      }
+    }
+  }
+}

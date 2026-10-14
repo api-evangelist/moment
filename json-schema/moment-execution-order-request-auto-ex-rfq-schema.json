@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-execution-order-request-auto-ex-rfq-schema.json",
+  "title": "ExecutionOrderRequest_AutoExRFQ",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-orders-api-openapi.yml#/components/schemas/ExecutionOrderRequest_AutoExRFQ",
+  "type": "object",
+  "properties": {
+    "all_or_none": {
+      "description": "Flag to indicate if the order should be executed as an All or None order.",
+      "type": "boolean"
+    },
+    "amount": {
+      "$ref": "#/$defs/OrderSize"
+    },
+    "annotation": {
+      "description": "Optional annotation for the execution order.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "client_execution_order_id": {
+      "description": "Idempotency key for the execution order request.",
+      "type": "string"
+    },
+    "execution_criteria": {
+      "$ref": "#/$defs/ExecutionCriteria"
+    },
+    "exit_criteria": {
+      "$ref": "#/$defs/ExitCriteria"
+    },
+    "fees": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Fee"
+      },
+      "x-go-type-skip-optional-pointer": true
+    },
+    "limit_price": {
+      "description": "Limit price of the execution order request. If omitted, the order will inherit the limit price of the order, if exists.",
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double"
+    },
+    "principal_account_id": {
+      "$ref": "#/$defs/PrincipalAccountID"
+    },
+    "rfq_protocol_parameters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RFQProtocolParameters"
+      }
+    },
+    "skip_lob_quotes": {
+      "description": "Flag to indicate whether to skip matching LOB quotes and only use RFQ quotes.",
+      "type": "boolean",
+      "default": false
+    },
+    "trader_id": {
+      "description": "an option to supply with a new trader ID",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    }
+  },
+  "required": [
+    "client_execution_order_id",
+    "amount",
+    "rfq_protocol_parameters",
+    "execution_criteria",
+    "skip_lob_quotes"
+  ],
+  "$defs": {
+    "Decimal": {
+      "title": "Decimal",
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Decimal number.",
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal"
+      }
+    },
+    "ExecutionCriteria": {
+      "type": "object",
+      "title": "Execution Criteria",
+      "required": [
+        "min_wait_time",
+        "min_number_quotes"
+      ],
+      "properties": {
+        "min_wait_time": {
+          "type": "string",
+          "format": "duration",
+          "description": "Minimum wait time for the execution order."
+        },
+        "min_number_quotes": {
+          "type": "integer",
+          "description": "Minimum number of quotes required on the side of the order, before execution can proceed. If the protocol is `request_for_quote`, this is the minimum number of RFQ quotes required. If the protocol is `limit_order_book`, this is the minimum number of LOB quotes required."
+        },
+        "max_transaction_cost_dollar": {
+          "type": "string",
+          "description": "Maximum transaction cost in dollars. Max buy price = estimated price * par value + maxDollar, Min sell price = estimated price * par value - maxDollar. Ex. a value of `5` would mean the transaction cost must be within $5 of the instrument's estimated price in dollars, meaning when buying a bond with a estimated price of $100 and a par value of $1000, the transaction cost must be below $1005."
+        },
+        "max_transaction_cost_percent": {
+          "type": "string",
+          "description": "Maximum transaction cost in percent. Max buy price = estimated price * (1 + maxPct / 100), Min sell price = estimated price * (1 - maxPct / 100). Ex. a value of `5` would mean the transaction cost must be within 5% of the instrument's estimated price in percent, meaning when buying a bond with a estimated price of $100, the transaction cost must be below $105."
+        },
+        "max_transaction_cost_yield": {
+          "type": "string",
+          "description": "Maximum transaction cost in yield. Max buy yield = estimated ytw - maxYTW, Max sell yield = estimated ytw + maxYTW. Ex. a value of `0.5` would mean the transaction cost must be within 50 bps of the instrument's estimated yield, meaning when buying a bond with an estimated yield to worst of 1.5%, the transaction cost must be above 1.0%."
+        }
+      }
+    },
+    "ExitCriteria": {
+      "type": "object",
+      "title": "Exit Criteria",
+      "required": [
+        "timeout"
+      ],
+      "properties": {
+        "timeout": {
+          "type": "string",
+          "format": "duration",
+          "description": "Timeout for the execution order."
+        }
+      }
+    },
+    "Fee": {
+      "title": "Fee",
+      "type": "object",
+      "description": "The fee to apply to the order.",
+      "properties": {
+        "fee_type": {
+          "$ref": "#/$defs/FeeType"
+        },
+        "fee_amount_type": {
+          "$ref": "#/$defs/FeeAmountType"
+        },
+        "recipient_id": {
+          "type": "string",
+          "description": "Unique ID of the recipient of the fee.",
+          "x-go-name": "RecipientID",
+          "x-go-type-skip-optional-pointer": true
+        },
+        "recipient_type": {
+          "$ref": "#/$defs/RecipientType"
+        },
+        "fee_amount": {
+          "description": "Fee amount to apply to the order.",
+          "$ref": "#/$defs/Decimal"
+        },
+        "max_fee_amount": {
+          "description": "Maximum fee amount to apply to the order.",
+          "$ref": "#/$defs/NullableDecimal"
+        },
+        "max_fee_amount_type": {
+          "$ref": "#/$defs/FeeAmountType"
+        },
+        "fee_name": {
+          "type": "string",
+          "description": "Optional name for the fee, for easier identification."
+        }
+      },
+      "required": [
+        "fee_type",
+        "fee_amount_type",
+        "fee_amount"
+      ]
+    },
+    "FeeAmountType": {
+      "title": "Fee Amount Type",
+      "type": "string",
+      "description": "The method used to calculate the fee amount. Supported types include:\n\n- `percentage_of_par`: Fee as a percentage of par value.\n  Example: `0.10` = 10 basis points of par value.\n\n- `percentage_of_market_value`: Fee as a percentage of the quote price (market value).\n  Example: `1` = 1% of market value.\n\n- `yield_bps`: Fee expressed in yield terms, in basis points.\n  Example: `100` = 100 basis points of yield.\n\n- `percentage_of_concession`: Fee applies to concession based quoting mechanism, especially for new issue CDs.\n  Example: `50` = 50 percent of all concession from the dealer.\n",
+      "enum": [
+        "percentage_of_par",
+        "percentage_of_market_value",
+        "yield_bps",
+        "percentage_of_concession"
+      ],
+      "x-enumNames": [
+        "FeeAmountTypePercentageOfPar",
+        "FeeAmountTypePercentageOfMarketValue",
+        "FeeAmountTypeYieldBps",
+        "FeeAmountTypePercentageOfConcession"
+      ]
+    },
+    "FeeType": {
+      "title": "Fee Type",
+      "type": "string",
+      "description": "The type of fee to apply to the order. Valid values are \"markup\", \"commission\", and \"sales_credit\".",
+      "enum": [
+        "markup",
+        "commission",
+        "sales_credit"
+      ],
+      "x-enumNames": [
+        "FeeTypeMarkup",
+        "FeeTypeCommission",
+        "FeeTypeSalesCredit"
+      ]
+    },
+    "NullableDecimal": {
+      "title": "Nullable Decimal",
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Nullable Decimal number.",
+      "nullable": true,
+      "x-go-type": "decimal.Decimal",
+      "x-go-type-import": {
+        "path": "github.com/shopspring/decimal"
+      }
+    },
+    "OrderSize": {
+      "type": "object",
+      "title": "Amount",
+      "description": "The Amount of an order with a specified `type` indicating how the amount is represented.\n- **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).\n- **Notional:** Represents the order size in notional dollar value.\n- **Shares:** Represents the order size in number of shares (for equities).",
+      "properties": {
+        "value": {
+          "type": "number",
+          "x-go-type": "float64"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "par",
+            "notional",
+            "shares"
+          ],
+          "default": "par",
+          "x-enumNames": [
+            "SizeTypePar",
+            "SizeTypeNotional",
+            "SizeTypeShares"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ]
+    },
+    "PrincipalAccountID": {
+      "description": "Moment account ID of the principal account (book) the execution order is booked to.",
+      "type": "string",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "RFQProtocolParameters": {
+      "type": "object",
+      "title": "RFQ Protocol Parameters",
+      "required": [
+        "venue_mpid",
+        "type",
+        "disclosure"
+      ],
+      "properties": {
+        "venue_mpid": {
+          "type": "string",
+          "description": "The MPID of the venue."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of the RFQ.",
+          "enum": [
+            "bin",
+            "asap"
+          ]
+        },
+        "disclosure": {
+          "type": "string",
+          "description": "The disclosure for the RFQ. Currently, only `disclosed` is supported.",
+          "enum": [
+            "disclosed",
+            "anonymous"
+          ]
+        },
+        "due_after": {
+          "type": "string",
+          "format": "duration",
+          "description": "Specifies how duration following RFQ creation, after which the RFQ becomes due."
+        },
+        "subject_after": {
+          "type": "string",
+          "format": "duration",
+          "description": "Specifies the duration following the due time (or submission time if no due time is defined) during which quotes are considered subject."
+        },
+        "expire_after": {
+          "type": "string",
+          "format": "duration",
+          "description": "Specifies the duration following the latest of due time, subject time, or submission time, after which the RFQ expires."
+        }
+      }
+    },
+    "RecipientType": {
+      "title": "Recipient Type",
+      "type": "string",
+      "description": "The type of recipient for the fee.",
+      "enum": [
+        "executing_broker",
+        "introducing_broker",
+        "advisor",
+        "customer"
+      ],
+      "x-enumNames": [
+        "RecipientTypeExecutingBroker",
+        "RecipientTypeIntroducingBroker",
+        "RecipientTypeAdvisor",
+        "RecipientTypeCustomer"
+      ]
+    }
+  }
+}

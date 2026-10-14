@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-ipallowlist-response-schema.json",
+  "title": "IPAllowlistResponse",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-organizations-roles-users-permissions-apis-openapi.yml#/components/schemas/IPAllowlistResponse",
+  "type": "object",
+  "properties": {
+    "ip_addresses": {
+      "type": "array",
+      "description": "A list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "ip_addresses"
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-portfolio-stats-schema.json",
+  "title": "Portfolio Statistics",
+  "description": "Aggregate statistics for a portfolio, including the yield to worst and yield to maturity for the portfolio.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-analytics-api-openapi.yml#/components/schemas/PortfolioStats",
+  "type": "object",
+  "properties": {
+    "yield_to_worst": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Yield to worst statistics for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "avg": {
+          "type": "number"
+        },
+        "avg_with_cash": {
+          "type": "number"
+        }
+      }
+    },
+    "yield_to_maturity": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Yield to maturity statistics for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "avg": {
+          "type": "number"
+        },
+        "avg_with_cash": {
+          "type": "number"
+        }
+      }
+    },
+    "sp_rating": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The S&P rating statistics for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "avg": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "coupon": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The coupon statistics for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "avg": {
+          "type": "number"
+        }
+      }
+    },
+    "duration": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The (modified) duration statistics for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "avg": {
+          "type": "number"
+        }
+      }
+    },
+    "maturity_years": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "The time to maturity statistics (in years) for the portfolio, when available.",
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "avg": {
+          "type": "number"
+        }
+      }
+    },
+    "cashflows": {
+      "description": "The cashflows for the portfolio, when available. Split into yearly, monthly and all cashflows, as well as by type (coupon or principal). All cashflow amounts are in USD.",
+      "type": "object",
+      "properties": {
+        "yearly": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CashFlowEvent"
+          }
+        },
+        "monthly": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CashFlowEvent"
+          }
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CashFlowEvent"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "CashFlowEvent": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "coupon",
+            "principal"
+          ]
+        }
+      }
+    }
+  }
+}

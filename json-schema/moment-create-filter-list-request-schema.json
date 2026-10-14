@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-create-filter-list-request-schema.json",
+  "title": "CreateFilterListRequest",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-filter-lists-api-openapi.yml#/components/schemas/CreateFilterListRequest",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The user defined name of the filter list",
+      "x-go-type-skip-optional-pointer": true
+    },
+    "field": {
+      "type": "string",
+      "description": "The ref data field that the filter list is based on",
+      "x-go-type-skip-optional-pointer": true
+    }
+  },
+  "required": [
+    "name",
+    "field"
+  ]
+}

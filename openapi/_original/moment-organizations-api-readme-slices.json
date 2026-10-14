@@ -1,0 +1,383 @@
+[
+ {
+  "page": "https://docs.moment.com/reference/getorganizationinfo-1.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Organizations API",
+    "description": "Moment's Organizations API allows Clients to check organization details such as introducing brokers, risk groups, and organization IDs.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "tags": [
+    {
+     "name": "Organizations"
+    }
+   ],
+   "paths": {
+    "/v1/org/self/": {
+     "get": {
+      "tags": [
+       "Organizations"
+      ],
+      "summary": "Organization Profile",
+      "description": "Get information about the authenticated organization. If the organization is a clearer/custodian for other introducing brokers, this will also return information about those introducing brokers.\n",
+      "operationId": "getOrganizationInfo",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "$ref": "#/components/schemas/OrganizationInfo"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    },
+    "schemas": {
+     "OrganizationInfo": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The organization's ID."
+       },
+       "name": {
+        "type": "string",
+        "description": "The organization's name."
+       },
+       "client_id": {
+        "type": "string",
+        "description": "The organization's client ID."
+       },
+       "introducing_brokers": {
+        "type": "array",
+        "description": "The organization's introducing brokers.",
+        "items": {
+         "$ref": "#/components/schemas/IntroducingBrokerInfo"
+        }
+       },
+       "custodians": {
+        "type": "array",
+        "description": "The organization's enabled custodians.",
+        "items": {
+         "$ref": "#/components/schemas/CustodianInfo"
+        }
+       },
+       "logo_url": {
+        "type": "string",
+        "description": "The URL of the organization's logo."
+       }
+      }
+     },
+     "IntroducingBrokerInfo": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The introducing broker's ID."
+       },
+       "name": {
+        "type": "string",
+        "description": "The introducing broker's name."
+       },
+       "client_id": {
+        "type": "string",
+        "description": "The introducing broker's client ID."
+       }
+      }
+     },
+     "CustodianInfo": {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "The custodian's ID."
+       },
+       "name": {
+        "type": "string",
+        "description": "The custodian's name."
+       }
+      }
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/getipallowlist.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Organizations API",
+    "description": "Moment's Organizations API allows Clients to check organization details such as introducing brokers, risk groups, and organization IDs.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/org/ip/": {
+     "get": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Get FIX IP Allowlist",
+      "description": "Retrieve the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "getIPAllowlist",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "ip_addresses": {
+             "type": "array",
+             "description": "A list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+             "items": {
+              "type": "string"
+             }
+            }
+           },
+           "example": {
+            "ip_addresses": [
+             "2001:0:130F:0:0:9C0:876A:130B"
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/addipallowlist.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Organizations API",
+    "description": "Moment's Organizations API allows Clients to check organization details such as introducing brokers, risk groups, and organization IDs.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/org/ip/": {
+     "post": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Add IP to FIX IP Allowlist",
+      "requestBody": {
+       "required": true,
+       "content": {
+        "application/json": {
+         "schema": {
+          "type": "object",
+          "properties": {
+           "ip_address": {
+            "type": "string",
+            "description": "The IP address to add to the allowed IP addresses for the organization."
+           }
+          }
+         }
+        }
+       }
+      },
+      "description": "Add a new IP address to the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "addIPAllowList",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "ip_addresses": {
+             "type": "array",
+             "description": "An updated list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+             "items": {
+              "type": "string"
+             }
+            }
+           },
+           "example": {
+            "ip_addresses": [
+             "2001:0:130F:0:0:9C0:876A:130B"
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ },
+ {
+  "page": "https://docs.moment.com/reference/removeipallowlist.md",
+  "definition": {
+   "openapi": "3.0.0",
+   "info": {
+    "title": "Organizations API",
+    "description": "Moment's Organizations API allows Clients to check organization details such as introducing brokers, risk groups, and organization IDs.",
+    "version": "1.0.0",
+    "contact": {
+     "name": "Moment Support",
+     "email": "support@withmoment.com"
+    }
+   },
+   "servers": [
+    {
+     "url": "https://live.moment-api.com"
+    },
+    {
+     "url": "https://paper.moment-api.com"
+    }
+   ],
+   "paths": {
+    "/v1/org/ip/{ip_address}/": {
+     "delete": {
+      "tags": [
+       "IP Allowlist"
+      ],
+      "summary": "Remove IP from FIX IP Allowlist",
+      "parameters": [
+       {
+        "name": "ip_address",
+        "in": "path",
+        "description": "The IP address to remove from the allowed IP addresses for the organization.",
+        "required": true,
+        "schema": {
+         "type": "string"
+        }
+       }
+      ],
+      "description": "Remove an IP address from the IPs that are allowed to connect to Moment's FIX sessions for a given organization.\n",
+      "operationId": "removeIPAllowList",
+      "responses": {
+       "200": {
+        "description": "Successful response",
+        "content": {
+         "application/json": {
+          "schema": {
+           "type": "object",
+           "properties": {
+            "ip_addresses": {
+             "type": "array",
+             "description": "An updated list of IP addresses that are allowed to connect to Moment's FIX sessions.",
+             "items": {
+              "type": "string"
+             }
+            }
+           },
+           "example": {
+            "ip_addresses": [
+             "2001:0:130F:0:0:9C0:876A:130B"
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "components": {
+    "securitySchemes": {
+     "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+     }
+    }
+   },
+   "security": [
+    {
+     "bearerAuth": []
+    }
+   ]
+  }
+ }
+]

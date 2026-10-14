@@ -1,0 +1,450 @@
+generated: '2026-10-14'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/moment-account-management-api-openapi.yml
+- openapi/moment-account-management-extended-api-openapi.yml
+- openapi/moment-analytics-api-openapi.yml
+- openapi/moment-data-api-openapi.yml
+- openapi/moment-filter-lists-api-openapi.yml
+vocabulary:
+  name: Moment Domain Vocabulary
+  description: 'Terms declared by Moment''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-14'
+  terms:
+  - term: Customizations
+    definition: 'Sleeve customizations, keyed by asset class. Entries live under an asset-class bucket: fixed-income constraints under `fixed_income`.
+      A bare map of entries at the top level (no asset-class bucket) is a legacy shape that is still accepted but is normalized into `fixed_income`
+      on write; new integrations should send the container shape.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Customizations
+  - term: AccountDetailResponse
+    definition: The response body for GET /v1/account/{account_id}/. Returns the full AccountDetail, or the reduced AccountDetailSlim when slim=true.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountDetailResponse
+  - term: AccountDetailSlim
+    definition: A reduced account payload returned by GET /v1/account/{account_id}/ when slim=true. Contains only account-level metadata; the
+      heavier lots, cash, sleeves, statistics, and compliance data are omitted.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountDetailSlim
+  - term: AccountDistribution
+    definition: 'Object declared by the contract with fields: monthly_cashflows, yearly_cashflows, instrument_cashflows, municipal_state_distribution,
+      sp_rating_distribution, moodys_rating_distribution, maturity_distribution, sector_distribution, issuer_distribution, coupon_distribution,
+      municipal_type_distribution.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountDistribution
+  - term: AccountInformation
+    definition: 'Object declared by the contract with fields: account_id, minimum_cash_balance, min_cash, buffer_cash, allocation_sum, sod_total_account_value,
+      cash_allocation, custodian_account_id, short_positions_enabled, moment_organization_id, moment_trading_group_id, custodian. (17 more)'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountInformation
+  - term: AccountSnapshot
+    definition: 'Object declared by the contract with fields: timestamp, total_market_value, cash_market_value, other_market_value, tracked_fixed_income_market_value,
+      treasury_market_value, corporate_market_value, agency_market_value, government_market_value, municipal_market_value, money_market_market_value,
+      cd_market_value. (9 more)'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountSnapshot
+  - term: Advisor
+    definition: 'Object declared by the contract with fields: id, name, organization_id, firm_name, advisor_type, metadata.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Advisor
+  - term: CashWeightAllocation
+    definition: 'Object declared by the contract with fields: min_allocation_weight, target_allocation_weight, max_allocation_weight.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CashWeightAllocation
+  - term: CashMarketValueAllocation
+    definition: 'Object declared by the contract with fields: min_allocation_market_value, target_allocation_market_value, max_allocation_market_value.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CashMarketValueAllocation
+  - term: AllocationConstraintValidation
+    definition: 'Object declared by the contract with fields: valid, constraint, market_value, weight, holdings_in_allocation.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AllocationConstraintValidation
+  - term: Allocation Basis
+    definition: Specifies how allocation targets and bounds are specified.
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AllocationBasis
+  - term: AverageValueConstraint
+    definition: 'Object declared by the contract with fields: type, field, min_average_value, target_average_value, max_average_value, constraint_priority.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AverageValueConstraint
+  - term: AverageValueConstraintValidation
+    definition: 'Object declared by the contract with fields: valid, constraint, holdings_average_value, holdings_in_bounds.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AverageValueConstraintValidation
+  - term: CashFlowEvent
+    definition: 'Object declared by the contract with fields: date, amount, type.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CashFlowEvent
+  - term: CashLot
+    definition: 'Object declared by the contract with fields: moment_lot_id, custodian_lot_id, currency, moment_reserved_quantity, unsettled_open_quantity,
+      settled_open_quantity, settled_closed_quantity, unsettled_closed_quantity, open_quantity.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CashLot
+  - term: ComplianceCheckFull
+    definition: 'Object declared by the contract with fields: compliant.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ComplianceCheckFull
+  - term: ComplianceFull
+    definition: 'Object declared by the contract with fields: compliant, checks.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ComplianceFull
+  - term: ConstraintPriority
+    definition: The priority of the constraint. Constraints with lower priority values will be relaxed first.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ConstraintPriority
+  - term: Custodian
+    definition: 'Object declared by the contract with fields: id, name.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Custodian
+  - term: DiversificationConstraint
+    definition: 'Object declared by the contract with fields: type, field, max_weight_per_unique_value, max_market_value_per_unique_value, min_weight_per_unique_value,
+      min_market_value_per_unique_value, constraint_priority.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/DiversificationConstraint
+  - term: DiversificationConstraintValidation
+    definition: 'Object declared by the contract with fields: valid, constraint, invalid_fields.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/DiversificationConstraintValidation
+  - term: FieldValidation
+    definition: 'Object declared by the contract with fields: field_value, invalid_holdings, market_value, weight.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/FieldValidation
+  - term: Household
+    definition: 'Object declared by the contract with fields: id, name.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Household
+  - term: Instrument
+    definition: 'Object declared by the contract with fields: isin, cusip, status, type, treasury_subtype, maturity_date, coupon, close_price,
+      close_yield_to_worst, close_yield_to_maturity, issuer, callable. (18 more)'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Instrument
+  - term: Instrument ID
+    definition: Instrument ISIN
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/InstrumentID
+  - term: Investor
+    definition: 'Object declared by the contract with fields: marginal_long_term_taxes, marginal_short_term_taxes, tax_state.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Investor
+  - term: LadderPolicyConstraint
+    definition: 'Object declared by the contract with fields: type, period_length, start_period, end_period, weight_tolerance, market_value_tolerance,
+      grace_period_months, use_call_adjusted_maturity, constraint_priority.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LadderPolicyConstraint
+  - term: LadderPolicyConstraintValidation
+    definition: 'Object declared by the contract with fields: valid, constraint, additional_constraints.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LadderPolicyConstraintValidation
+  - term: Lot
+    definition: 'A security lot. Every quantity carries the sign the custodian reported it under, which does not indicate direction: most custodians
+      report a short position as a negative quantity, but some report it as positive. Read position_type to determine direction.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Lot
+  - term: PositionType
+    definition: 'The direction of a lot: "long" is a position the account owns, "short" one it owes. Direction is deliberately separate from quantity,
+      whose sign is a per-custodian storage convention and says nothing about it.'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/PositionType
+  - term: ManagementType
+    definition: '"sma" for separately managed accounts. "uma" for unified managed accounts. null for accounts that are not classified as either
+      an SMA or a UMA.'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ManagementType
+  - term: MinCashSettingMode
+    definition: 'The mode of an account''s minimum-cash floor: a fixed dollar amount or a fraction of account value.'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/MinCashSettingMode
+  - term: MinCash
+    definition: An account's minimum-cash floor. Present only when a floor is configured. min_cash_setting selects the mode; the matching value
+      field is populated.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/MinCash
+  - term: BufferCash
+    definition: The cash an account wants parked in its funding sleeve, as a min/target/max. A placement target for cash rebalancing, not a floor
+      on what can be invested — that is min_cash. Present only when at least one bound is configured; an unconfigured bound is omitted.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/BufferCash
+  - term: AllocationSum
+    definition: How an account's managed sleeve targets plus its buffer cash target compare to 100%, as computed by accounts-api. The verdict
+      is balanced when the total is within 1e-6 of 1, under_allocated below that, and over_allocated above it. Fractions are decimals in [0, 1]
+      serialized as strings — e.g. "0.05" means 5%.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AllocationSum
+  - term: AllocationSumBase
+    definition: 'Object declared by the contract with fields: managed_target_sum, buffer_cash_target_percent, total, included_sleeve_ids, notional_sleeve_ids,
+      notional_total, template_owned, violation.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AllocationSumBase
+  - term: ModelComplianceCheckFull
+    definition: 'Object declared by the contract with fields: type, sleeve_id, model_id, constraints.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ModelComplianceCheckFull
+  - term: ProposalBase
+    definition: 'Object declared by the contract with fields: proposal_id, name, created_at, generated_at, failed_at, submitted_at, canceled_at,
+      completed_at, num_accounts, market_value, num_orders, filled_market_value. (2 more)'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ProposalBase
+  - term: ModelAssignment
+    definition: 'Object declared by the contract with fields: model_id, model_name, assignment_date, customizations, meta, rebalance_strategy,
+      cashflow_targets.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ModelAssignment
+  - term: CashflowTarget
+    definition: 'Object declared by the contract with fields: amount, start_date, end_date, frequency, source, call_assumption, overrides.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CashflowTarget
+  - term: Sleeve
+    definition: 'Object declared by the contract with fields: id, name, allocation_basis, priority, min_allocation, target_allocation, max_allocation,
+      extra, is_default, is_managed.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Sleeve
+  - term: SleeveStatistics
+    definition: 'Object declared by the contract with fields: timestamp, monthly_cashflows, yearly_cashflows, total_market_value, treasury_market_value,
+      corporate_market_value, agency_market_value, government_market_value, municipal_market_value, money_market_market_value, cd_market_value,
+      total_accrued_interest. (16 more)'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/SleeveStatistics
+  - term: Status
+    definition: 'Enumeration declared by the contract with values: running, pausing, paused.'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/Status
+  - term: TaxRates
+    definition: 'Object declared by the contract with fields: federal_tax_rate, state_tax_rate, local_tax_rate.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/TaxRates
+  - term: UniverseConstraintValidation
+    definition: 'Object declared by the contract with fields: valid, constraint, invalid_holdings.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/UniverseConstraintValidation
+  - term: WeightComplianceCheckFull
+    definition: 'Object declared by the contract with fields: type, sleeve_id, compliant, min_weight, target_weight, max_weight, current_weight.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/WeightComplianceCheckFull
+  - term: MarketValueComplianceCheckFull
+    definition: 'Object declared by the contract with fields: type, sleeve_id, compliant, min_market_value, required_market_value, target_market_value,
+      max_market_value, current_market_value.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/MarketValueComplianceCheckFull
+  - term: RebalanceStrategy
+    definition: 'The rebalance strategy for the sleeve. Determines how and when the sleeve is rebalanced. - unspecified: The rebalance strategy
+      is not set. - never: Disables all rebalancing. - violations_only: Only rebalances when there are violations. - enabled: Enables regular
+      rebalancing.'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/RebalanceStrategy
+  - term: AccountSettingKey
+    definition: Allowed platform-level setting keys. The min_cash_* keys are mutually exclusive; set one mode value and clear the others via delete_keys.
+      The buffer_cash_* keys are decimal fractions in [0, 1] and must satisfy min <= target <= max. A request touching any of them must address
+      all three, either as a setting or in delete_keys; a partial write is rejected.
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountSettingKey
+  - term: AccountSettingInput
+    definition: 'Object declared by the contract with fields: setting_key, setting_value, effective_date.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountSettingInput
+  - term: AccountSettingOutput
+    definition: 'Object declared by the contract with fields: setting_key, setting_value, effective_date.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountSettingOutput
+  - term: RestrictionType
+    definition: Type of trading restriction
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/RestrictionType
+  - term: RestrictionInput
+    definition: 'Object declared by the contract with fields: restriction_type, reason.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/RestrictionInput
+  - term: RestrictionOutput
+    definition: 'Object declared by the contract with fields: restriction_type, reason.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/RestrictionOutput
+  - term: LotOverrideField
+    definition: Allowed lot fields for user override
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LotOverrideField
+  - term: LotOverrideInput
+    definition: 'Object declared by the contract with fields: field, value, reason.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LotOverrideInput
+  - term: LotOverrideRevertTarget
+    definition: 'Object declared by the contract with fields: field.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LotOverrideRevertTarget
+  - term: LotOverrideOutput
+    definition: 'Object declared by the contract with fields: lot_override_id, lot_id, field, value, created_by, created_at, reason.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/LotOverrideOutput
+  - term: AccountStatisticsResponse
+    definition: 'Object declared by the contract with fields: account, sleeves.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountStatisticsResponse
+  - term: NewAccountStats
+    definition: Account-level aggregate statistics. Fields suffixed `_clean` exclude accrued interest; unsuffixed market values include it.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/NewAccountStats
+  - term: NewSleeveStats
+    definition: Per-sleeve statistics.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/NewSleeveStats
+  - term: NewModelAssignment
+    definition: The model assigned to a sleeve, with its customizations.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/NewModelAssignment
+  - term: AccountLotsResponse
+    definition: 'Object declared by the contract with fields: lots.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountLotsResponse
+  - term: NewLotStats
+    definition: Per-lot holdings with security data. Only open lots are returned (lot_status is always OPEN).
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/NewLotStats
+  - term: BatchAccountStatisticsRequest
+    definition: 'Object declared by the contract with fields: account_ids.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/BatchAccountStatisticsRequest
+  - term: BatchAccountStatisticsResponse
+    definition: 'Object declared by the contract with fields: accounts.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/BatchAccountStatisticsResponse
+  - term: BookingType
+    definition: The booking type for the account.
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/BookingType
+  - term: Client Order ID
+    definition: Client-provided unique ID for the order; for example, to cross-reference with an internal system. Must be unique within the trading
+      day, otherwise duplicate orders will be rejected during pre-trade checks.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/ClientOrderID
+  - term: Order Request RFQ
+    definition: Required for orders of type `rfq_response`, specifies the RFQ that the order is being placed against.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/OrderRFQ
+  - term: OrderSide
+    definition: 'Represents which side this order is on: - buy - sell'
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/OrderSide
+  - term: Size
+    definition: The size of an order, with a specified `type` indicating how the size is represented. Par sizes represent the size of the order
+      in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional
+      sizes represent the size of the order in current dollar value, so an order with notional $3000 would represent an order to buy or sell
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/OrderSize
+  - term: OrderType
+    definition: Represents the types of orders Moment currently supports. - limit - market - rfq_response
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/OrderType
+  - term: Order Request
+    definition: Each order has a unique identifier generated by Moment. The ID will be returned when an order is placed and can be used to check
+      the status of the order via the `GET /v1/trading/order/{id}/` endpoint. Updates on open orders at Moment will also be sent over the real-time
+      API, which is the recommended method of maintaining order state.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/PostOrderRequest
+  - term: PlaceOrderResponse
+    definition: Response from placing an order
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/PlaceOrderResponse
+  - term: CreateSleeveErrorDetails
+    definition: Present only when the create was refused because the sleeve's target does not fit the account's remaining allocation.
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/CreateSleeveErrorDetails
+  - term: UpdateDoNotTradeRequest
+    definition: 'Object declared by the contract with fields: do_not_trade, do_not_trade_reason.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-api-openapi.yml#/components/schemas/UpdateDoNotTradeRequest
+  - term: OrganizationAccount
+    definition: 'Object declared by the contract with fields: advisor_codes, custodian, moment_account_id, name.'
+    tags:
+    - Object
+    source: openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/OrganizationAccount
+  - term: APIError
+    definition: Standard error response format returned by all API endpoints.
+    tags:
+    - Object
+    source: openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/APIError
+  - term: ErrorType
+    definition: High-level error category for programmatic error handling.
+    tags:
+    - Enumeration
+    source: openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/ErrorType
+  - term: DecimalString
+    definition: An exact decimal amount, serialized as a string to preserve precision.
+    tags:
+    - Object
+    source: openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/DecimalString

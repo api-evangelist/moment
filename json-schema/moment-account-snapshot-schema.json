@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-account-snapshot-schema.json",
+  "title": "AccountSnapshot",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-account-management-api-openapi.yml#/components/schemas/AccountSnapshot",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "description": "The timestamp of the snapshot in RFC-3339 format with nanosecond precision.",
+      "format": "date-time"
+    },
+    "total_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The total market value of the account"
+    },
+    "cash_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The cash market value of the account"
+    },
+    "other_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The market value of all holdings that are not tracked by Moment. This includes all non-fixed income holdings and fixed income holdings that are not present in Moment's security master."
+    },
+    "tracked_fixed_income_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The tracked fixed income market value of the account -- this should be equal to the sum of treasury_market_value, corporate_market_value, agency_market_value, cd_market_value, municipal_market_value, and government_market_value"
+    },
+    "treasury_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The treasury market value of the account"
+    },
+    "corporate_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The corporate market value of the account"
+    },
+    "agency_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The agency market value of the account"
+    },
+    "government_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The government market value of the account"
+    },
+    "municipal_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The municipal market value of the account"
+    },
+    "money_market_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The money market market value of the account"
+    },
+    "cd_market_value": {
+      "type": "number",
+      "format": "double",
+      "description": "The CD market value of the account"
+    },
+    "total_accrued_interest": {
+      "type": "number",
+      "format": "double",
+      "description": "The total accrued interest of the account"
+    },
+    "average_ytw": {
+      "type": "number",
+      "format": "double",
+      "description": "The average yield to worst of the account"
+    },
+    "average_maturity": {
+      "type": "number",
+      "format": "double",
+      "description": "The average maturity of the account"
+    },
+    "average_duration": {
+      "type": "number",
+      "format": "double",
+      "description": "The average duration of the account"
+    },
+    "average_sp_rating": {
+      "type": "string",
+      "description": "The average SP rating of the account"
+    },
+    "average_moodys_rating": {
+      "type": "string",
+      "description": "The average Moody's rating of the account"
+    },
+    "average_coupon": {
+      "type": "number",
+      "format": "double",
+      "description": "The average coupon rate across all bonds in the account"
+    },
+    "average_book_ytm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double",
+      "description": "The average yield to maturity calculated at purchase time using basis price and date"
+    },
+    "average_book_ytw": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "format": "double",
+      "description": "The average yield to worst calculated at purchase time using basis price and date"
+    }
+  },
+  "required": [
+    "timestamp",
+    "total_market_value",
+    "cash_market_value",
+    "other_market_value",
+    "tracked_fixed_income_market_value",
+    "treasury_market_value",
+    "corporate_market_value",
+    "agency_market_value",
+    "government_market_value",
+    "municipal_market_value",
+    "money_market_market_value",
+    "cd_market_value",
+    "total_accrued_interest",
+    "average_ytw",
+    "average_maturity",
+    "average_duration",
+    "average_sp_rating",
+    "average_moodys_rating",
+    "average_coupon"
+  ]
+}

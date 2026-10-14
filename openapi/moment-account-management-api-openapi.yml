@@ -1,0 +1,3790 @@
+openapi: 3.0.0
+info:
+  title: Account Management API
+  description: Moment's Account Management API allows Clients to manage their accounts and associated data.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+paths:
+  /v1/account/batch/statistics/:
+    post:
+      tags:
+      - Accounts
+      summary: Get Account Statistics for Multiple Accounts
+      operationId: batchGetAccountStatistics
+      description: 'Returns account-level and per-sleeve statistics for each of the requested accounts. Accounts may be identified by their Moment account ID or their custodian account ID. All identifiers are validated first: if any account cannot be found, the whole request fails with a 404 listing the unknown identifiers and no statistics are returned.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchAccountStatisticsRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchAccountStatisticsResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: One or more accounts not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/document/:
+    post:
+      tags:
+      - Accounts
+      summary: Upload an Account Document
+      operationId: uploadAccountDocument
+      description: Uploads a document for a custodian account. The document payload is stored as a text file in the organization's document store. The organization is resolved from the authenticated API key.
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custodian_account_id:
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                  pattern: ^[^\x00-\x1f\x7f]+$
+                  description: The custodian's identifier for the account.
+                account_name:
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                  pattern: ^[^\x00-\x1f\x7f]+$
+                  description: The name of the account.
+                payload_type:
+                  type: string
+                  enum:
+                  - agreement_logs
+                  - onboarding_logs
+                  - strategy_selection
+                  description: The category of document being uploaded.
+                payload_string:
+                  type: string
+                  minLength: 1
+                  maxLength: 10485760
+                  description: The document contents to store.
+              required:
+              - custodian_account_id
+              - account_name
+              - payload_type
+              - payload_string
+      responses:
+        '200':
+          description: Document stored successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - ok
+                    description: Always "ok" when the document was stored.
+                required:
+                - status
+        '403':
+          description: Organization not permitted to upload documents
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Standard error response format returned by all API endpoints.
+                properties:
+                  error:
+                    type: string
+                    description: Human-readable error message describing what went wrong.
+                  error_details:
+                    description: Additional structured information about the error.
+                    x-go-type: any
+                    x-go-type-skip-optional-pointer: true
+                    x-oapi-codegen-extra-tags:
+                      exhaustruct: optional
+                  error_type:
+                    type: string
+                    description: High-level error category for programmatic error handling.
+                    enum:
+                    - invalid_request
+                    - not_found
+                    - server_error
+                    - unauthorized
+                    - rate_limited
+                    - forbidden
+                    - closed
+                    - not_implemented
+                    - resource_conflict
+                    x-enum-varnames:
+                    - ErrorTypeInvalidRequest
+                    - ErrorTypeNotFound
+                    - ErrorTypeServerError
+                    - ErrorTypeUnauthorized
+                    - ErrorTypeRateLimited
+                    - ErrorTypeForbidden
+                    - ErrorTypeNeedsMarketState
+                    - ErrorTypeNotImplemented
+                    - ErrorTypeResourceConflict
+                required:
+                - error
+                - error_type
+        '422':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/:
+    get:
+      tags:
+      - Accounts
+      summary: Get an Account
+      operationId: accountDetail
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      - name: slim
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: When true, return a reduced account payload containing only account-level metadata (see the AccountDetailSlim schema) and omit the heavier lots, cash, sleeves, statistics, and compliance data. Defaults to false.
+      responses:
+        '200':
+          description: Successful response. Returns AccountDetail, or AccountDetailSlim when slim=true.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDetailResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/cash_allocation/:
+    put:
+      tags:
+      - Accounts
+      operationId: updateCashAllocation
+      summary: Update the Cash Allocation policy for an Account
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashAllocation'
+      responses:
+        '204':
+          description: Cash allocation updated
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/do_not_trade/:
+    put:
+      tags:
+      - Accounts
+      operationId: updateDoNotTrade
+      summary: Update the Do Not Trade status for an Account
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDoNotTradeRequest'
+      responses:
+        '202':
+          description: Do not trade update request received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                - message
+              example:
+                message: Your do not trade update request has been received. It'll probably be satisfied in the next few seconds, but you will not be notified when it succeeds or fails. Keep polling 'GET /account' or 'GET /account/{account_id}'.
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/lots/:
+    get:
+      tags:
+      - Accounts
+      summary: Get Account Lots
+      operationId: getAccountLots
+      description: Returns per-lot holdings with security data for a single managed portfolio account. Only open lots are returned. The account may be identified by its Moment account ID or its custodian account ID.
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The Moment account ID or custodian account ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountLotsResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/order/:
+    post:
+      tags:
+      - Orders
+      summary: Place an Order for an Account
+      operationId: placeOrder
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/PostOrderRequest'
+              - type: object
+                properties:
+                  sleeve_id:
+                    type: string
+                    description: The ID of the sleeve to place the order in. This only applies to 'buy' orders.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceOrderResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/order/{order_id}/:
+    delete:
+      tags:
+      - Orders
+      summary: Cancel an Order
+      parameters: []
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+      operationId: cancelOrder
+      description: Attempts to cancel an open Order. If the order is no longer cancelable, a subsequent cancel reject event will be sent to the client via the Real-Time Orders API.
+    parameters:
+    - name: account_id
+      in: path
+      required: true
+      schema:
+        type: string
+        description: The ID of the account
+    - schema:
+        type: string
+      name: order_id
+      in: path
+      required: true
+      description: Order ID
+  /v1/account/{account_id}/restrictions/:
+    put:
+      tags:
+      - Accounts
+      operationId: updateAccountRestrictions
+      summary: Activate or deactivate trading restrictions for an Account
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                restrictions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RestrictionInput'
+                  description: Restrictions to activate
+                clear_restriction_types:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RestrictionType'
+                  description: Restriction types to deactivate
+              required:
+              - restrictions
+      responses:
+        '200':
+          description: Restrictions updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entity_type:
+                    type: string
+                  entity_id:
+                    type: string
+                  restrictions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RestrictionOutput'
+                required:
+                - entity_type
+                - entity_id
+                - restrictions
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/settings/:
+    put:
+      tags:
+      - Accounts
+      operationId: updateAccountSettings
+      summary: Update platform-level settings for an Account
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settings:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccountSettingInput'
+                delete_keys:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AccountSettingKey'
+              required:
+              - settings
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account_id:
+                    type: string
+                  settings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AccountSettingOutput'
+                required:
+                - account_id
+                - settings
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/sleeve/:
+    post:
+      tags:
+      - Sleeves
+      summary: Create a sleeve within an account
+      operationId: createSleeve
+      requestBody:
+        description: Initial sleeve parameters
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  description: A descriptive name for the sleeve
+                  type: string
+                allocation_basis:
+                  description: The basis for calculating the allocation of the sleeve.
+                  default: weight
+                  $ref: '#/components/schemas/AllocationBasis'
+                priority:
+                  description: The priority in which cash is allocated to sleeves based on their target allocations. Lower values are allocated first.
+                  type: integer
+                  default: 0
+                min_allocation:
+                  description: The lowest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  allOf:
+                  - $ref: '#/components/schemas/Decimal'
+                target_allocation:
+                  description: The desired proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  allOf:
+                  - $ref: '#/components/schemas/Decimal'
+                max_allocation:
+                  description: The highest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  allOf:
+                  - $ref: '#/components/schemas/Decimal'
+                required_market_value:
+                  description: An optional absolute floor, in account currency (USD), on the sleeve's target market value. When omitted, no market value floor is applied.
+                  allOf:
+                  - $ref: '#/components/schemas/Decimal'
+                is_managed:
+                  description: Whether the advisor manages this sleeve. Managed sleeves are billed, count toward the account's managed value and are optimized; unmanaged sleeves are excluded from all three. Defaults to true. A sleeve created with a model assignment cannot be unmanaged.
+                  type: boolean
+                  default: true
+                model_assignment:
+                  $ref: '#/components/schemas/ModelAssignment'
+                extra:
+                  description: Arbitrary user-specified sleeve metadata
+                  type: object
+                  additionalProperties:
+                    type: string
+                client_id:
+                  description: An optional caller-supplied external identifier for the sleeve. Must be unique within the account. When omitted, it defaults to the generated sleeve_id.
+                  type: string
+              required:
+              - name
+              - min_allocation
+              - target_allocation
+              - max_allocation
+              - extra
+        required: true
+      responses:
+        '201':
+          description: Sleeve created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sleeve_id:
+                    description: A unique identifier generated by the server
+                    type: string
+                  client_id:
+                    description: The caller-supplied external identifier for the sleeve, or the generated sleeve_id when none was supplied.
+                    type: string
+                  message:
+                    type: string
+                required:
+                - sleeve_id
+                - client_id
+                - message
+              example:
+                sleeve_id: slv_01JBFQZXMWZ08XDMTG08P2Z4XT
+                client_id: slv_01JBFQZXMWZ08XDMTG08P2Z4XT
+                message: Sleeve created.
+        '400':
+          description: Invalid request parameters, or accounts-api refused the sleeve because its target does not fit the account's remaining allocation. On a refusal, error_details.allocation_sum carries the account's AllocationSum as computed before the write, so a caller can show how much room is left.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSleeveError'
+        '409':
+          description: A sleeve with the same client_id or name already exists in the account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+    parameters:
+    - name: account_id
+      in: path
+      required: true
+      description: Account ID
+      schema:
+        type: string
+  /v1/account/{account_id}/sleeve/{sleeve_id}/:
+    patch:
+      tags:
+      - Sleeves
+      summary: Update a sleeve
+      operationId: updateSleeve
+      requestBody:
+        description: Initial sleeve parameters
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  description: A descriptive name for the sleeve
+                  type: string
+                allocation_basis:
+                  $ref: '#/components/schemas/AllocationBasis'
+                priority:
+                  description: The priority in which cash is allocated to sleeves based on their target
+                  type: integer
+                min_allocation:
+                  description: The lowest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  type: number
+                  format: double
+                target_allocation:
+                  description: The desired proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  type: number
+                  format: double
+                max_allocation:
+                  description: The highest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+                  type: number
+                  format: double
+                required_market_value:
+                  description: An optional absolute floor, in account currency (USD), on the sleeve's target market value. When omitted, no market value floor is applied.
+                  type: number
+                  format: double
+                is_managed:
+                  description: Whether the advisor manages this sleeve. Managed sleeves are billed, count toward the account's managed value and are optimized; unmanaged sleeves are excluded from all three. Left unchanged when omitted. A sleeve holding a strategy cannot be unmanaged, and the funding sleeve is always managed.
+                  type: boolean
+                extra:
+                  description: Arbitrary user-specified sleeve metadata
+                  type: object
+                  additionalProperties:
+                    type: string
+        required: true
+      responses:
+        '200':
+          description: Sleeve updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  sleeve_id:
+                    type: string
+                required:
+                - message
+                - sleeve_id
+              example:
+                message: Sleeve updated.
+                sleeve_id: slv_123
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account or sleeve not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+    parameters:
+    - name: account_id
+      in: path
+      required: true
+      description: Account ID
+      schema:
+        type: string
+    - name: sleeve_id
+      in: path
+      required: true
+      description: Sleeve ID
+      schema:
+        type: string
+    delete:
+      tags:
+      - Sleeves
+      summary: Delete a sleeve
+      operationId: deleteSleeve
+      responses:
+        '204':
+          description: Sleeve deleted
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account or sleeve not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/sleeve/{sleeve_id}/assign-lots/:
+    put:
+      tags:
+      - Sleeves
+      summary: Specify which lots are assigned to a sleeve
+      operationId: assignLotsToSleeve
+      requestBody:
+        description: Lot IDs of lots that are assigned to this sleeve
+        content:
+          application/json:
+            schema:
+              properties:
+                lots:
+                  description: Array of lot IDs
+                  type: array
+                  items:
+                    type: string
+              required:
+              - lots
+      responses:
+        '204':
+          description: Lots assigned to sleeve
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account or sleeve not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+    parameters:
+    - name: account_id
+      in: path
+      required: true
+      description: Account ID
+      schema:
+        type: string
+    - name: sleeve_id
+      in: path
+      required: true
+      description: Sleeve ID
+      schema:
+        type: string
+  /v1/account/{account_id}/sleeve/{sleeve_id}/model/:
+    parameters:
+    - name: account_id
+      in: path
+      required: true
+      description: Account ID
+      schema:
+        type: string
+    - name: sleeve_id
+      in: path
+      required: true
+      description: Sleeve ID
+      schema:
+        type: string
+    put:
+      tags:
+      - Sleeves
+      summary: Assigns a sleeve to a model
+      operationId: assignSleeveToModel
+      requestBody:
+        description: The model, assignment_date, cashflow_targets, and customizations to assign to the sleeve
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - model_id
+              - assignment_date
+              - customizations
+              properties:
+                model_id:
+                  type: string
+                  description: The ID of the model to of which the sleeve should be assigned
+                assignment_date:
+                  type: string
+                  format: date
+                  description: Assignment dates are used to align ladders and determine grace periods for the first ladder bucket before dynamic ladder rebalancing kicks in
+                customizations:
+                  $ref: '#/components/schemas/Customizations'
+                meta:
+                  type: object
+                  description: Arbitrary key-value store for additional metadata
+                  additionalProperties: true
+                rebalance_strategy:
+                  $ref: '#/components/schemas/RebalanceStrategy'
+                cashflow_targets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CashflowTarget'
+      responses:
+        '204':
+          description: Sleeve assigned to model
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account or sleeve not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+    delete:
+      tags:
+      - Sleeves
+      summary: Unassigns a sleeve from a model
+      operationId: unassignSleeveFromModel
+      responses:
+        '204':
+          description: Sleeve unassigned from model
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account or sleeve not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/statistics/:
+    get:
+      tags:
+      - Accounts
+      summary: Get Account Statistics
+      operationId: getAccountStatistics
+      description: Returns account-level and per-sleeve statistics for a single managed portfolio account. The account may be identified by its Moment account ID or its custodian account ID.
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The Moment account ID or custodian account ID
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountStatisticsResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+  /v1/account/{account_id}/stats/:
+    get:
+      tags:
+      - Accounts
+      summary: Get the Statistics for an Account
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the account
+      - $ref: '#/components/parameters/historical_statistics_start'
+      - $ref: '#/components/parameters/historical_statistics_end'
+      - $ref: '#/components/parameters/historical_statistics_frequency'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountSnapshot'
+  /v1/advisor/{advisor_id}/stats/:
+    get:
+      tags:
+      - Accounts
+      summary: Get the Statistics for the accounts of an Advisor
+      parameters:
+      - $ref: '#/components/parameters/advisor_id'
+      - $ref: '#/components/parameters/historical_statistics_start'
+      - $ref: '#/components/parameters/historical_statistics_end'
+      - $ref: '#/components/parameters/historical_statistics_frequency'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountSnapshot'
+  /v1/lot/{id}/overrides/:
+    put:
+      tags:
+      - Accounts
+      operationId: upsertLotOverrides
+      summary: Apply field overrides for a single Lot
+      description: 'Upserts and/or reverts field overrides on the given lot.  The owning
+
+        account is resolved from the lot on the server and access-checked
+
+        against the caller''s allowed orgs; callers do not need to supply it.
+
+        '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          description: The ID of the lot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                overrides:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LotOverrideInput'
+                  description: Field overrides to upsert.  Empty array is valid when only reverting.
+                revert_targets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LotOverrideRevertTarget'
+                  description: Fields whose active override should be deactivated.
+              required:
+              - overrides
+      responses:
+        '200':
+          description: Overrides updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account_id:
+                    type: string
+                    description: Owning account_id resolved from the lot.
+                  lot_id:
+                    type: string
+                  active_overrides:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LotOverrideOutput'
+                    description: Currently-active overrides on the lot after this request.
+                required:
+                - account_id
+                - lot_id
+                - active_overrides
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+        '404':
+          description: Lot not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+components:
+  schemas:
+    Customizations:
+      type: object
+      description: 'Sleeve customizations, keyed by asset class. Entries live under an asset-class bucket: fixed-income constraints under `fixed_income`. A bare map of entries at the top level (no asset-class bucket) is a legacy shape that is still accepted but is normalized into `fixed_income` on write; new integrations should send the container shape.'
+      additionalProperties: true
+      x-go-type: json.RawMessage
+      properties:
+        fixed_income:
+          type: object
+          description: Fixed-income constraints, keyed by a caller-supplied entry id (e.g. "allocation_20260609"). Each entry is a universe filter or an allocation target.
+          additionalProperties: true
+      example:
+        fixed_income:
+          universe_example:
+            type: universe
+            filter:
+              maturity_in_years:
+                greater_than_or_equal_to: 0.5
+          allocation_example:
+            type: allocation
+            filter:
+              maturity_date:
+                less_than: '2030-01-01'
+            min_market_value: 100000
+    AccountDetail:
+      allOf:
+      - $ref: '#/components/schemas/AccountInformation'
+      - type: object
+        properties:
+          advisor:
+            $ref: '#/components/schemas/Advisor'
+          statistics:
+            $ref: '#/components/schemas/AccountStatistics'
+          compliance:
+            $ref: '#/components/schemas/ComplianceFull'
+          proposal:
+            $ref: '#/components/schemas/ProposalBase'
+          lots:
+            type: array
+            items:
+              $ref: '#/components/schemas/Lot'
+          cash:
+            type: array
+            items:
+              $ref: '#/components/schemas/CashLot'
+          sleeves:
+            description: An object containing all of the account's sleeves keyed by sleeve ID
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/SleeveWithStatisticsAndCompliance'
+        required:
+        - statistics
+        - compliance
+        - lots
+        - cash
+        - sleeves
+    AccountDetailResponse:
+      description: The response body for GET /v1/account/{account_id}/. Returns the full AccountDetail, or the reduced AccountDetailSlim when slim=true.
+      oneOf:
+      - $ref: '#/components/schemas/AccountDetail'
+      - $ref: '#/components/schemas/AccountDetailSlim'
+    AccountDetailSlim:
+      description: A reduced account payload returned by GET /v1/account/{account_id}/ when slim=true. Contains only account-level metadata; the heavier lots, cash, sleeves, statistics, and compliance data are omitted.
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account
+        custodian_account_id:
+          type: string
+          description: The Custodian-tracked ID of the account
+        moment_organization_id:
+          type: string
+          description: The ID of the Moment organization that the account belongs to
+        moment_trading_group_id:
+          type: string
+          description: The ID of the Moment trading group that the account belongs to
+        custodian:
+          $ref: '#/components/schemas/Custodian'
+        household:
+          $ref: '#/components/schemas/Household'
+        is_taxable:
+          type: boolean
+          description: Whether the account is taxable
+        account_type:
+          type: string
+          description: The type of the account
+        management_type:
+          $ref: '#/components/schemas/ManagementType'
+        prime_brokerage_enabled:
+          type: boolean
+          description: Whether the account is eligible for prime brokerage services.
+        desired_status:
+          $ref: '#/components/schemas/Status'
+          description: The desired status of the account
+        custodial_status:
+          type: string
+          description: The custodial status of the account
+        account_name:
+          type: string
+          description: The name of the account
+        last_updated_at:
+          type: string
+          description: The last time the account was updated
+          format: date-time
+        do_not_trade:
+          type: boolean
+          description: Whether trading is disabled for the account
+        do_not_trade_reason:
+          type: string
+          description: The reason why trading is disabled for the account
+        margin_eligible:
+          type: boolean
+          description: Whether the account is eligible for margin trading
+        do_not_buy:
+          type: boolean
+          description: Whether buying is disabled for the account
+        do_not_sell:
+          type: boolean
+          description: Whether selling is disabled for the account
+      required:
+      - account_id
+      - custodian_account_id
+      - moment_organization_id
+      - moment_trading_group_id
+      - custodian
+      - household
+      - is_taxable
+      - account_type
+      - management_type
+      - prime_brokerage_enabled
+      - desired_status
+      - custodial_status
+      - account_name
+      - last_updated_at
+    AccountDistribution:
+      type: object
+      properties:
+        monthly_cashflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashFlowEvent'
+        yearly_cashflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashFlowEvent'
+        instrument_cashflows:
+          description: Per-instrument forward cashflow events (coupons, principal at maturity, dividends, and confirmed call redemptions) for the account's current holdings, bounded to roughly one year forward. Unlike monthly_cashflows and yearly_cashflows these are not aggregated, so each event retains the ISIN of the originating instrument for per-bond attribution.
+          type: array
+          items:
+            $ref: '#/components/schemas/InstrumentCashFlowEvent'
+        municipal_state_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        sp_rating_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        moodys_rating_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        maturity_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        sector_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        issuer_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        coupon_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        municipal_type_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - monthly_cashflows
+      - yearly_cashflows
+      - municipal_state_distribution
+      - sp_rating_distribution
+      - moodys_rating_distribution
+      - maturity_distribution
+      - sector_distribution
+      - issuer_distribution
+      - coupon_distribution
+      - municipal_type_distribution
+    AccountInformation:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account
+        minimum_cash_balance:
+          $ref: '#/components/schemas/Decimal'
+          description: The minimum cash balance of the account
+        min_cash:
+          $ref: '#/components/schemas/MinCash'
+          description: The account's minimum-cash floor. Present only when configured via the min_cash_setting account setting.
+        buffer_cash:
+          $ref: '#/components/schemas/BufferCash'
+          description: The cash the account wants parked in its funding sleeve. Present only when at least one buffer_cash_* account setting is configured.
+        allocation_sum:
+          $ref: '#/components/schemas/AllocationSum'
+          description: How the account's managed sleeve targets plus its buffer cash target compare to 100%, as accounts-api computed it for this read. Omitted when accounts-api reported none.
+        sod_total_account_value:
+          $ref: '#/components/schemas/Decimal'
+          description: The account's total value as of the start of the trading day. Omitted when no start-of-day value is available.
+        cash_allocation:
+          $ref: '#/components/schemas/CashAllocation'
+          description: The cash allocation of the account
+        custodian_account_id:
+          type: string
+          description: The Custodian-tracked ID of the account
+        short_positions_enabled:
+          type: boolean
+          description: Whether short positions are enabled for the account
+        moment_organization_id:
+          type: string
+          description: The ID of the Moment organization that the account belongs to
+        moment_trading_group_id:
+          type: string
+          description: The ID of the Moment trading group that the account belongs to
+        custodian:
+          $ref: '#/components/schemas/Custodian'
+        household:
+          $ref: '#/components/schemas/Household'
+        is_taxable:
+          type: boolean
+          description: Whether the account is taxable
+        account_type:
+          type: string
+          description: The type of the account
+        management_type:
+          $ref: '#/components/schemas/ManagementType'
+        prime_brokerage_enabled:
+          type: boolean
+          description: Whether the account is eligible for prime brokerage services.
+        status:
+          $ref: '#/components/schemas/Status'
+          description: The current status of the account.
+        desired_status:
+          $ref: '#/components/schemas/Status'
+          description: The desired status of the account
+        custodial_status:
+          type: string
+          description: The custodial status of the account
+        investor:
+          $ref: '#/components/schemas/Investor'
+        account_name:
+          type: string
+          description: The name of the account
+        extra:
+          type: object
+          description: Extra information about the account
+          additionalProperties:
+            type: string
+        last_updated_at:
+          type: string
+          description: The last time the account was updated
+          format: date-time
+        do_not_trade:
+          type: boolean
+          description: Whether trading is disabled for the account
+        do_not_trade_reason:
+          type: string
+          description: The reason why trading is disabled for the account
+        margin_eligible:
+          type: boolean
+          description: Whether the account is eligible for margin trading
+        do_not_buy:
+          type: boolean
+          description: Whether buying is disabled for the account
+        do_not_sell:
+          type: boolean
+          description: Whether selling is disabled for the account
+      required:
+      - account_id
+      - minimum_cash_balance
+      - cash_allocation
+      - custodian_account_id
+      - short_positions_enabled
+      - moment_organization_id
+      - moment_trading_group_id
+      - custodian
+      - advisor
+      - household
+      - is_taxable
+      - account_type
+      - management_type
+      - status
+      - desired_status
+      - custodial_status
+      - investor
+      - account_name
+      - prime_brokerage_enabled
+      - extra
+      - last_updated_at
+    AccountSnapshot:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: The timestamp of the snapshot in RFC-3339 format with nanosecond precision.
+          format: date-time
+        total_market_value:
+          type: number
+          format: double
+          description: The total market value of the account
+        cash_market_value:
+          type: number
+          format: double
+          description: The cash market value of the account
+        other_market_value:
+          type: number
+          format: double
+          description: The market value of all holdings that are not tracked by Moment. This includes all non-fixed income holdings and fixed income holdings that are not present in Moment's security master.
+        tracked_fixed_income_market_value:
+          type: number
+          format: double
+          description: The tracked fixed income market value of the account -- this should be equal to the sum of treasury_market_value, corporate_market_value, agency_market_value, cd_market_value, municipal_market_value, and government_market_value
+        treasury_market_value:
+          type: number
+          format: double
+          description: The treasury market value of the account
+        corporate_market_value:
+          type: number
+          format: double
+          description: The corporate market value of the account
+        agency_market_value:
+          type: number
+          format: double
+          description: The agency market value of the account
+        government_market_value:
+          type: number
+          format: double
+          description: The government market value of the account
+        municipal_market_value:
+          type: number
+          format: double
+          description: The municipal market value of the account
+        money_market_market_value:
+          type: number
+          format: double
+          description: The money market market value of the account
+        cd_market_value:
+          type: number
+          format: double
+          description: The CD market value of the account
+        total_accrued_interest:
+          type: number
+          format: double
+          description: The total accrued interest of the account
+        average_ytw:
+          type: number
+          format: double
+          description: The average yield to worst of the account
+        average_maturity:
+          type: number
+          format: double
+          description: The average maturity of the account
+        average_duration:
+          type: number
+          format: double
+          description: The average duration of the account
+        average_sp_rating:
+          type: string
+          description: The average SP rating of the account
+        average_moodys_rating:
+          type: string
+          description: The average Moody's rating of the account
+        average_coupon:
+          type: number
+          format: double
+          description: The average coupon rate across all bonds in the account
+        average_book_ytm:
+          type: number
+          format: double
+          description: The average yield to maturity calculated at purchase time using basis price and date
+          nullable: true
+        average_book_ytw:
+          type: number
+          format: double
+          description: The average yield to worst calculated at purchase time using basis price and date
+          nullable: true
+      required:
+      - timestamp
+      - total_market_value
+      - cash_market_value
+      - other_market_value
+      - tracked_fixed_income_market_value
+      - treasury_market_value
+      - corporate_market_value
+      - agency_market_value
+      - government_market_value
+      - municipal_market_value
+      - money_market_market_value
+      - cd_market_value
+      - total_accrued_interest
+      - average_ytw
+      - average_maturity
+      - average_duration
+      - average_sp_rating
+      - average_moodys_rating
+      - average_coupon
+    AccountStatistics:
+      allOf:
+      - $ref: '#/components/schemas/AccountSnapshot'
+      - $ref: '#/components/schemas/AccountDistribution'
+    Advisor:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the advisor
+        name:
+          type: string
+          description: The name of the advisor
+        organization_id:
+          type: string
+          description: The ID of the organization that the advisor belongs to
+        firm_name:
+          type: string
+          description: The name of the firm that the advisor belongs to
+        advisor_type:
+          type: string
+          description: The type of the advisor
+        metadata:
+          type: object
+          description: Extra information about the advisor
+          additionalProperties:
+            type: string
+      required:
+      - id
+      - name
+      - organization_id
+      - firm_name
+      - advisor_type
+      - metadata
+    CashWeightAllocation:
+      type: object
+      properties:
+        min_allocation_weight:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The minimum cash weight of the account
+        target_allocation_weight:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The target cash weight of the account
+        max_allocation_weight:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The maximum cash weight of the account
+    CashMarketValueAllocation:
+      type: object
+      properties:
+        min_allocation_market_value:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The minimum cash market value of the account
+        target_allocation_market_value:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The target cash market value of the account
+        max_allocation_market_value:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The maximum cash market value of the account
+    CashAllocation:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CashWeightAllocation'
+      - $ref: '#/components/schemas/CashMarketValueAllocation'
+    AllocationConstraintValidation:
+      type: object
+      properties:
+        valid:
+          title: Valid
+          type: boolean
+        constraint:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - allocation
+              title: Type
+            filter:
+              type: object
+            min_weight:
+              type: number
+              title: Min Weight
+              description: The minimum weight for the allocation constraint.
+            max_weight:
+              type: number
+              title: Max Weight
+              description: The maximum weight for the allocation constraint.
+            target_weight:
+              type: number
+              title: Target Weight
+              description: The target weight for the allocation constraint.
+            min_market_value:
+              type: number
+              title: Min Market Value
+              description: The minimum market value for the allocation constraint, which can be specified instead of min_weight.
+            required_market_value:
+              type: number
+              title: Required Market Value
+              description: The required market value floor for the allocation constraint, which can be specified instead of min_weight.
+            max_market_value:
+              type: number
+              title: Max Market Value
+              description: The maximum market value for the allocation constraint, which can be specified instead of max_weight.
+            target_market_value:
+              type: number
+              title: Target Market Value
+              description: The target market value for the allocation constraint, which can be specified instead of target_weight.
+          title: AllocationConstraint
+        market_value:
+          title: Market Value
+          type: number
+        weight:
+          title: Weight
+          type: number
+        holdings_in_allocation:
+          title: Holdings in Allocation
+          type: array
+          items:
+            $ref: '#/components/schemas/InstrumentID'
+    AllocationBasis:
+      type: string
+      title: Allocation Basis
+      description: Specifies how allocation targets and bounds are specified.
+      enum:
+      - weight
+      - market_value
+    AverageValueConstraint:
+      properties:
+        type:
+          type: string
+          enum:
+          - average_value
+          title: Type
+        field:
+          type: string
+          title: Field
+          description: The field to apply the average value constraint to.
+        min_average_value:
+          anyOf:
+          - type: number
+          - type: string
+          title: Min Average Value
+          description: The minimum average value for the field.
+        target_average_value:
+          anyOf:
+          - type: number
+          - type: string
+          title: Target Average Value
+          description: The target average value for the field.
+        max_average_value:
+          anyOf:
+          - type: number
+          - type: string
+          title: Max Average Value
+          description: The maximum average value for the field.
+        constraint_priority:
+          $ref: '#/components/schemas/ConstraintPriority'
+      type: object
+      required:
+      - type
+      - field
+      title: AverageValueConstraint
+    AverageValueConstraintValidation:
+      type: object
+      properties:
+        valid:
+          title: Valid
+          type: boolean
+        constraint:
+          $ref: '#/components/schemas/AverageValueConstraint'
+        holdings_average_value:
+          title: Holdings Average Value
+          type: number
+        holdings_in_bounds:
+          title: Holdings in Bounds
+          type: array
+          items:
+            $ref: '#/components/schemas/InstrumentID'
+    CashFlowEvent:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+          format: double
+        type:
+          type: string
+          enum:
+          - coupon
+          - principal
+          - dividend
+          - call
+      required:
+      - amount
+      - date
+      - type
+    InstrumentCashFlowEvent:
+      allOf:
+      - $ref: '#/components/schemas/CashFlowEvent'
+      - type: object
+        properties:
+          instrument_id:
+            type: string
+            description: The ISIN of the instrument paying the cashflow
+        required:
+        - instrument_id
+    CashLot:
+      type: object
+      properties:
+        moment_lot_id:
+          type: string
+          description: The ID of the lot
+        custodian_lot_id:
+          type: string
+          description: The ID of the lot in the custodian's system
+        currency:
+          type: string
+          description: The currency of the lot
+        moment_reserved_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The reserved quantity of the lot
+        unsettled_open_quantity:
+          description: The unsettled open quantity of the lot
+          $ref: '#/components/schemas/Decimal'
+        settled_open_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The settled open quantity of the lot
+        settled_closed_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The settled closed quantity of the lot
+        unsettled_closed_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The unsettled closed quantity of the lot
+        open_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The total open quantity of the lot. Equal to the sum of settled_open_quantity, unsettled_open_quantity, and moment_reserved_quantity.
+      required:
+      - moment_lot_id
+      - custodian_lot_id
+      - currency
+      - moment_reserved_quantity
+      - unsettled_open_quantity
+      - settled_open_quantity
+      - settled_closed_quantity
+      - unsettled_closed_quantity
+      - open_quantity
+    ComplianceCheckFull:
+      properties:
+        compliant:
+          type: boolean
+          description: Whether the account is in compliance.
+      discriminator:
+        propertyName: type
+        mapping:
+          weight_compliance: '#/components/schemas/WeightComplianceCheckFull'
+          market_value_compliance: '#/components/schemas/MarketValueComplianceCheckFull'
+          model_compliance: '#/components/schemas/ModelComplianceCheckFull'
+      oneOf:
+      - $ref: '#/components/schemas/WeightComplianceCheckFull'
+      - $ref: '#/components/schemas/MarketValueComplianceCheckFull'
+      - $ref: '#/components/schemas/ModelComplianceCheckFull'
+      required:
+      - compliant
+    ComplianceFull:
+      type: object
+      properties:
+        compliant:
+          type: boolean
+          description: Whether the account is in compliance.
+        checks:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceCheckFull'
+      required:
+      - compliant
+      - checks
+    ConstraintPriority:
+      type: number
+      minimum: 1
+      maximum: 3
+      default: 1
+      title: ConstraintPriority
+      description: The priority of the constraint. Constraints with lower priority values will be relaxed first.
+    ConstraintValidation:
+      title: ConstraintValidation
+      type: object
+      anyOf:
+      - $ref: '#/components/schemas/UniverseConstraintValidation'
+      - $ref: '#/components/schemas/AllocationConstraintValidation'
+      - $ref: '#/components/schemas/DiversificationConstraintValidation'
+      - $ref: '#/components/schemas/AverageValueConstraintValidation'
+      - $ref: '#/components/schemas/LadderPolicyConstraintValidation'
+    Custodian:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the custodian
+        name:
+          type: string
+          description: The name of the custodian
+      required:
+      - id
+      - name
+    Decimal:
+      type: number
+      format: double
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    NullDecimal:
+      type: number
+      format: double
+      x-go-type: decimal.NullDecimal
+      x-go-type-skip-optional-pointer: true
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    DiversificationConstraint:
+      properties:
+        type:
+          type: string
+          enum:
+          - diversification
+          title: Type
+        field:
+          type: string
+          title: field
+          description: The field to apply the diversification constraint to.
+        max_weight_per_unique_value:
+          type: number
+          title: Max Weight Per Unique Value
+          description: The maximum weight per unique value for the diversification constraint.
+        max_market_value_per_unique_value:
+          type: number
+          title: Max Market Value Per Unique Value
+          description: The maximum market value per unique value for the diversification constraint.
+        min_weight_per_unique_value:
+          type: number
+          title: Min Weight Per Unique Value
+          description: The minimum weight per unique value for the diversification constraint, which is optional to specify.
+        min_market_value_per_unique_value:
+          type: number
+          title: Min Market Value Per Unique Value
+          description: The minimum market value per unique value for the diversification constraint, which is optional to specify.
+        constraint_priority:
+          $ref: '#/components/schemas/ConstraintPriority'
+      type: object
+      required:
+      - type
+      - field
+      title: DiversificationConstraint
+    DiversificationConstraintValidation:
+      type: object
+      properties:
+        valid:
+          title: Valid
+          type: boolean
+        constraint:
+          $ref: '#/components/schemas/DiversificationConstraint'
+        invalid_fields:
+          title: Invalid Fields
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldValidation'
+    FieldValidation:
+      type: object
+      properties:
+        field_value:
+          type: string
+        invalid_holdings:
+          items:
+            $ref: '#/components/schemas/InstrumentID'
+        market_value:
+          type: number
+        weight:
+          type: number
+    Household:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the household
+        name:
+          type: string
+          description: The name of the household
+      required:
+      - id
+    Instrument:
+      type: object
+      properties:
+        isin:
+          type: string
+          title: ISIN
+          description: The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.
+          example: US594918AD66
+          minLength: 12
+          maxLength: 12
+        cusip:
+          type: string
+          title: CUSIP
+          description: 'CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.
+
+            Note: Available to licensed users only. The Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds. CUSIPs are unique security identifiers managed by The CUSIP Service Bureau.'
+          nullable: true
+          example: H00402625
+          minLength: 9
+          maxLength: 9
+        status:
+          type: string
+          description: 'The status of the bond reflects many possible states a bond can be in.
+
+
+            * called: The bond has been called by the issuer.
+
+            * converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.
+
+            * defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.
+
+            * funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.
+
+            * liquidated: The issuer has been liquidated.
+
+            * matured: The bond has reached its maturity date and the bondholders have been repaid their principal.
+
+            * outstanding: The bond is still active and has not reached its maturity date.
+
+            * pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.
+
+            * put: The bond has been put (sold back) to the issuer.
+
+            * repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.
+
+            * tendered: The bond has been tendered (offered for repurchase) by the issuer.
+
+            * repurchased: The bond has been repurchased by the issuer.
+
+            * restructured: The security has been restructured into a new security or into a security with materially different terms.
+
+            * unknown: The status of the bond is unknown.'
+          example: called
+          enum:
+          - called
+          - converted
+          - defaulted
+          - funged
+          - liquidated
+          - matured
+          - outstanding
+          - pre_issuance
+          - put
+          - repaid
+          - tendered
+          - repurchased
+          - restructured
+          - unknown
+          x-go-type: reference.BondStatus
+          x-go-type-import:
+            path: github.com/moment-technology/public-data-api/internal/instruments/reference
+        type:
+          type: string
+          description: The type of fixed income security.
+          example: agency
+          enum:
+          - agency
+          - cd
+          - corporate
+          - government
+          - municipal
+          - treasury
+          x-go-type: reference.BondType
+          x-go-type-import:
+            path: github.com/moment-technology/public-data-api/internal/instruments/reference
+        treasury_subtype:
+          type: string
+          description: 'The subtype of a treasury. Possible values include:
+
+            * bond: long term i.e. 20, 30 years
+
+            * note: intermediate term i.e. 2, 3, 5, 7, and 10 years
+
+            * bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)
+
+            * tips: treasury inflation-protected securities
+
+            * strips: separate trading of registered interest and principal of securities
+
+            * floating: floating rate notes'
+          nullable: true
+          example: bill
+          enum:
+          - bond
+          - bill
+          - note
+          - strips
+          - tips
+          - floating
+          x-go-type: reference.TreasurySubtype
+          x-go-type-import:
+            path: github.com/moment-technology/public-data-api/internal/instruments/reference
+        maturity_date:
+          type: string
+          format: date
+          description: 'The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds.'
+          nullable: true
+          example: '2023-01-15'
+          x-go-type: string
+        coupon:
+          type: number
+          format: double
+          description: The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds.
+          nullable: true
+          example: 5
+        close_price:
+          type: number
+          format: double
+          description: 'The close price, or ''end of day price'' is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only.'
+          nullable: true
+          example: 100.2
+        close_yield_to_worst:
+          type: number
+          format: double
+          description: 'The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+          nullable: true
+          example: 5.486
+        close_yield_to_maturity:
+          type: number
+          format: double
+          description: 'The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+          nullable: true
+          example: 5.486
+        issuer:
+          type: string
+          description: Name of the bond issuer
+          example: AAA United States Government Money Market Account Inc.
+        callable:
+          type: boolean
+          description: Whether the bond is callable, meaning the issuer has the right, but not the obligation to redeem the bond — in other words, pay out the bondholder — before its maturity date at a set price (the call price).
+          nullable: true
+          example: true
+        next_call_date:
+          type: string
+          format: date
+          description: The date of the next possible call on the bond. Null if the bond is not callable.
+          nullable: true
+          example: '2027-05-01'
+          x-go-type: string
+        next_call_price:
+          type: number
+          format: double
+          description: The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable.
+          nullable: true
+          example: 100
+        municipal_taxable_federal:
+          type: boolean
+          description: Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.
+          nullable: true
+          example: false
+        municipal_state:
+          type: string
+          description: The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds.
+          nullable: true
+          example: AZ
+        purpose:
+          type: string
+          description: The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus.
+          nullable: true
+          example: Water & Sewer
+        use_of_proceeds:
+          type: string
+          description: 'A more detailed explanation of how the issuer will use the money raised from the bond issuance. For example: Construction of new facilities, refinancing existing debt, general corporate purposes, etc.'
+          nullable: true
+          example: Construction of water treatment plant and related infrastructure improvements
+        accrued_interest:
+          type: number
+          format: double
+          description: The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.
+          nullable: true
+          example: 56.25
+        price:
+          type: number
+          format: double
+          description: The latest evaluated price of the instrument, as a percentage of par.
+          nullable: true
+        yield_to_worst:
+          type: number
+          format: double
+          description: The latest evaluated yield to worst of the instrument.
+          nullable: true
+        yield_to_maturity:
+          type: number
+          format: double
+          description: The latest evaluated yield to maturity of the instrument.
+          nullable: true
+        par_value:
+          type: number
+          format: double
+          description: The instrument's par value. Usually 1000 for most bond types. Usually 5000 for municipal bonds.
+        description:
+          type: string
+          description: 'Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]'
+          example: AAA UNITED STATES GOVERNMENT MONEY MARKET ACCOUNT INC 2.6%, 11/30/2022
+        description_short:
+          type: string
+          description: 'Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]'
+          example: MI 5.0% 05/01/2034
+        sp_rating:
+          type: string
+          description: 'Standard & Poor''s rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor''s (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor''s Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor''s or its affiliates.'
+          nullable: true
+          example: AAA
+        moodys_rating:
+          type: string
+          description: 'Moody''s rating for the bond in the standard Aaa - C format. NR if marked as not rated by the agency. Null if there is no rating (Aaa - C or NR) provided by the agency. Note: available to Moody''s licensed users only. This data includes Moody''s ratings and related financial information. Moody''s ratings and data are proprietary to Moody''s Corporation. The information is used under license and is subject to copyright and other intellectual property rights held by Moody''s or its affiliates.'
+          nullable: true
+          example: Aaa
+        duration:
+          type: number
+          format: double
+          description: 'The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond''s price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.'
+          nullable: true
+          example: 0.69
+        sector:
+          type: string
+          description: Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)
+          example: Financial Services
+        principal_factor:
+          type: number
+          format: double
+          description: The principal factor of the bond.
+          nullable: true
+          example: 1
+      required:
+      - isin
+      - description
+      - status
+      - par_value
+      - type
+      - issuer
+    InstrumentID:
+      type: string
+      title: Instrument ID
+      description: Instrument ISIN
+      example: US594918AD66
+    Investor:
+      type: object
+      properties:
+        marginal_long_term_taxes:
+          allOf:
+          - $ref: '#/components/schemas/TaxRates'
+          nullable: true
+        marginal_short_term_taxes:
+          allOf:
+          - $ref: '#/components/schemas/TaxRates'
+          nullable: true
+        tax_state:
+          type: string
+          nullable: true
+          description: The state or territory where the account is taxable
+      required:
+      - marginal_long_term_taxes
+      - marginal_short_term_taxes
+      - tax_state
+    LadderPolicyConstraint:
+      properties:
+        type:
+          type: string
+          enum:
+          - ladder_policy
+          title: Type
+        period_length:
+          type: number
+          title: Period Length
+          description: The length of one ladder period in months.
+          example: 12
+        start_period:
+          type: number
+          title: Start Period
+          description: The starting period of the ladder.
+          example: 0
+          default: 0
+        end_period:
+          type: number
+          title: End Period
+          description: The ending period of the ladder.
+          example: 1
+          default: 1
+        weight_tolerance:
+          type: number
+          title: Weight Tolerance
+          description: The maximum weight deviation allowed for each bucket in the ladder.
+          example: 0.05
+        market_value_tolerance:
+          type: number
+          title: Market Value Tolerance
+          description: The maximum market value deviation allowed for each bucket in the ladder, which can be specified instead of weight_tolerance.
+        grace_period_months:
+          type: number
+          title: Grace Period Months
+          description: The length of the grace period in months. The grace period is the time period after the assignment date where a dynamic ladder policy constraint are not yet being adjusted.
+          default: 1
+        use_call_adjusted_maturity:
+          type: boolean
+          title: Use Call Adjusted Maturity
+          description: The call adjusted maturity date is the terminal date of the bond implied by its yield to worst. If set to true then the ladder policy constraint will use the call adjusted maturity date instead of the maturity date.
+          default: false
+        constraint_priority:
+          $ref: '#/components/schemas/ConstraintPriority'
+      type: object
+      required:
+      - type
+      - period_length
+      title: LadderPolicyConstraint
+    LadderPolicyConstraintValidation:
+      type: object
+      properties:
+        valid:
+          title: Valid
+          type: boolean
+        constraint:
+          $ref: '#/components/schemas/LadderPolicyConstraint'
+        additional_constraints:
+          title: Additional Constraints
+          type: array
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/AllocationConstraintValidation'
+            - $ref: '#/components/schemas/UniverseConstraintValidation'
+    Lot:
+      type: object
+      description: 'A security lot. Every quantity carries the sign the custodian reported it under, which does not indicate direction: most custodians report a short position as a negative quantity, but some report it as positive. Read position_type to determine direction.'
+      properties:
+        moment_lot_id:
+          type: string
+          description: The ID of the lot
+        custodian_lot_id:
+          type: string
+          description: The ID of the lot in the custodian's system
+        sleeve_id:
+          type: string
+          description: The ID of the sleeve that the lot belongs to
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        accrued_interest:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The amount of interest that has accrued, but not yet been paid to to the bondholder since the last interest payment. The size of the interest payment we'd make or receive if we were to trade this this entire lot right now. Derived from open_quantity, so it carries the same sign.
+        basis_date:
+          type: string
+          format: date
+          description: The basis date of the lot
+        basis_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The basis quantity of the lot
+        basis_price:
+          $ref: '#/components/schemas/Decimal'
+          description: The basis price of the lot in percentage of par
+        book_ytm:
+          type: number
+          format: double
+          description: The yield to maturity calculated at purchase time using basis price and date
+          nullable: true
+        book_ytc:
+          type: number
+          format: double
+          description: The yield to call calculated at purchase time using basis price and date (null if not callable)
+          nullable: true
+        book_ytw:
+          type: number
+          format: double
+          description: The yield to worst calculated at purchase time using basis price and date
+          nullable: true
+        position_type:
+          $ref: '#/components/schemas/PositionType'
+        is_short_position:
+          type: boolean
+          deprecated: true
+          description: Whether the lot is a short position. Deprecated — read position_type instead. True exactly when position_type is "short".
+        settled_closed_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The settled closed quantity of the lot
+        settled_open_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The settled open quantity of the lot
+        unsettled_closed_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The unsettled closed quantity of the lot
+        unsettled_open_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The unsettled open quantity of the lot
+        moment_reserved_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The reserved quantity of the lot
+        open_quantity:
+          $ref: '#/components/schemas/Decimal'
+          description: The total open quantity of the lot. Equal to the sum of settled_open_quantity, unsettled_open_quantity, and moment_reserved_quantity.
+        open_market_value:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The total open market value of the lot based on open_quantity, the latest instrument price, and accrued interest, if known. Derived from open_quantity, so it carries the same sign.
+        long_term:
+          type: boolean
+          description: Whether the lot is long-term
+        wash_sale:
+          type: boolean
+          description: Whether the lot is a wash sale
+      required:
+      - moment_lot_id
+      - custodian_lot_id
+      - sleeve_id
+      - instrument
+      - basis_date
+      - basis_quantity
+      - basis_price
+      - position_type
+      - is_short_position
+      - settled_closed_quantity
+      - settled_open_quantity
+      - unsettled_closed_quantity
+      - unsettled_open_quantity
+      - moment_reserved_quantity
+      - open_quantity
+      - long_term
+      - wash_sale
+    PositionType:
+      type: string
+      description: 'The direction of a lot: "long" is a position the account owns, "short" one it owes. Direction is deliberately separate from quantity, whose sign is a per-custodian storage convention and says nothing about it.'
+      enum:
+      - long
+      - short
+      x-enum-varnames:
+      - PositionTypeLong
+      - PositionTypeShort
+    ManagementType:
+      type: string
+      description: '"sma" for separately managed accounts. "uma" for unified managed accounts. null for accounts that are not classified as either an SMA or a UMA.'
+      enum:
+      - sma
+      - uma
+      nullable: true
+    MinCashSettingMode:
+      type: string
+      enum:
+      - dollar
+      - percent
+      x-enum-varnames:
+      - MinCashSettingModeDollar
+      - MinCashSettingModePercent
+      description: 'The mode of an account''s minimum-cash floor: a fixed dollar amount or a fraction of account value.'
+    MinCash:
+      type: object
+      description: An account's minimum-cash floor. Present only when a floor is configured. min_cash_setting selects the mode; the matching value field is populated.
+      properties:
+        min_cash_setting:
+          $ref: '#/components/schemas/MinCashSettingMode'
+        min_cash_dollar:
+          type: string
+          description: The minimum-cash floor as a fixed dollar amount. Present when min_cash_setting is "dollar".
+        min_cash_percent:
+          type: string
+          description: The minimum-cash floor as a fraction of account value, expressed as a decimal in the range (0, 1] — e.g. "0.05" means 5%. Present when min_cash_setting is "percent".
+      required:
+      - min_cash_setting
+    BufferCash:
+      type: object
+      description: The cash an account wants parked in its funding sleeve, as a min/target/max. A placement target for cash rebalancing, not a floor on what can be invested — that is min_cash. Present only when at least one bound is configured; an unconfigured bound is omitted.
+      properties:
+        buffer_cash_min_percent:
+          type: string
+          description: The buffer's minimum, as a fraction of managed value expressed as a decimal in [0, 1] — e.g. "0.05" means 5%. Not a whole-number percent.
+        buffer_cash_target_percent:
+          type: string
+          description: The buffer's target, as a fraction of managed value expressed as a decimal in [0, 1] — e.g. "0.05" means 5%. Not a whole-number percent.
+        buffer_cash_max_percent:
+          type: string
+          description: The buffer's maximum, as a fraction of managed value expressed as a decimal in [0, 1] — e.g. "0.05" means 5%. Not a whole-number percent.
+    AllocationSum:
+      description: How an account's managed sleeve targets plus its buffer cash target compare to 100%, as computed by accounts-api. The verdict is balanced when the total is within 1e-6 of 1, under_allocated below that, and over_allocated above it. Fractions are decimals in [0, 1] serialized as strings — e.g. "0.05" means 5%.
+      discriminator:
+        propertyName: verdict
+        mapping:
+          balanced: '#/components/schemas/AllocationSumBalanced'
+          under_allocated: '#/components/schemas/AllocationSumUnderAllocated'
+          over_allocated: '#/components/schemas/AllocationSumOverAllocated'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationSumBalanced'
+      - $ref: '#/components/schemas/AllocationSumUnderAllocated'
+      - $ref: '#/components/schemas/AllocationSumOverAllocated'
+    AllocationSumBase:
+      type: object
+      properties:
+        managed_target_sum:
+          type: string
+          description: 'The sum of target_allocation over the sleeves in included_sleeve_ids: standard, managed, non-default, non-transitioning, weight-basis sleeves that carry weights.'
+        buffer_cash_target_percent:
+          type: string
+          description: The account's buffer_cash_target_percent setting. Omitted when the account has none.
+        total:
+          type: string
+          description: managed_target_sum plus buffer_cash_target_percent (0 when unset).
+        included_sleeve_ids:
+          type: array
+          items:
+            type: string
+          description: The sleeves summed into managed_target_sum.
+        notional_sleeve_ids:
+          type: array
+          items:
+            type: string
+          description: The market-value-basis sleeves excluded from the sum.
+        notional_total:
+          type: string
+          description: The dollar targets of notional_sleeve_ids summed, in account currency (USD).
+        template_owned:
+          type: boolean
+          description: Whether some sleeve on the account carries a live asset allocation template id (one that is not transitioning). Under-allocation is a violation only on a template-owned account; over-allocation always is.
+        violation:
+          type: boolean
+          description: 'accounts-api''s policy result: over_allocated, or under_allocated on a template-owned account. Render warnings from this flag rather than re-deriving the rule; the guarded sleeve writes refuse on it.'
+      required:
+      - managed_target_sum
+      - total
+      - included_sleeve_ids
+      - notional_sleeve_ids
+      - notional_total
+      - template_owned
+      - violation
+    AllocationSumBalanced:
+      allOf:
+      - $ref: '#/components/schemas/AllocationSumBase'
+      - type: object
+        properties:
+          verdict:
+            type: string
+            enum:
+            - balanced
+        required:
+        - verdict
+    AllocationSumUnderAllocated:
+      allOf:
+      - $ref: '#/components/schemas/AllocationSumBase'
+      - type: object
+        properties:
+          verdict:
+            type: string
+            enum:
+            - under_allocated
+          remaining:
+            type: string
+            description: How far total falls short of 1.
+        required:
+        - verdict
+        - remaining
+    AllocationSumOverAllocated:
+      allOf:
+      - $ref: '#/components/schemas/AllocationSumBase'
+      - type: object
+        properties:
+          verdict:
+            type: string
+            enum:
+            - over_allocated
+          excess:
+            type: string
+            description: How far total exceeds 1.
+        required:
+        - verdict
+        - excess
+    ModelComplianceCheckFull:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - model_compliance
+        sleeve_id:
+          type: string
+          description: The ID of the sleeve.
+        model_id:
+          type: string
+          description: The ID of the model.
+        constraints:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ConstraintValidation'
+      required:
+      - type
+      - sleeve_id
+      - model_id
+      - constraints
+    ProposalBase:
+      type: object
+      properties:
+        proposal_id:
+          type: string
+          description: The ID of the proposal.
+        name:
+          type: string
+          description: The name of the proposal. Generated by the portfolio management system.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the proposal was created.
+        generated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time when the optimization to generate the proposal was completed, if applicable.
+        failed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time when the optimization to generate the proposal failed, if applicable.
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time when the proposal was submitted for execution, if applicable.
+        canceled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time when the proposal was canceled, if applicable.
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time when the proposal was completed, if applicable.
+        num_accounts:
+          type: integer
+          nullable: true
+          description: The number of accounts in the proposal.
+        market_value:
+          type: integer
+          nullable: true
+          description: The total market value of the proposed orders in the proposal.
+        num_orders:
+          type: integer
+          nullable: true
+          description: The number of orders in the proposal.
+        filled_market_value:
+          type: integer
+          nullable: true
+          description: The total market value of the filled orders in the proposal.
+        num_filled_orders:
+          type: integer
+          nullable: true
+          description: The number of orders in the proposal that have been filled.
+        proposal_status:
+          type: string
+          enum:
+          - running
+          - failed
+          - canceled
+          - in_review
+          - executing
+          - completed
+          description: 'The current status of the proposal.
+
+            running: The optimizer is currently running and has not yet generated proposed orders.
+
+            failed: The optimizer failed to generate proposed orders.
+
+            canceled: The user canceled the proposal before submitting it for execution.
+
+            in_review: The optimizer has generated proposed orders, and the user is now reviewing the orders prior to submitting them.
+
+            executing: The user has submitted the proposed orders, but they have not yet all reached a terminal state.
+
+            completed: The user has submitted the proposed orders and they have all reached a terminal state.'
+    ModelAssignment:
+      type: object
+      properties:
+        model_id:
+          type: string
+          description: The ID of the model to of which the sleeve should be assigned
+        model_name:
+          type: string
+          description: The name of the model to which the sleeve is assigned
+          readOnly: true
+        assignment_date:
+          type: string
+          format: date
+          description: Assignment dates are used to align ladders and determine grace periods for the first ladder bucket before dynamic ladder rebalancing kicks in
+        customizations:
+          $ref: '#/components/schemas/Customizations'
+        meta:
+          type: object
+          description: Arbitrary key-value store for additional metadata
+          additionalProperties:
+            type: string
+        rebalance_strategy:
+          $ref: '#/components/schemas/RebalanceStrategy'
+        cashflow_targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashflowTarget'
+      required:
+      - model_id
+      - assignment_date
+      - customizations
+      - meta
+      - cashflow_targets
+    CashflowTarget:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: The amount of cashflow to target per period
+        start_date:
+          type: string
+          format: date
+          description: The date on which the cashflow target starts being applied. This date is inclusive. Must be in the format YYYYMMDD, i.e. 20250101. If not provided, the cashflow target will start on the current date.
+        end_date:
+          type: string
+          format: date
+          description: The date on which the cashflow target stops being applied. This date is exclusive. Must be in the format YYYYMMDD, i.e. 20251231.
+        frequency:
+          type: string
+          description: 'The frequency of the cashflow.
+
+
+            * one_time: Cashflow is a one-time payment.
+
+            * monthly: Cashflow is distributed monthly.
+
+            * bimonthly: Cashflow is distributed every two months.
+
+            * quarterly: Cashflow is distributed quarterly.
+
+            * semiannually: Cashflow is distributed twice per year.
+
+            * annually: Cashflow is distributed annually.'
+          enum:
+          - one_time
+          - monthly
+          - bimonthly
+          - quarterly
+          - semiannually
+          - annually
+        source:
+          type: string
+          description: 'The source of the cashflow.
+
+
+            * coupon: Cashflow is derived from coupon payments.
+
+            * principal: Cashflow is derived from principal payments.
+
+            * coupon_and_principal: Cashflow is derived from both coupon and principal payments.'
+          enum:
+          - coupon
+          - principal
+          - coupon_and_principal
+        call_assumption:
+          type: string
+          description: 'The assumption made about when bonds will be called.
+
+
+            * maturity_date: Assumes bonds are held until maturity.
+
+            * workout_date: Assumes bonds are called at the workout date.
+
+            * next_call_date: Assumes bonds are called at the next call date.'
+          enum:
+          - maturity_date
+          - workout_date
+          - next_call_date
+        overrides:
+          type: object
+          description: 'Custom cashflow amounts to override specific buckets. Keys are bucket date ranges in format
+
+            "YYYYMMDD_YYYYMMDD" (start_end), values are the override amount.
+
+            Example: {"20250301_20250401": 13000} overrides the March 2025 bucket for a monthly frequency starting on the 1st.'
+          additionalProperties: true
+          x-go-type: json.RawMessage
+      required:
+      - amount
+      - end_date
+      - frequency
+      - source
+      - call_assumption
+      - overrides
+    Sleeve:
+      type: object
+      properties:
+        id:
+          description: A unique identifier for this sleeve
+          type: string
+          readOnly: true
+        name:
+          description: A descriptive name for the sleeve
+          type: string
+        allocation_basis:
+          description: The basis for calculating the allocation of the sleeve
+          type: string
+          $ref: '#/components/schemas/AllocationBasis'
+        priority:
+          description: The priority in which cash is allocated to sleeves based on their target allocations. Lower values are allocated first.
+          type: integer
+        min_allocation:
+          $ref: '#/components/schemas/Decimal'
+          description: The lowest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+        target_allocation:
+          $ref: '#/components/schemas/Decimal'
+          description: The desired proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+        max_allocation:
+          $ref: '#/components/schemas/Decimal'
+          description: The highest proportion of the total market value of the account's non-cash holdings we'd like assigned to this sleeve
+        extra:
+          type: object
+          description: Arbitrary user-specified sleeve metadata
+          additionalProperties:
+            type: string
+        is_default:
+          description: Whether the sleeve is the default sleeve. There is exactly one default sleeve. The default sleeve may not be deleted.
+          type: boolean
+        is_managed:
+          description: Whether the advisor manages this sleeve. Managed sleeves are billed, count toward the account's managed value and are optimized; unmanaged sleeves are excluded from all three.
+          type: boolean
+      required:
+      - name
+      - allocation_basis
+      - priority
+      - min_allocation
+      - target_allocation
+      - max_allocation
+      - extra
+      - is_default
+      - is_managed
+    SleeveStatistics:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: RFC-3339 timestamp with nanosecond precision representing the time at which these statistics were generated
+          format: date-time
+        monthly_cashflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashFlowEvent'
+        yearly_cashflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/CashFlowEvent'
+        total_market_value:
+          type: number
+          format: double
+          description: The total market value of the holdings in the sleeve. Equal to the sum of treasury_market_value, corporate_market_value, agency_market_value, cd_market_value, municipal_market_value, money_market_market_value, and government_market_value.
+        treasury_market_value:
+          type: number
+          format: double
+          description: The total market value of all U.S. Treasury bond holdings in the sleeve
+        corporate_market_value:
+          type: number
+          format: double
+          description: The total market value of all corporate bond holdings in the sleeve
+        agency_market_value:
+          type: number
+          format: double
+          description: The total market value of all agency bond holdings in the sleeve
+        government_market_value:
+          type: number
+          format: double
+          description: The total market value of all foreign government bond holdings in the sleeve
+        municipal_market_value:
+          type: number
+          format: double
+          description: The total market value of all municipal bond holdings in the sleeve
+        money_market_market_value:
+          type: number
+          format: double
+          description: The total market value of all money market holdings in the sleeve
+        cd_market_value:
+          type: number
+          format: double
+          description: The total market value of all CD holdings in the sleeve
+        total_accrued_interest:
+          type: number
+          format: double
+          description: The total accrued interest of the account
+        average_ytw:
+          type: number
+          format: double
+          description: The average yield to worst across all holdings in the sleeve
+        average_maturity:
+          type: number
+          format: double
+          description: The average time to maturity across all holdings in the sleeve
+        average_duration:
+          type: number
+          format: double
+          description: The average duration of the holdings in the sleeve
+        average_sp_rating:
+          type: string
+          description: The average S&P credit rating across all holdings in the sleeve
+        average_moodys_rating:
+          type: string
+          description: The average Moody's credit rating across all holdings in the sleeve
+        average_coupon:
+          type: number
+          format: double
+          description: The average coupon rate across all holdings in the sleeve
+        average_book_ytm:
+          type: number
+          format: double
+          description: The average yield to maturity calculated at purchase time using basis price and date
+          nullable: true
+        average_book_ytw:
+          type: number
+          format: double
+          description: The average yield to worst calculated at purchase time using basis price and date
+          nullable: true
+        municipal_state_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        sp_rating_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        moodys_rating_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        maturity_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        sector_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        issuer_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        coupon_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+        municipal_type_distribution:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - timestamp
+      - monthly_cashflows
+      - yearly_cashflows
+      - total_market_value
+      - treasury_market_value
+      - corporate_market_value
+      - agency_market_value
+      - government_market_value
+      - municipal_market_value
+      - money_market_market_value
+      - cd_market_value
+      - total_accrued_interest
+      - average_ytw
+      - average_maturity
+      - average_duration
+      - average_sp_rating
+      - average_moodys_rating
+      - average_coupon
+      - municipal_state_distribution
+      - sp_rating_distribution
+      - moodys_rating_distribution
+      - maturity_distribution
+      - sector_distribution
+      - issuer_distribution
+      - coupon_distribution
+      - municipal_type_distribution
+    SleeveWithStatisticsAndCompliance:
+      allOf:
+      - $ref: '#/components/schemas/Sleeve'
+      - type: object
+        properties:
+          model_assignment:
+            allOf:
+            - $ref: '#/components/schemas/ModelAssignment'
+            nullable: true
+          statistics:
+            $ref: '#/components/schemas/SleeveStatistics'
+          compliance:
+            $ref: '#/components/schemas/ComplianceFull'
+        required:
+        - statistics
+        - compliance
+        - model_assignment
+    Status:
+      type: string
+      enum:
+      - running
+      - pausing
+      - paused
+    TaxRates:
+      type: object
+      properties:
+        federal_tax_rate:
+          type: number
+          nullable: true
+          description: The federal tax rate
+        state_tax_rate:
+          type: number
+          nullable: true
+          description: The state tax rate
+        local_tax_rate:
+          type: number
+          nullable: true
+          description: The local tax rate
+      required:
+      - federal_tax_rate
+      - state_tax_rate
+      - local_tax_rate
+    UniverseConstraintValidation:
+      type: object
+      properties:
+        valid:
+          title: Valid
+          type: boolean
+        constraint:
+          properties:
+            type:
+              type: string
+              enum:
+              - universe
+              title: Type
+            filter:
+              type: object
+              title: Filter
+          type: object
+          required:
+          - type
+          - filter
+          title: UniverseConstraint
+        invalid_holdings:
+          title: Invalid Holdings
+          type: array
+          items:
+            $ref: '#/components/schemas/InstrumentID'
+    WeightComplianceCheckFull:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - weight_compliance
+        sleeve_id:
+          type: string
+          description: The ID of the sleeve.
+        compliant:
+          type: boolean
+          description: Whether the sleeve weight is compliant with the limits.
+        min_weight:
+          type: number
+          description: The minimum weight of the sleeve.
+        target_weight:
+          type: number
+          description: The target weight of the sleeve.
+        max_weight:
+          type: number
+          description: The maximum weight of the sleeve.
+        current_weight:
+          type: number
+          description: The current weight of the sleeve.
+      required:
+      - type
+      - sleeve_id
+      - compliant
+      - min_weight
+      - target_weight
+      - max_weight
+      - current_weight
+    MarketValueComplianceCheckFull:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - market_value_compliance
+        sleeve_id:
+          type: string
+          description: The ID of the sleeve.
+        compliant:
+          type: boolean
+          description: Whether the sleeve market value is compliant with the limits.
+        min_market_value:
+          type: number
+          description: The minimum market value allocation in dollars.
+        required_market_value:
+          type: number
+          description: The required market value floor allocation in dollars.
+        target_market_value:
+          type: number
+          description: The target market value allocation in dollars.
+        max_market_value:
+          type: number
+          description: The maximum market value allocation in dollars.
+        current_market_value:
+          type: number
+          description: The current market value allocation in dollars.
+      required:
+      - type
+      - sleeve_id
+      - compliant
+      - min_market_value
+      - required_market_value
+      - target_market_value
+      - max_market_value
+      - current_market_value
+    RebalanceStrategy:
+      type: string
+      description: 'The rebalance strategy for the sleeve. Determines how and when the sleeve is rebalanced. - unspecified: The rebalance strategy is not set. - never: Disables all rebalancing. - violations_only: Only rebalances when there are violations. - enabled: Enables regular rebalancing.'
+      enum:
+      - unspecified
+      - never
+      - violations_only
+      - enabled
+    AccountSettingKey:
+      type: string
+      enum:
+      - min_cash_setting
+      - min_cash_dollar
+      - min_cash_percent
+      - buffer_cash_min_percent
+      - buffer_cash_target_percent
+      - buffer_cash_max_percent
+      - account_name
+      - tax_state
+      - tax_rate_short_term_federal
+      - tax_rate_short_term_state
+      - tax_rate_short_term_local
+      - tax_rate_long_term_federal
+      - tax_rate_long_term_state
+      - tax_rate_long_term_local
+      - tax_budget_short_term
+      - tax_budget_long_term
+      description: 'Allowed platform-level setting keys. The min_cash_* keys are mutually
+
+        exclusive; set one mode value and clear the others via delete_keys. The
+
+        buffer_cash_* keys are decimal fractions in [0, 1] and must satisfy
+
+        min <= target <= max. A request touching any of them must address all
+
+        three, either as a setting or in delete_keys; a partial write is
+
+        rejected.
+
+        '
+    AccountSettingInput:
+      type: object
+      properties:
+        setting_key:
+          $ref: '#/components/schemas/AccountSettingKey'
+        setting_value:
+          type: string
+        effective_date:
+          type: string
+          format: date
+          description: Optional effective date in YYYY-MM-DD format
+      required:
+      - setting_key
+      - setting_value
+    AccountSettingOutput:
+      type: object
+      properties:
+        setting_key:
+          $ref: '#/components/schemas/AccountSettingKey'
+        setting_value:
+          type: string
+        effective_date:
+          type: string
+          format: date
+          description: Effective date in YYYY-MM-DD format, omitted if not set
+      required:
+      - setting_key
+      - setting_value
+    RestrictionType:
+      type: string
+      enum:
+      - DO_NOT_TRADE
+      - DO_NOT_BUY
+      - DO_NOT_SELL
+      description: Type of trading restriction
+    RestrictionInput:
+      type: object
+      properties:
+        restriction_type:
+          $ref: '#/components/schemas/RestrictionType'
+        reason:
+          type: string
+          description: Human-readable reason for the restriction
+      required:
+      - restriction_type
+    RestrictionOutput:
+      type: object
+      properties:
+        restriction_type:
+          $ref: '#/components/schemas/RestrictionType'
+        reason:
+          type: string
+          description: Human-readable reason for the restriction
+      required:
+      - restriction_type
+      - reason
+    LotOverrideField:
+      type: string
+      enum:
+      - unadj_cost_per_unit
+      - trade_date
+      - settlement_date
+      - acquired_date
+      description: Allowed lot fields for user override
+    LotOverrideInput:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/LotOverrideField'
+        value:
+          type: string
+          description: Override value. Numeric string for unadj_cost_per_unit; YYYY-MM-DD for date fields.
+        reason:
+          type: string
+      required:
+      - field
+      - value
+    LotOverrideRevertTarget:
+      type: object
+      properties:
+        field:
+          $ref: '#/components/schemas/LotOverrideField'
+      required:
+      - field
+    LotOverrideOutput:
+      type: object
+      properties:
+        lot_override_id:
+          type: string
+        lot_id:
+          type: string
+        field:
+          $ref: '#/components/schemas/LotOverrideField'
+        value:
+          type: string
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        reason:
+          type: string
+      required:
+      - lot_override_id
+      - lot_id
+      - field
+      - value
+      - created_by
+      - created_at
+    AccountStatisticsResponse:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/NewAccountStats'
+        sleeves:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewSleeveStats'
+      required:
+      - account
+      - sleeves
+    NewAccountStats:
+      type: object
+      description: Account-level aggregate statistics. Fields suffixed `_clean` exclude accrued interest; unsuffixed market values include it.
+      properties:
+        moment_account_id:
+          type: string
+          description: The Moment account ID
+        custodian_account_id:
+          type: string
+          nullable: true
+          description: The account ID assigned by the custodian
+        total_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Total market value including accrued interest
+        total_market_value_clean:
+          type: number
+          format: double
+          nullable: true
+          description: Total market value excluding accrued interest
+        cash_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Cash position in USD
+        immediately_withdrawable_cash:
+          type: number
+          format: double
+          nullable: true
+          description: Start-of-day settled cash minus cash reserved for currently executing orders — buy orders that have been placed but not yet filled. Uses start-of-day settled cash rather than current cash (which includes unsettled intraday activity), so it reflects cash that can be withdrawn immediately today. Once an order fills, its cost is deducted from cash directly, so nothing is double-counted. Null when the account's cash balance is unavailable.
+        total_accrued_interest:
+          type: number
+          format: double
+          nullable: true
+          description: Total accrued interest across holdings
+        average_yield_to_worst:
+          type: number
+          format: double
+          nullable: true
+          description: Weighted average yield to worst. Null when the account holds no fixed income.
+        average_duration:
+          type: number
+          format: double
+          nullable: true
+          description: Weighted average duration
+        average_maturity_in_years:
+          type: number
+          format: double
+          nullable: true
+          description: Weighted average maturity in years
+        average_sp_rating:
+          type: string
+          nullable: true
+          description: Weighted average S&P rating
+        average_coupon:
+          type: number
+          format: double
+          nullable: true
+          description: Weighted average coupon rate
+        holding_count:
+          type: integer
+          format: int64
+          nullable: true
+          description: Number of holdings
+        unrealized_gain_loss:
+          type: number
+          format: double
+          nullable: true
+          description: Total unrealized gain or loss
+        treasury_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of treasury holdings
+        corporate_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of corporate holdings
+        agency_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of agency holdings
+        cd_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of CD holdings
+        government_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of government holdings
+        municipal_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of municipal holdings
+        money_market_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of money market holdings
+        managed_portfolio_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Total market value minus money market (managed portfolio balance)
+        do_not_trade:
+          type: boolean
+          nullable: true
+          description: Whether the account has an active do-not-trade restriction
+        do_not_trade_reason:
+          type: string
+          nullable: true
+          description: Reason for the active do-not-trade restriction, if present
+        last_month_net_accrued:
+          type: number
+          format: double
+          description: Net accrued interest earned during the last completed calendar month (USD, accrual basis). Excludes accrued interest paid at purchase and zero-coupon accretion.
+        ytd_net_accrued:
+          type: number
+          format: double
+          description: Net accrued interest earned year to date (USD, accrual basis), same methodology as last_month_net_accrued. Fresh through the previous night's ledger refresh.
+      required:
+      - moment_account_id
+      - last_month_net_accrued
+      - ytd_net_accrued
+    NewSleeveStats:
+      type: object
+      description: Per-sleeve statistics.
+      properties:
+        id:
+          type: string
+          description: Sleeve ID
+        name:
+          type: string
+          description: Sleeve name
+        sleeve_type:
+          type: string
+          description: Sleeve type
+        priority:
+          type: integer
+          format: int64
+          nullable: true
+          description: The priority in which cash is allocated to sleeves based on their target allocations. Lower values are allocated first.
+        allocation_basis:
+          allOf:
+          - $ref: '#/components/schemas/AllocationBasis'
+          nullable: true
+          description: 'The basis for calculating the allocation of the sleeve: weight-based (0-1) or market-value-based ($).'
+        strategy_id:
+          type: string
+          nullable: true
+          description: ID of the strategy (model) assigned to this sleeve
+        strategy_name:
+          type: string
+          nullable: true
+          description: Name of the strategy (model) assigned to this sleeve
+        total_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Total market value including accrued interest
+        total_market_value_clean:
+          type: number
+          format: double
+          nullable: true
+          description: Total market value excluding accrued interest
+        total_securities_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of the sleeve's positions only — total market value minus cash, still including accrued interest. Money market funds count as positions here, not as cash. Subtract total_accrued_interest for the clean position value.
+        total_accrued_interest:
+          type: number
+          format: double
+          nullable: true
+          description: Total accrued interest
+        cash_usd:
+          type: number
+          format: double
+          nullable: true
+          description: Cash position in USD
+        weight_in_account:
+          type: number
+          format: double
+          nullable: true
+          description: Percentage weight in account
+        holding_count:
+          type: integer
+          format: int64
+          nullable: true
+          description: Number of holdings
+        min_allocation:
+          type: number
+          format: double
+          nullable: true
+          description: Minimum allocation target
+        target_allocation:
+          type: number
+          format: double
+          nullable: true
+          description: Target allocation
+        max_allocation:
+          type: number
+          format: double
+          nullable: true
+          description: Maximum allocation target
+        weighted_average_yield_to_worst:
+          type: number
+          format: double
+          nullable: true
+          description: Market value weighted average yield to worst
+        weighted_average_maturity_in_years:
+          type: number
+          format: double
+          nullable: true
+          description: Market value weighted average maturity in years
+        weighted_average_sp_rating:
+          type: string
+          nullable: true
+          description: Market value weighted average S&P credit rating
+        treasury_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of treasury holdings in this sleeve
+        corporate_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of corporate holdings in this sleeve
+        agency_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of agency holdings in this sleeve
+        cd_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of CD holdings in this sleeve
+        government_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of government holdings in this sleeve
+        municipal_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of municipal holdings in this sleeve
+        money_market_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of money market fund holdings in this sleeve
+        equity_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of equity holdings in this sleeve
+        fund_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value of fund holdings (ETFs and mutual funds other than money market funds) in this sleeve
+        other_market_value:
+          type: number
+          format: double
+          nullable: true
+          description: 'Market value of holdings in this sleeve whose instrument is not defined in security reference data. Not a catch-all: a referenced instrument matching none of the classes above is counted in no class. The asset-class values are also not directly comparable — the fixed-income classes include accrued interest, while money_market, equity, fund, and other do not — so they do not sum to total_securities_market_value.'
+        model_assignment:
+          allOf:
+          - $ref: '#/components/schemas/NewModelAssignment'
+          nullable: true
+          description: The model assigned to this sleeve and its customizations, if any
+      required:
+      - id
+      - name
+      - sleeve_type
+    NewModelAssignment:
+      type: object
+      description: The model assigned to a sleeve, with its customizations.
+      properties:
+        model_id:
+          type: string
+          description: ID of the assigned model
+        customizations:
+          $ref: '#/components/schemas/Customizations'
+      required:
+      - model_id
+      - customizations
+    AccountLotsResponse:
+      type: object
+      properties:
+        lots:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewLotStats'
+      required:
+      - lots
+    NewLotStats:
+      type: object
+      description: Per-lot holdings with security data. Only open lots are returned (lot_status is always OPEN).
+      properties:
+        id:
+          type: string
+          description: Lot ID
+        sleeve_id:
+          type: string
+          nullable: true
+          description: ID of the sleeve this lot belongs to
+        lot_status:
+          type: string
+          nullable: true
+          description: Lot status (always OPEN — closed lots are excluded)
+        market_value:
+          type: number
+          format: double
+          nullable: true
+          description: Market value including accrued interest
+        market_value_clean:
+          type: number
+          format: double
+          nullable: true
+          description: Market value excluding accrued interest
+        quantity:
+          type: number
+          format: double
+          nullable: true
+          description: Raw quantity
+        display_quantity:
+          type: number
+          format: double
+          nullable: true
+          description: Display quantity adjusted for fixed income
+        accrued_interest:
+          type: number
+          format: double
+          nullable: true
+          description: Accrued interest
+        book_ytw:
+          type: number
+          format: double
+          nullable: true
+          description: Book yield to worst
+        current_cost:
+          type: number
+          format: double
+          nullable: true
+          description: Current cost basis
+        unrealized_gain_loss:
+          type: number
+          format: double
+          nullable: true
+          description: Unrealized gain or loss
+        unrealized_gain_loss_pct:
+          type: number
+          format: double
+          nullable: true
+          description: Unrealized gain or loss percentage
+        weight_in_account:
+          type: number
+          format: double
+          nullable: true
+          description: Percentage weight in account
+        trade_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Trade date
+        settlement_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Settlement date
+        ticker:
+          type: string
+          nullable: true
+          description: Security ticker symbol
+        cusip:
+          type: string
+          nullable: true
+          description: CUSIP identifier
+        name:
+          type: string
+          nullable: true
+          description: Security name
+        sp_rating:
+          type: string
+          nullable: true
+          description: S&P credit rating
+        asset_class:
+          type: string
+          nullable: true
+          description: 'Bond type of the security: treasury, corporate, municipal, agency, cd, government, securitized or money_market. Null for equity and fund lots'
+        maturity_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: Security maturity date
+        coupon:
+          type: number
+          format: double
+          nullable: true
+          description: Coupon rate
+        duration:
+          type: number
+          format: double
+          nullable: true
+          description: Duration
+        mpe_ytw:
+          type: number
+          format: double
+          nullable: true
+          description: Market price estimate yield to worst
+        mpe_mid_price:
+          type: number
+          format: double
+          nullable: true
+          description: Market price estimate mid price. Null for money market fund lots by design — use market_value directly for MMF valuation.
+        mpe_accrued_interest:
+          type: number
+          format: double
+          nullable: true
+          description: Market price estimate accrued interest per unit
+      required:
+      - id
+    BatchAccountStatisticsRequest:
+      type: object
+      properties:
+        account_ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+          description: Moment account IDs or custodian account IDs. Duplicates are collapsed.
+      required:
+      - account_ids
+    BatchAccountStatisticsResponse:
+      type: object
+      properties:
+        accounts:
+          type: array
+          description: Statistics for each requested account, in request order. Each entry has the same shape as the single-account statistics response; the account carries both the Moment and custodian identifiers for correlation.
+          items:
+            $ref: '#/components/schemas/AccountStatisticsResponse'
+      required:
+      - accounts
+    BookingType:
+      type: string
+      description: The booking type for the account.
+      enum:
+      - cash
+      - margin
+    ClientOrderID:
+      type: string
+      title: Client Order ID
+      description: Client-provided unique ID for the order; for example, to cross-reference with an internal system. Must be unique within the trading day, otherwise duplicate orders will be rejected during pre-trade checks.
+    OrderRFQ:
+      type: object
+      title: Order Request RFQ
+      description: Required for orders of type `rfq_response`, specifies the RFQ that the order is being placed against.
+      required:
+      - id
+      - contra_quote_id
+      properties:
+        id:
+          type: string
+          description: The ID of the RFQ that led to the order request.
+        contra_quote_id:
+          type: string
+          title: Contra Quote ID
+          description: The ID of the quote that is being traded against.
+    OrderSide:
+      type: string
+      enum:
+      - buy
+      - sell
+      example: buy
+      title: OrderSide
+      description: 'Represents which side this order is on:
+
+
+        - buy
+
+        - sell'
+    OrderSize:
+      type: object
+      title: Size
+      description: The size of an order, with a specified `type` indicating how the size is represented. Par sizes represent the size of the order in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the order in current dollar value, so an order with notional $3000 would represent an order to buy or sell $3000 worth of the bond at the current market prices. Currently, only par sizes are supported.
+      properties:
+        value:
+          $ref: '#/components/schemas/Decimal'
+        type:
+          type: string
+          enum:
+          - par
+          default: par
+      required:
+      - value
+      - type
+    OrderType:
+      type: string
+      enum:
+      - limit
+      - market
+      - rfq_response
+      default: limit
+      example: limit
+      description: 'Represents the types of orders Moment currently supports.
+
+
+        - limit
+
+        - market
+
+        - rfq_response'
+    PostOrderRequest:
+      description: Each order has a unique identifier generated by Moment. The ID will be returned when an order is placed and can be used to check the status of the order via the `GET /v1/trading/order/{id}/` endpoint. Updates on open orders at Moment will also be sent over the real-time API, which is the recommended method of maintaining order state.
+      type: object
+      title: Order Request
+      properties:
+        instrument_id:
+          $ref: '#/components/schemas/InstrumentID'
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        side:
+          $ref: '#/components/schemas/OrderSide'
+        type:
+          $ref: '#/components/schemas/OrderType'
+        limit_price:
+          $ref: '#/components/schemas/NullDecimal'
+          description: The Percentage Price is represented as a percentage of par. For a typical $1,000 par value bond, a percentage price of $90 values the bond at $900. This is a clean price, which does not include accrued interest.
+          example: 90
+          minimum: 0
+          x-go-type-skip-optional-pointer: true
+        annotation:
+          type: string
+          title: annotation
+          description: Custom, arbitrary, client-provided metadata.
+        booking_instructions:
+          type: object
+          title: booking_instructions
+          description: Client-provided information to configure trade booking for the order, as a map from string to string. Passing a multi-layer JSON map or something other than "string":"string" key-value pairs will result in an error. The specific contents of this field should be determined in conjunction with the back-office integration.
+          additionalProperties:
+            type: string
+          example:
+            key1: value1
+            key2: value2
+        extended_hours:
+          type: boolean
+          default: false
+          description: (default) false. If true, eligible for execution outside regular trading hours. In live mode, trading hours are from 9:30 am to 4:00 pm ET. Extended hours are from 7:30 am to 5:30 pm ET. For paper trading, normal trading hours are from 9:30 am to 4:00 pm ET. Extended hours are from 1:00 am to 11:00 pm ET.
+        rfq:
+          $ref: '#/components/schemas/OrderRFQ'
+        booking_type:
+          $ref: '#/components/schemas/BookingType'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Metadata is an arbitrary key-value store for client-provided data associated with the order.
+          x-go-type-skip-optional-pointer: true
+        review_required:
+          type: boolean
+          default: false
+          description: Flag to indicate if the order requires manual review before execution.
+          x-go-type-skip-optional-pointer: true
+        review_reason:
+          type: string
+          description: Reason for why the order requires review. Only applicable when review_required is true.
+          x-go-type-skip-optional-pointer: true
+      required:
+      - instrument_id
+      - amount
+      - side
+      - type
+      - client_order_id
+      - booking_instructions
+      - extended_hours
+    PlaceOrderResponse:
+      type: object
+      description: Response from placing an order
+      properties:
+        id:
+          type: string
+          title: ID
+          description: Moment-generated ULID identifier for the order
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+      required:
+      - id
+      - client_order_id
+    CreateSleeveError:
+      allOf:
+      - $ref: '#/paths/~1v1~1account~1document~1/post/responses/403/content/application~1json/schema'
+      - type: object
+        properties:
+          error_details:
+            $ref: '#/components/schemas/CreateSleeveErrorDetails'
+    CreateSleeveErrorDetails:
+      type: object
+      description: Present only when the create was refused because the sleeve's target does not fit the account's remaining allocation.
+      properties:
+        allocation_sum:
+          $ref: '#/components/schemas/AllocationSum'
+      required:
+      - allocation_sum
+    UpdateDoNotTradeRequest:
+      type: object
+      properties:
+        do_not_trade:
+          type: boolean
+          description: Whether trading should be disabled for the account
+        do_not_trade_reason:
+          type: string
+          description: The reason why trading is disabled for the account
+  parameters:
+    historical_statistics_start:
+      name: start
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+        example: '2023-11-22'
+      description: Filter data equal to or after this time in YYYY-MM-DD format.
+    historical_statistics_end:
+      name: end
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+        example: '2024-11-22'
+      description: Filter data equal to or before this time in YYYY-MM-DD format.
+    historical_statistics_frequency:
+      name: frequency
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+        - 1day
+        - 15min
+        default: 1day
+      description: "Frequency of the statistics.\n\n- **1day**: Daily statistics.\n  EOD close statistics.\n\n  Maximum supported time range: 18,250 days (50 years).\n\n- **15min**: 15-minute statistics.\n  15 minute interval statistics.\n\n  Maximum supported time range: 15 days."
+    advisor_id:
+      name: advisor_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The ID of the advisor
+tags:
+- name: Accounts
+- name: Orders
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/accountdetail-1.md
+  - https://docs.moment.com/reference/assignlotstosleeve.md
+  - https://docs.moment.com/reference/assignsleevetomodel.md
+  - https://docs.moment.com/reference/batchgetaccountstatistics.md
+  - https://docs.moment.com/reference/cancelorder.md
+  - https://docs.moment.com/reference/createsleeve.md
+  - https://docs.moment.com/reference/deletesleeve.md
+  - https://docs.moment.com/reference/get_v1-account-account-id-stats-1.md
+  - https://docs.moment.com/reference/get_v1-advisor-advisor-id-stats-1.md
+  - https://docs.moment.com/reference/getaccountlots.md
+  - https://docs.moment.com/reference/getaccountstatistics.md
+  - https://docs.moment.com/reference/placeorder.md
+  - https://docs.moment.com/reference/unassignsleevefrommodel.md
+  - https://docs.moment.com/reference/updateaccountrestrictions.md
+  - https://docs.moment.com/reference/updateaccountsettings.md
+  - https://docs.moment.com/reference/updatecashallocation.md
+  - https://docs.moment.com/reference/updatedonottrade.md
+  - https://docs.moment.com/reference/updatesleeve.md
+  - https://docs.moment.com/reference/uploadaccountdocument.md
+  - https://docs.moment.com/reference/upsertlotoverrides.md
+  merge:
+    pages: 20
+    deduped: 54
+    conflicts_kept_first: 0

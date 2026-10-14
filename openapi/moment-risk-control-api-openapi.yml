@@ -1,0 +1,1143 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: support@withmoment.com
+    name: Moment Support
+    url: https://withmoment.com/support
+  description: 'Moment''s Risk Control API is a platform for managing risk for your trading
+
+    organization and any child organizations that you manage. The API provides
+
+    endpoints for creating, updating and deleting risk controls, as well as
+
+    viewing the risk controls that you own and/or that have been assigned by a
+
+    parent organization. These controls are then evaluated as part of the normal
+
+    order and execution workflow to ensure that all orders are within the risk
+
+    limits that have been set.
+
+
+    For complete documentation on the Risk Control API and to obtain your keys
+
+    head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have
+
+    your keys, head to the environments tab to quickly get started.'
+  title: Risk Control API
+  version: 1.0.0
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+security:
+- jwtAuth: []
+paths:
+  /v1/trading/risk/controls/:
+    get:
+      tags:
+      - Risk
+      summary: List the risk controls that pertain to the organization.
+      description: 'Get all risk controls for the organization that you are currently
+
+        authenticated as. This endpoint will return all risk controls that you
+
+        own and/or that have been assigned to you by a parent organization. This
+
+        endpoint takes in optional filter parameters.'
+      operationId: getRiskControls
+      parameters:
+      - name: asset_class
+        in: query
+        description: Filter controls to those that apply to the specified asset class.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: type
+        in: query
+        description: 'Filter controls to those of the specified type, one of `universe`,
+
+          `exposure`, `order` or `attestation`. Repeat the parameter to accept
+
+          several, and omit it for all types.
+
+
+          Un-enumerated deliberately: a second enum over these values renames
+
+          the exported ControlResponseType constants in the generated Go. An
+
+          unrecognised value is not an error, it simply matches no controls,
+
+          the same as an unrecognised `asset_class`.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: Risk controls retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ControlResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - Risk
+      summary: Create a new risk control.
+      description: 'Create a new risk control for the organization that you are currently
+
+        authenticated as. This endpoint will create a new risk control with the
+
+        provided parameters and return the ID of the newly-created risk control.'
+      operationId: createRiskControl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlSpec'
+        required: true
+      responses:
+        '201':
+          description: Risk control created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlRef'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    ControlFilter:
+      properties:
+        filter:
+          description: 'The filter expression that defines the subset of securities that the
+
+            control applies to. If this field is not present, the control applies
+
+            to all instruments.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataFilter'
+    AttestationAttributes:
+      type: object
+      properties:
+        account_condition:
+          description: 'Which accounts on the order must complete the attestation. If this
+
+            field is not present, all of them must.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/AccountCondition'
+        applicable_to_buy_orders:
+          description: Whether the control applies to buy orders. Defaults to true, matching universe constraints. Indications of interest and block works ride on this flag.
+          type: boolean
+          default: true
+          x-go-type-skip-optional-pointer: true
+          x-omitempty: false
+        applicable_to_sell_orders:
+          description: Whether the control applies to sell orders. Defaults to false, matching universe constraints, so an attestation applies to buys unless it says otherwise. Indications of interest and block works ride on this flag.
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+          x-omitempty: false
+        attestation:
+          description: The attestation this control requires, named by id. Exactly one, so an order requiring several comes from several controls.
+          type: object
+          properties:
+            id:
+              description: Identifier for the attestation, stable across its versions.
+              allOf:
+              - $ref: '#/components/schemas/ULID'
+          required:
+          - id
+        parameters:
+          allOf:
+          - $ref: '#/components/schemas/AttestationParameters'
+      required:
+      - attestation
+    AccountCondition:
+      description: 'Limits an attestation control to some of the accounts on an order.
+
+        Only the accounts that pass every field set here must complete the
+
+        attestation; a field left unset is not tested. An account whose flag
+
+        the order never stated passes no test, so it is excluded.
+
+
+        Do not set `is_discretionary` to true together with `is_solicited`. No
+
+        account can pass both, because a discretionary account carries no
+
+        solicitation.
+
+        '
+      type: object
+      properties:
+        is_discretionary:
+          description: True to include only the accounts the broker traded at its own discretion, false to include only those it did not.
+          type: boolean
+        is_natural_person:
+          description: True to include only the accounts held by a natural person, false to include only those held by a legal entity. Some trusts and estates cannot be classified either way, and both values exclude them.
+          type: boolean
+        is_solicited:
+          description: True to include only the accounts where the advisor solicited the order, false to include only those where the client asked for it. Leave unset when `is_discretionary` is true.
+          type: boolean
+    AttestationParameters:
+      description: Conditions that trigger an attestation after its instrument filter and order-side scope apply.
+      type: object
+      properties:
+        below_de_minimis:
+          description: Require the attestation when a buy order is priced at or below the instrument's de minimis threshold. Market orders also trigger because they have no limit price.
+          type: boolean
+    ControlResponse:
+      description: 'A flattened representation of a control.
+
+        '
+      type: object
+      properties:
+        applies_to_asset_classes:
+          description: The list of asset classes that the control will apply to.
+          type: array
+          items:
+            type: string
+        archived_at:
+          description: 'The timestamp that the control was deleted. Presence indicates that
+
+            the control is no longer active.
+
+            '
+          type: string
+          format: date-time
+        attestation_attributes:
+          description: The attestation the control requires, present on attestation controls only.
+          allOf:
+          - $ref: '#/components/schemas/AttestationAttributes'
+        control_id:
+          description: 'The unique identifier for the control. This ID is used to reference
+
+            the control in other endpoints.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ULID'
+        created_at:
+          description: 'The timestamp that the control was created. This timestamp is set
+
+            when the control is created and cannot be modified.
+
+            '
+          type: string
+          format: date-time
+        definition:
+          description: 'The definition of the control. This is a JSON object string that contains
+
+            the parameters that are used to evaluate the control.
+
+            '
+          type: string
+        enabled:
+          description: 'Indicates if the control is currently enabled.
+
+            '
+          type: boolean
+        entity_ids:
+          description: 'The list of entity IDs that the control applies to. This list can
+
+            contain any number of entity IDs and can be used to apply the control
+
+            to multiple entities.
+
+            '
+          type: array
+          items:
+            type: string
+        excluded_entity_ids:
+          description: 'The list of entity IDs that are excluded from the control. This list can
+
+            contain any number of entity IDs and can be used to exclude specific
+
+            entities from the control.
+
+            '
+          type: array
+          items:
+            type: string
+        exposure_settings:
+          description: 'The exposure settings for the control. These settings are used to
+
+            determine the limits that the control enforces.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ExposureSettings'
+        filter:
+          description: 'The filter expression that defines the subset of securities that the
+
+            control applies to. If this field is not present, the control applies
+
+            to all instruments.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ControlFilter'
+        marketplace_restriction:
+          description: 'What the marketplace does with the securities the control matches.
+
+            `hide` removes them from the marketplace; when absent they stay
+
+            visible. `hide` is only valid on a universe control. Order entry is
+
+            governed by `remediation` alone.
+
+            '
+          type: string
+          enum:
+          - hide
+        name:
+          description: 'The name of the control. This name is used to identify the control
+
+            in the UI and in other endpoints.
+
+            '
+          type: string
+        order_attributes:
+          description: 'The order attributes for the control. These attributes are used to
+
+            determine the limits that the control enforces.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/OrderAttributes'
+        organization_id:
+          description: 'The unique identifier for the organization that the control belongs
+
+            to. Only the owner of the control can modify the control.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ULID'
+        remediation:
+          description: 'The remediation for the control, which indicates how an order should
+
+            be handled if it violates the control. `reject` blocks the order,
+
+            `flag` holds it for review, and `none` takes no action on it.
+
+            Remediation governs order entry only; `marketplace_restriction`
+
+            governs marketplace visibility.
+
+            '
+          type: string
+          enum:
+          - reject
+          - flag
+          - none
+        saved_by:
+          description: 'The unique identifier for the user that saved the control. This ID
+
+            is used to identify the user that created the control.
+
+            '
+          type: string
+        scope:
+          description: 'The scope of the control. Combined with the "scope" field, this indicates
+
+            the entities that the control applies to.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/Scope'
+        type:
+          description: 'The type of the control. Every type a control can be created as is
+
+            returned here, so a client that decodes this as a closed set has to
+
+            know all of them.
+
+            '
+          type: string
+          enum:
+          - universe
+          - exposure
+          - order
+          - attestation
+        universe_parameters:
+          description: 'The universe parameters for the control. These parameters are used to
+
+            determine the limits that the control enforces.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/UniverseParameters'
+        version_id:
+          description: 'The unique identifier for the version of the control. This ID is used
+
+            to reference the version of the control in other endpoints. The value should
+
+            be a ULID, which means they are both ordered and unique.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ULID'
+      required:
+      - control_id
+      - created_at
+      - definition
+      - entity_ids
+      - excluded_entity_ids
+      - name
+      - organization_id
+      - remediation
+      - saved_by
+      - scope
+      - type
+      - version_id
+      - applies_to_asset_classes
+    ExposureSettings:
+      properties:
+        closed_volume_maximum:
+          description: 'The maximum volume filled in all orders, in currency, that the
+
+            organization can have at any given time. Orders that would violate this
+
+            limit will be rejected.
+
+            '
+          type: number
+        open_volume_maximum:
+          description: 'The maximum daily volume, in currency, that can be open (orders
+
+            issued but not yet filled) at any given time. Orders that would
+
+            violate this limit will be rejected.
+
+            '
+          type: number
+        total_volume_maximum:
+          description: 'The maximum volume of open and closed orders, in currency, that the
+
+            organization can have at any given time. Order that would violate this
+
+            limit will be rejected.
+
+            '
+          type: number
+    OrderAttributes:
+      properties:
+        absolute_price_pop_maximum:
+          description: 'The maximum price (percentage of par) that an order can be executed
+
+            at. This value is an absolute price and is used to determine the
+
+            maximum price that an order can be executed at.
+
+            '
+          type: number
+        absolute_price_pop_minimum:
+          description: 'The minimum price (percentage of par) that an order can be executed
+
+            at. This value is an absolute price and is used to determine the
+
+            minimum price that an order can be executed at.
+
+            '
+          type: number
+        account_identifier_patterns:
+          description: 'A list of pattern expressions that are used to match the account
+
+            identifiers that the control applies to. If an account identifier
+
+            matches any of the regular expressions, the control applies to that
+
+            account.
+
+            '
+          type: array
+          items:
+            type: string
+        denomination_minimum:
+          description: 'The minimum denomination that an order can be created with. The
+
+            size notional of the order must be divisble by the denomination
+
+            with no remainder.
+
+            '
+          type: number
+        market_value_maximum:
+          description: 'The maximum market value that an order can be executed.
+
+            '
+          type: number
+        market_value_minimum:
+          description: 'The minimum market value that an order can be executed.
+
+            '
+          type: number
+        prev_close_price_band_percentage_lower:
+          description: 'The lower bound of the previous close price band, expressed as percentage
+
+            deviation from the security''s previous close price. A value of 2.0 would
+
+            indicate that the order price must be greater than 98% of the previous
+
+            close price (2% below).
+
+            '
+          type: number
+        prev_close_price_band_percentage_upper:
+          description: 'The upper bound of the previous close price band, expressed as percentage
+
+            deviation from the security''s previous close price. A value of 2.0 would
+
+            indicate that the order price must be less than 102% of the previous
+
+            close price (2% above).
+
+            '
+          type: number
+        price_band_percentage_lower:
+          description: 'The lower bound of the PMP band for the control. This value is a
+
+            percentage and is used to determine the minimum price that an order
+
+            can be executed
+
+            '
+          type: number
+        price_band_percentage_upper:
+          description: 'The upper bound of the PMP band for the control. This value is a
+
+            percentage and is used to determine the maximum price that an order
+
+            can be executed at.
+
+            '
+          type: number
+        settlement_calendar_days_out_maximum:
+          description: 'The maximum number of calendar days from today that an order''s
+
+            settlement date may be. Orders settling more than this many
+
+            calendar days out will be flagged by the control.
+
+            '
+          type: integer
+          format: int32
+          maximum: 1000
+          minimum: 0
+        size_notional_maximum:
+          description: 'The maximum notional value that an order can be executed.
+
+            '
+          type: number
+        size_notional_minimum:
+          description: 'The minimum notional value that an order can be executed.
+
+            '
+          type: number
+        yield_to_maturity_percentage_maximum:
+          description: 'The maximum yield to maturity that an order can be executed.
+
+            '
+          type: number
+        yield_to_maturity_percentage_minimum:
+          description: 'The minimum yield to maturity that an order can be executed.
+
+            '
+          type: number
+        yield_to_worst_percentage_maximum:
+          description: 'The maximum yield to worst that an order can be executed.
+
+            '
+          type: number
+        yield_to_worst_percentage_minimum:
+          description: 'The minimum yield to worst that an order can be executed.
+
+            '
+          type: number
+    RefDataAny:
+      oneOf:
+      - type: string
+      - type: boolean
+      - type: number
+    RefDataAnyOrFieldRef:
+      description: 'A value that can be a static literal (string, boolean, number) or a
+
+        field reference for field-to-field comparisons.
+
+        '
+      oneOf:
+      - type: string
+      - type: boolean
+      - type: number
+      - $ref: '#/components/schemas/RefDataFieldReference'
+    RefDataComparable:
+      oneOf:
+      - type: string
+      - type: number
+      - $ref: '#/components/schemas/RefDataFieldReference'
+    RefDataArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/RefDataAny'
+    RefDataExpression:
+      description: 'The filter will be applied to the refdata field indicated, using one
+
+        and only one of the specified attributes. Each attribute specifies a
+
+        condition and the values for comparison.
+
+
+        Values can be static literals (strings, numbers, booleans) or field
+
+        references. A field reference uses the syntax `{"$field": "field_name"}`
+
+        to compare the source field against another field on the same instrument,
+
+        rather than a static value. Field references are supported on all scalar
+
+        comparison operators (equal_to, greater_than, less_than, etc.) but not
+
+        on array operators (in, not_in).
+
+        '
+      type: object
+      properties:
+        ends_with:
+          description: 'Matches if the field ends with any of the specified values.
+
+            '
+          type: string
+        equal_to:
+          description: 'Matches if the field is equal to any of the specified values.
+
+            Accepts static values or a field reference.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataAnyOrFieldRef'
+        greater_than:
+          description: 'Matches if the field is greater than any of the specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataComparable'
+        greater_than_or_equal_to:
+          description: 'Matches if the field is greater than or equal to any of the specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataComparable'
+        in:
+          description: 'Matches if the field is in the list of specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataArray'
+        is_null:
+          description: 'Matches if the field is null or not NULL.
+
+            '
+          type: boolean
+        less_than:
+          description: 'Matches if the field is less than any of the specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataComparable'
+        less_than_or_equal_to:
+          description: 'Matches if the field is less than or equal to any of the specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataComparable'
+        not_equal_to:
+          description: 'Matches if the field is not equal to any of the specified values.
+
+            Accepts static values or a field reference.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataAnyOrFieldRef'
+        not_in:
+          description: 'Matches if the field is not in the list of specified values.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataArray'
+        starts_with:
+          description: 'Matches if the field starts with any of the specified values.
+
+            '
+          type: string
+      oneOf:
+      - required:
+        - ends_with
+      - required:
+        - equal_to
+      - required:
+        - in
+      - required:
+        - is_null
+      - required:
+        - greater_than
+      - required:
+        - greater_than_or_equal_to
+      - required:
+        - less_than
+      - required:
+        - less_than_or_equal_to
+      - required:
+        - not_equal_to
+      - required:
+        - not_in
+      - required:
+        - starts_with
+    RefDataFieldReference:
+      description: "A reference to another field on the same instrument, used for\nfield-to-field comparisons. Instead of comparing a field against a\nstatic value, this allows comparing one field against another.\n\nFor example, to ensure that `days_to_next_sink` is greater than\n`call_notification_min`:\n\n```json\n{\n  \"days_to_next_sink\": {\n    \"greater_than\": { \"$field\": \"call_notification_min\" }\n  }\n}\n```\n"
+      type: object
+      properties:
+        $field:
+          description: 'The name of the reference data field to compare against.
+
+            '
+          type: string
+      additionalProperties: false
+      required:
+      - $field
+    RefDataFilter:
+      description: "A `RefDataFilter` is an expression that is used to identify a set of\ninstruments based on their ref data characteristics.\n\nA simple expression is a reference data field name, an operator and one\nor more operands. E.g. the expression\n\n```json\n{\n  \"type\": {\n    \"in\": [ \"treasury\" ]\n  }\n}\n```\n\nwould select all instruments that have a `type` attribute with the value of\n`treasury`.\n\nA `RefDataFilter` can also be a compound expression. There are 2 flavors,\nan `and` expression and an `or` expression. Both are arrays of\n`RefDataFilter`s. E.g.\n\n```json\n{\n  \"and\": [\n    {\n      \"type\": {\n        \"in\": [ \"treasury\" ]\n      }\n    },\n    {\n      \"currency\": {\n        \"equal_to\": \"USD\"\n      }\n    }\n  ]\n}\n```\n"
+      type: object
+      properties:
+        and:
+          description: 'The `and` filter is used to combine multiple filters together. The
+
+            filters are applied in order, and the result is the intersection of
+
+            the filters.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/RefDataFilter'
+        or:
+          description: 'The `or` filter is used to combine multiple filters together. The
+
+            filters are applied in order, and the result is the union of the
+
+            filters.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/RefDataFilter'
+      additionalProperties:
+        $ref: '#/components/schemas/RefDataExpression'
+    Scope:
+      description: "Indicates the type of entity a control applies to.\n\n- `account` indicates the control applies to the indicated accounts\n  (entities).\n- `advisor` indicates the control applies to the indicated advisor codes.\n- `global` indicates the control applies to the indicated organization\n  (entity) and all child organizations.\n- `organization` indicates the control applies to the indicated\n  organizations (entities).\n- `risk-group` indicates the control applies to the indicated\n  risk group(s) (entities).\n"
+      type: string
+      enum:
+      - account
+      - advisor
+      - global
+      - organization
+      - risk-group
+    ULID:
+      description: 'A Universally-unique Lexicographically-sortable IDentifier is a 128-bit string that''s both unique
+
+        and sortable by creation time. ULIDs in the context of this API can also be prefixed with
+
+        a short string indicating the type of entity the ULID identifies, e.g. `acct_` would indicate the
+
+        ULID is the identifier for an account entity.
+
+        '
+      type: string
+      pattern: ^([a-z]+_)?[0-9A-Z]{26}$
+    UniverseParameters:
+      type: object
+      properties:
+        applicable_to_buy_orders:
+          description: 'Indicates if the control applies to buy orders. If this field is set to
+
+            `true`, the control will be evaluated for buy orders. If this field is
+
+            set to `false`, the control will not be evaluated for buy orders.
+
+            '
+          type: boolean
+          default: true
+        applicable_to_holdings:
+          description: 'Indicates if the control applies to holdings. If this field is set to
+
+            `true`, the control will be evaluated for holdings. If this field is
+
+            set to `false`, the control will not be evaluated for holdings.
+
+            '
+          type: boolean
+          default: false
+        applicable_to_sell_orders:
+          description: 'Indicates if the control applies to sell orders. If this field is set to
+
+            `true`, the control will be evaluated for sell orders. If this field is
+
+            set to `false`, the control will not be evaluated for sell orders.
+
+            '
+          type: boolean
+          default: false
+        parameters:
+          description: 'The filter expression that defines the constraint. Used to describe the
+
+            constrained refdata attributes of the instrument(s) indicated by the (optional)
+
+            `filter` expression.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/RefDataFilter'
+      required:
+      - parameters
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    AttestationRequirement:
+      description: "An attestation requirement asks the advisor to complete an attestation\nbefore the order can be submitted. When the attestation is incomplete at\nsubmit, `remediation` decides what happens: `reject` blocks the order,\n`flag` lets it through marked.\n\n`filter` gates whether the control applies at all — an order the\nexpression does not select passes silently, rather than failing the\ncontrol.\n\n---\n\n```json\n{\n  \"type\": \"attestation\",\n  \"filter\": {\n    \"type\": { \"equal_to\": \"municipal\" }\n  },\n  \"attestation\": { \"id\": \"attn_01JZ8X9Y2K3M4N5P6Q7R8S9T0A\" },\n  \"parameters\": { \"below_de_minimis\": true },\n  \"account_condition\": { \"is_solicited\": true },\n  \"applicable_to_buy_orders\": true,\n  \"applicable_to_sell_orders\": false\n}\n```\n\nThe above requires the referenced attestation on municipal buy orders,\nand asks only the accounts the advisor solicited.\n"
+      allOf:
+      - $ref: '#/components/schemas/ControlFilter'
+      - $ref: '#/components/schemas/AttestationAttributes'
+      - properties:
+          type:
+            type: string
+        required:
+        - type
+    ControlDefinition:
+      description: 'The control itself. One of 4 types: UniverseConstraint,
+
+        ExposureLimit, OrderValidation, or AttestationRequirement.
+
+        '
+      discriminator:
+        propertyName: type
+        mapping:
+          universe: '#/components/schemas/UniverseConstraint'
+          exposure: '#/components/schemas/ExposureLimit'
+          order: '#/components/schemas/OrderValidation'
+          attestation: '#/components/schemas/AttestationRequirement'
+      oneOf:
+      - $ref: '#/components/schemas/AttestationRequirement'
+      - $ref: '#/components/schemas/ExposureLimit'
+      - $ref: '#/components/schemas/OrderValidation'
+      - $ref: '#/components/schemas/UniverseConstraint'
+    ControlRef:
+      description: 'Identifies the just-specified control to be created.
+
+        '
+      type: object
+      properties:
+        id:
+          description: 'The unique identifier for the control. This ID is used to reference
+
+            the control in other endpoints.
+
+            '
+          type: string
+          format: ulid
+    ControlSpec:
+      description: 'Defines the state of a control to be created or updated
+
+        '
+      type: object
+      properties:
+        applies_to:
+          description: 'Describes the set of entities that the control manages.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/ScopeDef'
+        applies_to_asset_classes:
+          description: 'The list of asset classes that the control will apply to.
+
+            At least one asset class is required.'
+          type: array
+          items:
+            type: string
+          minItems: 1
+        control:
+          $ref: '#/components/schemas/ControlDefinition'
+        enabled:
+          description: 'Toggle to enable or disable the control. If the control is disabled,
+
+            it will not be used to validate orders.
+
+            '
+          type: boolean
+          default: true
+        marketplace_restriction:
+          description: 'What the marketplace does with the securities the control matches.
+
+            `hide` removes them from the marketplace; when absent they stay
+
+            visible. `hide` is only valid on a universe control. Order entry is
+
+            governed by `remediation` alone.
+
+            '
+          type: string
+          enum:
+          - hide
+        name:
+          description: 'The name of the control. This name is used to identify the control
+
+            in the UI and in other endpoints.
+
+            '
+          type: string
+        remediation:
+          description: 'The remediation for the control, which indicates how an order should
+
+            be handled if it violates the control. `reject` blocks the order,
+
+            `flag` holds it for review, and `none` takes no action on it.
+
+            Remediation governs order entry only; `marketplace_restriction`
+
+            governs marketplace visibility.
+
+            '
+          type: string
+          default: reject
+          enum:
+          - reject
+          - flag
+          - none
+      required:
+      - applies_to
+      - applies_to_asset_classes
+      - control
+      - name
+    ExposureLimit:
+      description: 'An exposure limit control manages the risk for the organization that is
+
+        attempting to execute an order. The control is defined by an optional
+
+        filter expression that is used to identify the set of securities that
+
+        the control applies to. The control then evaluates the order and its
+
+        anticipated effects against the state of the organization''s portfolio
+
+        to determine if the order is within the limits set by the control.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/ControlFilter'
+      - $ref: '#/components/schemas/ExposureSettings'
+      - properties:
+          type:
+            type: string
+        required:
+        - type
+    OrderValidation:
+      description: 'An order validation control is a control that is applied to an
+
+        order before it is executed. The control is defined by an optional
+
+        filter expression that is used to identify the set of securities
+
+        that the control applies to. The control is then evaluated against
+
+        the order to determine if the order is within the limits set by the
+
+        control.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/ControlFilter'
+      - $ref: '#/components/schemas/OrderAttributes'
+      - properties:
+          type:
+            type: string
+        required:
+        - type
+    ScopeDef:
+      description: 'Indicates the entities that the control applies to. The scope is an enum
+
+        idicating the type of entity that the control applies to, and the
+
+        entity_ids are the unique identifiers for the organizations/accounts/etc
+
+        to which the control applies.
+
+        '
+      type: object
+      properties:
+        entity_ids:
+          description: 'The list of entity IDs that the control applies to. This list can
+
+            contain any number of entity IDs and can be used to apply the control
+
+            to multiple entities.
+
+
+            Generally the entity IDs will be [ULIDs](#ULID),
+
+            but this restriction is not enforced. The values should simply make sense
+
+            given the scope.
+
+
+            Note: Cannot be used together with excluded_entity_ids.
+
+            '
+          type: array
+          items:
+            type: string
+          x-go-type-skip-optional-pointer: true
+        excluded_entity_ids:
+          description: 'The list of entity IDs that are excluded from the control. This list can
+
+            contain any number of entity IDs and can be used to exclude specific
+
+            entities from the control scope.
+
+
+            Generally the entity IDs will be [ULIDs](#ULID),
+
+            but this restriction is not enforced. The values should simply make sense
+
+            given the scope.
+
+
+            Note: Cannot be used together with entity_ids. Only available for organization scope.
+
+            '
+          type: array
+          items:
+            type: string
+          x-go-type-skip-optional-pointer: true
+        scope:
+          description: 'Indicates the type of entity a control applies to.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/Scope'
+      not:
+        allOf:
+        - properties:
+            entity_ids:
+              type: array
+          required:
+          - entity_ids
+        - properties:
+            excluded_entity_ids:
+              type: array
+          required:
+          - excluded_entity_ids
+      oneOf:
+      - required:
+        - entity_ids
+      - required:
+        - excluded_entity_ids
+      required:
+      - scope
+    UniverseConstraint:
+      description: "A universe constraint is a control that restricts the set of securities\nthat can be traded. The constraint is defined by a pair of filter\nexpressions, one required and one optional. The two expressions are combined, such that\nthe `parameters` expression is applied to the subset of securities indicated by the `filter`\nexpression.\n\n---\n\n```json\n{\n  \"filter\": {\n    \"type\": {\n      \"in\": [ \"treasury\" ]\n    }\n  },\n  \"parameters\": {\n    \"reg_s\": {\n      \"equal_to\": true\n    }\n  }\n}\n```\n\nThe above example constrains the set of tradeable treasury instruments to those\nthat are are Reg S eligible. Assuming no other controls are applicable, the affected\norganizations' tradeable universe would be:\n\n- Reg S-eligible treasuries;\n- all munis;\n- all corporates.\n\nUniverse constraints without a `filter` expression will be applied to all instruments. The\nfollowing control would restrict the tradeable universe to instruments denominated in USD:\n\
+        \n```json\n{\n  \"parameters\": {\n    \"currency\": {\n      \"equal_to\": \"USD\"\n    }\n  }\n}\n```\n\nCombined with the first control, the affected organizations' tradeable universe would be:\n\n- Reg S-eligible treasuries denominated in USD;\n- all munis denominated in USD;\n- all corporates denominated in USD.\n\nWe could then add a third control:\n\n```json\n{\n  \"filter\": {\n    \"type\": {\n      \"in\": [\n        \"corporate\",\n        \"muninicpal\",\n      ]\n    }\n  },\n  \"parameters\": {\n    \"and\": [\n      \"reg_s\": {\n        \"equal_to\": true\n      },\n      \"144a\": {\n        \"equal_to\": true\n      }\n    ]\n  }\n}\n```\n\nwhich would further restrict the tradeable universe to:\n\n- Reg S-eligible treasuries denominated in USD;\n- 144A-eligible munis denominated in USD that are not also Reg S-eligible; and\n- 144A-eligible corporates denominated in USD that are not also Reg-S eligible.\n\n### Field-to-field comparisons\n\nFilter values can also\
+        \ reference other fields on the same instrument using the\n`$field` syntax. For example, the following control ensures that an instrument's\n`days_to_next_sink` is greater than its `call_notification_min`:\n\n```json\n{\n  \"parameters\": {\n    \"days_to_next_sink\": {\n      \"greater_than\": { \"$field\": \"call_notification_min\" }\n    }\n  }\n}\n```\n\nField references are supported on all scalar comparison operators\n(`equal_to`, `greater_than`, `less_than`, etc.) but not on array\noperators (`in`, `not_in`).\n"
+      allOf:
+      - $ref: '#/components/schemas/ControlFilter'
+      - $ref: '#/components/schemas/UniverseParameters'
+      - properties:
+          type:
+            type: string
+        required:
+        - type
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: Risk
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/createriskcontrol.md
+  - https://docs.moment.com/reference/getriskcontrols.md
+  merge:
+    pages: 2
+    deduped: 19
+    conflicts_kept_first: 0

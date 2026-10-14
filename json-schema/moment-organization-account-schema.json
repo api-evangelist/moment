@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-organization-account-schema.json",
+  "title": "OrganizationAccount",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-account-management-extended-api-openapi.yml#/components/schemas/OrganizationAccount",
+  "type": "object",
+  "properties": {
+    "advisor_codes": {
+      "description": "List of advisor codes associated with the account",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "custodian": {
+      "description": "Name of the custodian holding the account",
+      "type": "string"
+    },
+    "moment_account_id": {
+      "description": "Moment's unique identifier for the account",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name associated with the account",
+      "type": "string"
+    }
+  },
+  "required": [
+    "moment_account_id",
+    "custodian",
+    "advisor_codes",
+    "name"
+  ]
+}

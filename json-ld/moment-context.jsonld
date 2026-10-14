@@ -1,0 +1,1741 @@
+{
+  "@context": {
+    "@vocab": "https://moment.com/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "moment": "https://moment.com/schema#",
+    "Customizations": "moment:Customizations",
+    "fixed_income": {
+      "@id": "moment:fixed_income"
+    },
+    "AccountDetailSlim": "moment:AccountDetailSlim",
+    "account_id": {
+      "@id": "moment:account_id",
+      "@type": "xsd:string"
+    },
+    "custodian_account_id": {
+      "@id": "moment:custodian_account_id",
+      "@type": "xsd:string"
+    },
+    "moment_organization_id": {
+      "@id": "moment:moment_organization_id",
+      "@type": "xsd:string"
+    },
+    "moment_trading_group_id": {
+      "@id": "moment:moment_trading_group_id",
+      "@type": "xsd:string"
+    },
+    "custodian": {
+      "@id": "moment:custodian",
+      "@type": "@id"
+    },
+    "household": {
+      "@id": "moment:household",
+      "@type": "@id"
+    },
+    "is_taxable": {
+      "@id": "moment:is_taxable",
+      "@type": "xsd:boolean"
+    },
+    "account_type": {
+      "@id": "moment:account_type",
+      "@type": "xsd:string"
+    },
+    "management_type": {
+      "@id": "moment:management_type",
+      "@type": "@id"
+    },
+    "prime_brokerage_enabled": {
+      "@id": "moment:prime_brokerage_enabled",
+      "@type": "xsd:boolean"
+    },
+    "desired_status": {
+      "@id": "moment:desired_status",
+      "@type": "@id"
+    },
+    "custodial_status": {
+      "@id": "moment:custodial_status",
+      "@type": "xsd:string"
+    },
+    "account_name": {
+      "@id": "moment:account_name",
+      "@type": "xsd:string"
+    },
+    "last_updated_at": {
+      "@id": "moment:last_updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "do_not_trade": {
+      "@id": "moment:do_not_trade",
+      "@type": "xsd:boolean"
+    },
+    "do_not_trade_reason": {
+      "@id": "moment:do_not_trade_reason",
+      "@type": "xsd:string"
+    },
+    "margin_eligible": {
+      "@id": "moment:margin_eligible",
+      "@type": "xsd:boolean"
+    },
+    "do_not_buy": {
+      "@id": "moment:do_not_buy",
+      "@type": "xsd:boolean"
+    },
+    "do_not_sell": {
+      "@id": "moment:do_not_sell",
+      "@type": "xsd:boolean"
+    },
+    "AccountDistribution": "moment:AccountDistribution",
+    "monthly_cashflows": {
+      "@id": "moment:monthly_cashflows",
+      "@container": "@list"
+    },
+    "yearly_cashflows": {
+      "@id": "moment:yearly_cashflows",
+      "@container": "@list"
+    },
+    "instrument_cashflows": {
+      "@id": "moment:instrument_cashflows",
+      "@container": "@list"
+    },
+    "municipal_state_distribution": {
+      "@id": "moment:municipal_state_distribution"
+    },
+    "sp_rating_distribution": {
+      "@id": "moment:sp_rating_distribution"
+    },
+    "moodys_rating_distribution": {
+      "@id": "moment:moodys_rating_distribution"
+    },
+    "maturity_distribution": {
+      "@id": "moment:maturity_distribution"
+    },
+    "sector_distribution": {
+      "@id": "moment:sector_distribution"
+    },
+    "issuer_distribution": {
+      "@id": "moment:issuer_distribution"
+    },
+    "coupon_distribution": {
+      "@id": "moment:coupon_distribution"
+    },
+    "municipal_type_distribution": {
+      "@id": "moment:municipal_type_distribution"
+    },
+    "AccountInformation": "moment:AccountInformation",
+    "minimum_cash_balance": {
+      "@id": "moment:minimum_cash_balance",
+      "@type": "@id"
+    },
+    "min_cash": {
+      "@id": "moment:min_cash",
+      "@type": "@id"
+    },
+    "buffer_cash": {
+      "@id": "moment:buffer_cash",
+      "@type": "@id"
+    },
+    "allocation_sum": {
+      "@id": "moment:allocation_sum",
+      "@type": "@id"
+    },
+    "sod_total_account_value": {
+      "@id": "moment:sod_total_account_value",
+      "@type": "@id"
+    },
+    "cash_allocation": {
+      "@id": "moment:cash_allocation",
+      "@type": "@id"
+    },
+    "short_positions_enabled": {
+      "@id": "moment:short_positions_enabled",
+      "@type": "xsd:boolean"
+    },
+    "status": {
+      "@id": "moment:status",
+      "@type": "@id"
+    },
+    "investor": {
+      "@id": "moment:investor",
+      "@type": "@id"
+    },
+    "extra": {
+      "@id": "moment:extra"
+    },
+    "AccountSnapshot": "moment:AccountSnapshot",
+    "timestamp": {
+      "@id": "moment:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "total_market_value": {
+      "@id": "moment:total_market_value",
+      "@type": "xsd:decimal"
+    },
+    "cash_market_value": {
+      "@id": "moment:cash_market_value",
+      "@type": "xsd:decimal"
+    },
+    "other_market_value": {
+      "@id": "moment:other_market_value",
+      "@type": "xsd:decimal"
+    },
+    "tracked_fixed_income_market_value": {
+      "@id": "moment:tracked_fixed_income_market_value",
+      "@type": "xsd:decimal"
+    },
+    "treasury_market_value": {
+      "@id": "moment:treasury_market_value",
+      "@type": "xsd:decimal"
+    },
+    "corporate_market_value": {
+      "@id": "moment:corporate_market_value",
+      "@type": "xsd:decimal"
+    },
+    "agency_market_value": {
+      "@id": "moment:agency_market_value",
+      "@type": "xsd:decimal"
+    },
+    "government_market_value": {
+      "@id": "moment:government_market_value",
+      "@type": "xsd:decimal"
+    },
+    "municipal_market_value": {
+      "@id": "moment:municipal_market_value",
+      "@type": "xsd:decimal"
+    },
+    "money_market_market_value": {
+      "@id": "moment:money_market_market_value",
+      "@type": "xsd:decimal"
+    },
+    "cd_market_value": {
+      "@id": "moment:cd_market_value",
+      "@type": "xsd:decimal"
+    },
+    "total_accrued_interest": {
+      "@id": "moment:total_accrued_interest",
+      "@type": "xsd:decimal"
+    },
+    "average_ytw": {
+      "@id": "moment:average_ytw",
+      "@type": "xsd:decimal"
+    },
+    "average_maturity": {
+      "@id": "moment:average_maturity",
+      "@type": "xsd:decimal"
+    },
+    "average_duration": {
+      "@id": "moment:average_duration",
+      "@type": "xsd:decimal"
+    },
+    "average_sp_rating": {
+      "@id": "moment:average_sp_rating",
+      "@type": "xsd:string"
+    },
+    "average_moodys_rating": {
+      "@id": "moment:average_moodys_rating",
+      "@type": "xsd:string"
+    },
+    "average_coupon": {
+      "@id": "moment:average_coupon",
+      "@type": "xsd:decimal"
+    },
+    "average_book_ytm": {
+      "@id": "moment:average_book_ytm",
+      "@type": "xsd:decimal"
+    },
+    "average_book_ytw": {
+      "@id": "moment:average_book_ytw",
+      "@type": "xsd:decimal"
+    },
+    "Advisor": "moment:Advisor",
+    "id": {
+      "@id": "moment:id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "moment:name",
+      "@type": "xsd:string"
+    },
+    "organization_id": {
+      "@id": "moment:organization_id",
+      "@type": "xsd:string"
+    },
+    "firm_name": {
+      "@id": "moment:firm_name",
+      "@type": "xsd:string"
+    },
+    "advisor_type": {
+      "@id": "moment:advisor_type",
+      "@type": "xsd:string"
+    },
+    "metadata": {
+      "@id": "moment:metadata"
+    },
+    "CashWeightAllocation": "moment:CashWeightAllocation",
+    "min_allocation_weight": {
+      "@id": "moment:min_allocation_weight",
+      "@type": "@id"
+    },
+    "target_allocation_weight": {
+      "@id": "moment:target_allocation_weight",
+      "@type": "@id"
+    },
+    "max_allocation_weight": {
+      "@id": "moment:max_allocation_weight",
+      "@type": "@id"
+    },
+    "CashMarketValueAllocation": "moment:CashMarketValueAllocation",
+    "min_allocation_market_value": {
+      "@id": "moment:min_allocation_market_value",
+      "@type": "@id"
+    },
+    "target_allocation_market_value": {
+      "@id": "moment:target_allocation_market_value",
+      "@type": "@id"
+    },
+    "max_allocation_market_value": {
+      "@id": "moment:max_allocation_market_value",
+      "@type": "@id"
+    },
+    "AllocationConstraintValidation": "moment:AllocationConstraintValidation",
+    "valid": {
+      "@id": "moment:valid",
+      "@type": "xsd:boolean"
+    },
+    "constraint": {
+      "@id": "moment:constraint"
+    },
+    "market_value": {
+      "@id": "moment:market_value",
+      "@type": "xsd:decimal"
+    },
+    "weight": {
+      "@id": "moment:weight",
+      "@type": "xsd:decimal"
+    },
+    "holdings_in_allocation": {
+      "@id": "moment:holdings_in_allocation",
+      "@container": "@list"
+    },
+    "AllocationBasis": "moment:AllocationBasis",
+    "AverageValueConstraint": "moment:AverageValueConstraint",
+    "type": {
+      "@id": "moment:type",
+      "@type": "xsd:string"
+    },
+    "field": {
+      "@id": "moment:field",
+      "@type": "xsd:string"
+    },
+    "min_average_value": {
+      "@id": "moment:min_average_value"
+    },
+    "target_average_value": {
+      "@id": "moment:target_average_value"
+    },
+    "max_average_value": {
+      "@id": "moment:max_average_value"
+    },
+    "constraint_priority": {
+      "@id": "moment:constraint_priority",
+      "@type": "@id"
+    },
+    "AverageValueConstraintValidation": "moment:AverageValueConstraintValidation",
+    "holdings_average_value": {
+      "@id": "moment:holdings_average_value",
+      "@type": "xsd:decimal"
+    },
+    "holdings_in_bounds": {
+      "@id": "moment:holdings_in_bounds",
+      "@container": "@list"
+    },
+    "CashFlowEvent": "moment:CashFlowEvent",
+    "date": {
+      "@id": "moment:date",
+      "@type": "xsd:date"
+    },
+    "amount": {
+      "@id": "moment:amount",
+      "@type": "xsd:decimal"
+    },
+    "CashLot": "moment:CashLot",
+    "moment_lot_id": {
+      "@id": "moment:moment_lot_id",
+      "@type": "xsd:string"
+    },
+    "custodian_lot_id": {
+      "@id": "moment:custodian_lot_id",
+      "@type": "xsd:string"
+    },
+    "currency": {
+      "@id": "moment:currency",
+      "@type": "xsd:string"
+    },
+    "moment_reserved_quantity": {
+      "@id": "moment:moment_reserved_quantity",
+      "@type": "@id"
+    },
+    "unsettled_open_quantity": {
+      "@id": "moment:unsettled_open_quantity",
+      "@type": "@id"
+    },
+    "settled_open_quantity": {
+      "@id": "moment:settled_open_quantity",
+      "@type": "@id"
+    },
+    "settled_closed_quantity": {
+      "@id": "moment:settled_closed_quantity",
+      "@type": "@id"
+    },
+    "unsettled_closed_quantity": {
+      "@id": "moment:unsettled_closed_quantity",
+      "@type": "@id"
+    },
+    "open_quantity": {
+      "@id": "moment:open_quantity",
+      "@type": "@id"
+    },
+    "ComplianceCheckFull": "moment:ComplianceCheckFull",
+    "compliant": {
+      "@id": "moment:compliant",
+      "@type": "xsd:boolean"
+    },
+    "ComplianceFull": "moment:ComplianceFull",
+    "checks": {
+      "@id": "moment:checks",
+      "@container": "@list"
+    },
+    "Custodian": "moment:Custodian",
+    "DiversificationConstraint": "moment:DiversificationConstraint",
+    "max_weight_per_unique_value": {
+      "@id": "moment:max_weight_per_unique_value",
+      "@type": "xsd:decimal"
+    },
+    "max_market_value_per_unique_value": {
+      "@id": "moment:max_market_value_per_unique_value",
+      "@type": "xsd:decimal"
+    },
+    "min_weight_per_unique_value": {
+      "@id": "moment:min_weight_per_unique_value",
+      "@type": "xsd:decimal"
+    },
+    "min_market_value_per_unique_value": {
+      "@id": "moment:min_market_value_per_unique_value",
+      "@type": "xsd:decimal"
+    },
+    "DiversificationConstraintValidation": "moment:DiversificationConstraintValidation",
+    "invalid_fields": {
+      "@id": "moment:invalid_fields",
+      "@container": "@list"
+    },
+    "FieldValidation": "moment:FieldValidation",
+    "field_value": {
+      "@id": "moment:field_value",
+      "@type": "xsd:string"
+    },
+    "invalid_holdings": {
+      "@id": "moment:invalid_holdings"
+    },
+    "Household": "moment:Household",
+    "Instrument": "moment:Instrument",
+    "isin": {
+      "@id": "moment:isin",
+      "@type": "xsd:string"
+    },
+    "cusip": {
+      "@id": "moment:cusip",
+      "@type": "xsd:string"
+    },
+    "treasury_subtype": {
+      "@id": "moment:treasury_subtype",
+      "@type": "xsd:string"
+    },
+    "maturity_date": {
+      "@id": "moment:maturity_date",
+      "@type": "xsd:date"
+    },
+    "coupon": {
+      "@id": "moment:coupon",
+      "@type": "xsd:decimal"
+    },
+    "close_price": {
+      "@id": "moment:close_price",
+      "@type": "xsd:decimal"
+    },
+    "close_yield_to_worst": {
+      "@id": "moment:close_yield_to_worst",
+      "@type": "xsd:decimal"
+    },
+    "close_yield_to_maturity": {
+      "@id": "moment:close_yield_to_maturity",
+      "@type": "xsd:decimal"
+    },
+    "issuer": {
+      "@id": "moment:issuer",
+      "@type": "xsd:string"
+    },
+    "callable": {
+      "@id": "moment:callable",
+      "@type": "xsd:boolean"
+    },
+    "next_call_date": {
+      "@id": "moment:next_call_date",
+      "@type": "xsd:date"
+    },
+    "next_call_price": {
+      "@id": "moment:next_call_price",
+      "@type": "xsd:decimal"
+    },
+    "municipal_taxable_federal": {
+      "@id": "moment:municipal_taxable_federal",
+      "@type": "xsd:boolean"
+    },
+    "municipal_state": {
+      "@id": "moment:municipal_state",
+      "@type": "xsd:string"
+    },
+    "purpose": {
+      "@id": "moment:purpose",
+      "@type": "xsd:string"
+    },
+    "use_of_proceeds": {
+      "@id": "moment:use_of_proceeds",
+      "@type": "xsd:string"
+    },
+    "accrued_interest": {
+      "@id": "moment:accrued_interest",
+      "@type": "xsd:decimal"
+    },
+    "price": {
+      "@id": "moment:price",
+      "@type": "xsd:decimal"
+    },
+    "yield_to_worst": {
+      "@id": "moment:yield_to_worst",
+      "@type": "xsd:decimal"
+    },
+    "yield_to_maturity": {
+      "@id": "moment:yield_to_maturity",
+      "@type": "xsd:decimal"
+    },
+    "par_value": {
+      "@id": "moment:par_value",
+      "@type": "xsd:decimal"
+    },
+    "description": {
+      "@id": "moment:description",
+      "@type": "xsd:string"
+    },
+    "description_short": {
+      "@id": "moment:description_short",
+      "@type": "xsd:string"
+    },
+    "sp_rating": {
+      "@id": "moment:sp_rating",
+      "@type": "xsd:string"
+    },
+    "moodys_rating": {
+      "@id": "moment:moodys_rating",
+      "@type": "xsd:string"
+    },
+    "duration": {
+      "@id": "moment:duration",
+      "@type": "xsd:decimal"
+    },
+    "sector": {
+      "@id": "moment:sector",
+      "@type": "xsd:string"
+    },
+    "principal_factor": {
+      "@id": "moment:principal_factor",
+      "@type": "xsd:decimal"
+    },
+    "Investor": "moment:Investor",
+    "marginal_long_term_taxes": {
+      "@id": "moment:marginal_long_term_taxes"
+    },
+    "marginal_short_term_taxes": {
+      "@id": "moment:marginal_short_term_taxes"
+    },
+    "tax_state": {
+      "@id": "moment:tax_state",
+      "@type": "xsd:string"
+    },
+    "LadderPolicyConstraint": "moment:LadderPolicyConstraint",
+    "period_length": {
+      "@id": "moment:period_length",
+      "@type": "xsd:decimal"
+    },
+    "start_period": {
+      "@id": "moment:start_period",
+      "@type": "xsd:decimal"
+    },
+    "end_period": {
+      "@id": "moment:end_period",
+      "@type": "xsd:decimal"
+    },
+    "weight_tolerance": {
+      "@id": "moment:weight_tolerance",
+      "@type": "xsd:decimal"
+    },
+    "market_value_tolerance": {
+      "@id": "moment:market_value_tolerance",
+      "@type": "xsd:decimal"
+    },
+    "grace_period_months": {
+      "@id": "moment:grace_period_months",
+      "@type": "xsd:decimal"
+    },
+    "use_call_adjusted_maturity": {
+      "@id": "moment:use_call_adjusted_maturity",
+      "@type": "xsd:boolean"
+    },
+    "LadderPolicyConstraintValidation": "moment:LadderPolicyConstraintValidation",
+    "additional_constraints": {
+      "@id": "moment:additional_constraints",
+      "@container": "@list"
+    },
+    "Lot": "moment:Lot",
+    "sleeve_id": {
+      "@id": "moment:sleeve_id",
+      "@type": "xsd:string"
+    },
+    "instrument": {
+      "@id": "moment:instrument",
+      "@type": "@id"
+    },
+    "basis_date": {
+      "@id": "moment:basis_date",
+      "@type": "xsd:date"
+    },
+    "basis_quantity": {
+      "@id": "moment:basis_quantity",
+      "@type": "@id"
+    },
+    "basis_price": {
+      "@id": "moment:basis_price",
+      "@type": "@id"
+    },
+    "book_ytm": {
+      "@id": "moment:book_ytm",
+      "@type": "xsd:decimal"
+    },
+    "book_ytc": {
+      "@id": "moment:book_ytc",
+      "@type": "xsd:decimal"
+    },
+    "book_ytw": {
+      "@id": "moment:book_ytw",
+      "@type": "xsd:decimal"
+    },
+    "position_type": {
+      "@id": "moment:position_type",
+      "@type": "@id"
+    },
+    "is_short_position": {
+      "@id": "moment:is_short_position",
+      "@type": "xsd:boolean"
+    },
+    "open_market_value": {
+      "@id": "moment:open_market_value",
+      "@type": "@id"
+    },
+    "long_term": {
+      "@id": "moment:long_term",
+      "@type": "xsd:boolean"
+    },
+    "wash_sale": {
+      "@id": "moment:wash_sale",
+      "@type": "xsd:boolean"
+    },
+    "PositionType": "moment:PositionType",
+    "ManagementType": "moment:ManagementType",
+    "MinCashSettingMode": "moment:MinCashSettingMode",
+    "MinCash": "moment:MinCash",
+    "min_cash_setting": {
+      "@id": "moment:min_cash_setting",
+      "@type": "@id"
+    },
+    "min_cash_dollar": {
+      "@id": "moment:min_cash_dollar",
+      "@type": "xsd:string"
+    },
+    "min_cash_percent": {
+      "@id": "moment:min_cash_percent",
+      "@type": "xsd:string"
+    },
+    "BufferCash": "moment:BufferCash",
+    "buffer_cash_min_percent": {
+      "@id": "moment:buffer_cash_min_percent",
+      "@type": "xsd:string"
+    },
+    "buffer_cash_target_percent": {
+      "@id": "moment:buffer_cash_target_percent",
+      "@type": "xsd:string"
+    },
+    "buffer_cash_max_percent": {
+      "@id": "moment:buffer_cash_max_percent",
+      "@type": "xsd:string"
+    },
+    "AllocationSumBase": "moment:AllocationSumBase",
+    "managed_target_sum": {
+      "@id": "moment:managed_target_sum",
+      "@type": "xsd:string"
+    },
+    "total": {
+      "@id": "moment:total",
+      "@type": "xsd:string"
+    },
+    "included_sleeve_ids": {
+      "@id": "moment:included_sleeve_ids",
+      "@container": "@list"
+    },
+    "notional_sleeve_ids": {
+      "@id": "moment:notional_sleeve_ids",
+      "@container": "@list"
+    },
+    "notional_total": {
+      "@id": "moment:notional_total",
+      "@type": "xsd:string"
+    },
+    "template_owned": {
+      "@id": "moment:template_owned",
+      "@type": "xsd:boolean"
+    },
+    "violation": {
+      "@id": "moment:violation",
+      "@type": "xsd:boolean"
+    },
+    "ModelComplianceCheckFull": "moment:ModelComplianceCheckFull",
+    "model_id": {
+      "@id": "moment:model_id",
+      "@type": "xsd:string"
+    },
+    "constraints": {
+      "@id": "moment:constraints"
+    },
+    "ProposalBase": "moment:ProposalBase",
+    "proposal_id": {
+      "@id": "moment:proposal_id",
+      "@type": "xsd:string"
+    },
+    "created_at": {
+      "@id": "moment:created_at",
+      "@type": "xsd:dateTime"
+    },
+    "generated_at": {
+      "@id": "moment:generated_at",
+      "@type": "xsd:dateTime"
+    },
+    "failed_at": {
+      "@id": "moment:failed_at",
+      "@type": "xsd:dateTime"
+    },
+    "submitted_at": {
+      "@id": "moment:submitted_at",
+      "@type": "xsd:dateTime"
+    },
+    "canceled_at": {
+      "@id": "moment:canceled_at",
+      "@type": "xsd:dateTime"
+    },
+    "completed_at": {
+      "@id": "moment:completed_at",
+      "@type": "xsd:dateTime"
+    },
+    "num_accounts": {
+      "@id": "moment:num_accounts",
+      "@type": "xsd:integer"
+    },
+    "num_orders": {
+      "@id": "moment:num_orders",
+      "@type": "xsd:integer"
+    },
+    "filled_market_value": {
+      "@id": "moment:filled_market_value",
+      "@type": "xsd:integer"
+    },
+    "num_filled_orders": {
+      "@id": "moment:num_filled_orders",
+      "@type": "xsd:integer"
+    },
+    "proposal_status": {
+      "@id": "moment:proposal_status",
+      "@type": "xsd:string"
+    },
+    "ModelAssignment": "moment:ModelAssignment",
+    "model_name": {
+      "@id": "moment:model_name",
+      "@type": "xsd:string"
+    },
+    "assignment_date": {
+      "@id": "moment:assignment_date",
+      "@type": "xsd:date"
+    },
+    "customizations": {
+      "@id": "moment:customizations",
+      "@type": "@id"
+    },
+    "meta": {
+      "@id": "moment:meta"
+    },
+    "rebalance_strategy": {
+      "@id": "moment:rebalance_strategy",
+      "@type": "@id"
+    },
+    "cashflow_targets": {
+      "@id": "moment:cashflow_targets",
+      "@container": "@list"
+    },
+    "CashflowTarget": "moment:CashflowTarget",
+    "start_date": {
+      "@id": "moment:start_date",
+      "@type": "xsd:date"
+    },
+    "end_date": {
+      "@id": "moment:end_date",
+      "@type": "xsd:date"
+    },
+    "frequency": {
+      "@id": "moment:frequency",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "moment:source",
+      "@type": "xsd:string"
+    },
+    "call_assumption": {
+      "@id": "moment:call_assumption",
+      "@type": "xsd:string"
+    },
+    "overrides": {
+      "@id": "moment:overrides"
+    },
+    "Sleeve": "moment:Sleeve",
+    "allocation_basis": {
+      "@id": "moment:allocation_basis",
+      "@type": "@id"
+    },
+    "priority": {
+      "@id": "moment:priority",
+      "@type": "xsd:integer"
+    },
+    "min_allocation": {
+      "@id": "moment:min_allocation",
+      "@type": "@id"
+    },
+    "target_allocation": {
+      "@id": "moment:target_allocation",
+      "@type": "@id"
+    },
+    "max_allocation": {
+      "@id": "moment:max_allocation",
+      "@type": "@id"
+    },
+    "is_default": {
+      "@id": "moment:is_default",
+      "@type": "xsd:boolean"
+    },
+    "is_managed": {
+      "@id": "moment:is_managed",
+      "@type": "xsd:boolean"
+    },
+    "SleeveStatistics": "moment:SleeveStatistics",
+    "Status": "moment:Status",
+    "TaxRates": "moment:TaxRates",
+    "federal_tax_rate": {
+      "@id": "moment:federal_tax_rate",
+      "@type": "xsd:decimal"
+    },
+    "state_tax_rate": {
+      "@id": "moment:state_tax_rate",
+      "@type": "xsd:decimal"
+    },
+    "local_tax_rate": {
+      "@id": "moment:local_tax_rate",
+      "@type": "xsd:decimal"
+    },
+    "UniverseConstraintValidation": "moment:UniverseConstraintValidation",
+    "WeightComplianceCheckFull": "moment:WeightComplianceCheckFull",
+    "min_weight": {
+      "@id": "moment:min_weight",
+      "@type": "xsd:decimal"
+    },
+    "target_weight": {
+      "@id": "moment:target_weight",
+      "@type": "xsd:decimal"
+    },
+    "max_weight": {
+      "@id": "moment:max_weight",
+      "@type": "xsd:decimal"
+    },
+    "current_weight": {
+      "@id": "moment:current_weight",
+      "@type": "xsd:decimal"
+    },
+    "MarketValueComplianceCheckFull": "moment:MarketValueComplianceCheckFull",
+    "min_market_value": {
+      "@id": "moment:min_market_value",
+      "@type": "xsd:decimal"
+    },
+    "required_market_value": {
+      "@id": "moment:required_market_value",
+      "@type": "xsd:decimal"
+    },
+    "target_market_value": {
+      "@id": "moment:target_market_value",
+      "@type": "xsd:decimal"
+    },
+    "max_market_value": {
+      "@id": "moment:max_market_value",
+      "@type": "xsd:decimal"
+    },
+    "current_market_value": {
+      "@id": "moment:current_market_value",
+      "@type": "xsd:decimal"
+    },
+    "RebalanceStrategy": "moment:RebalanceStrategy",
+    "AccountSettingKey": "moment:AccountSettingKey",
+    "AccountSettingInput": "moment:AccountSettingInput",
+    "setting_key": {
+      "@id": "moment:setting_key",
+      "@type": "@id"
+    },
+    "setting_value": {
+      "@id": "moment:setting_value",
+      "@type": "xsd:string"
+    },
+    "effective_date": {
+      "@id": "moment:effective_date",
+      "@type": "xsd:date"
+    },
+    "AccountSettingOutput": "moment:AccountSettingOutput",
+    "RestrictionType": "moment:RestrictionType",
+    "RestrictionInput": "moment:RestrictionInput",
+    "restriction_type": {
+      "@id": "moment:restriction_type",
+      "@type": "@id"
+    },
+    "reason": {
+      "@id": "moment:reason",
+      "@type": "xsd:string"
+    },
+    "RestrictionOutput": "moment:RestrictionOutput",
+    "LotOverrideField": "moment:LotOverrideField",
+    "LotOverrideInput": "moment:LotOverrideInput",
+    "value": {
+      "@id": "moment:value",
+      "@type": "xsd:string"
+    },
+    "LotOverrideRevertTarget": "moment:LotOverrideRevertTarget",
+    "LotOverrideOutput": "moment:LotOverrideOutput",
+    "lot_override_id": {
+      "@id": "moment:lot_override_id",
+      "@type": "xsd:string"
+    },
+    "lot_id": {
+      "@id": "moment:lot_id",
+      "@type": "xsd:string"
+    },
+    "created_by": {
+      "@id": "moment:created_by",
+      "@type": "xsd:string"
+    },
+    "AccountStatisticsResponse": "moment:AccountStatisticsResponse",
+    "account": {
+      "@id": "moment:account",
+      "@type": "@id"
+    },
+    "sleeves": {
+      "@id": "moment:sleeves",
+      "@container": "@list"
+    },
+    "NewAccountStats": "moment:NewAccountStats",
+    "moment_account_id": {
+      "@id": "moment:moment_account_id",
+      "@type": "xsd:string"
+    },
+    "total_market_value_clean": {
+      "@id": "moment:total_market_value_clean",
+      "@type": "xsd:decimal"
+    },
+    "immediately_withdrawable_cash": {
+      "@id": "moment:immediately_withdrawable_cash",
+      "@type": "xsd:decimal"
+    },
+    "average_yield_to_worst": {
+      "@id": "moment:average_yield_to_worst",
+      "@type": "xsd:decimal"
+    },
+    "average_maturity_in_years": {
+      "@id": "moment:average_maturity_in_years",
+      "@type": "xsd:decimal"
+    },
+    "holding_count": {
+      "@id": "moment:holding_count",
+      "@type": "xsd:integer"
+    },
+    "unrealized_gain_loss": {
+      "@id": "moment:unrealized_gain_loss",
+      "@type": "xsd:decimal"
+    },
+    "managed_portfolio_market_value": {
+      "@id": "moment:managed_portfolio_market_value",
+      "@type": "xsd:decimal"
+    },
+    "last_month_net_accrued": {
+      "@id": "moment:last_month_net_accrued",
+      "@type": "xsd:decimal"
+    },
+    "ytd_net_accrued": {
+      "@id": "moment:ytd_net_accrued",
+      "@type": "xsd:decimal"
+    },
+    "NewSleeveStats": "moment:NewSleeveStats",
+    "sleeve_type": {
+      "@id": "moment:sleeve_type",
+      "@type": "xsd:string"
+    },
+    "strategy_id": {
+      "@id": "moment:strategy_id",
+      "@type": "xsd:string"
+    },
+    "strategy_name": {
+      "@id": "moment:strategy_name",
+      "@type": "xsd:string"
+    },
+    "total_securities_market_value": {
+      "@id": "moment:total_securities_market_value",
+      "@type": "xsd:decimal"
+    },
+    "cash_usd": {
+      "@id": "moment:cash_usd",
+      "@type": "xsd:decimal"
+    },
+    "weight_in_account": {
+      "@id": "moment:weight_in_account",
+      "@type": "xsd:decimal"
+    },
+    "weighted_average_yield_to_worst": {
+      "@id": "moment:weighted_average_yield_to_worst",
+      "@type": "xsd:decimal"
+    },
+    "weighted_average_maturity_in_years": {
+      "@id": "moment:weighted_average_maturity_in_years",
+      "@type": "xsd:decimal"
+    },
+    "weighted_average_sp_rating": {
+      "@id": "moment:weighted_average_sp_rating",
+      "@type": "xsd:string"
+    },
+    "equity_market_value": {
+      "@id": "moment:equity_market_value",
+      "@type": "xsd:decimal"
+    },
+    "fund_market_value": {
+      "@id": "moment:fund_market_value",
+      "@type": "xsd:decimal"
+    },
+    "model_assignment": {
+      "@id": "moment:model_assignment"
+    },
+    "NewModelAssignment": "moment:NewModelAssignment",
+    "AccountLotsResponse": "moment:AccountLotsResponse",
+    "lots": {
+      "@id": "moment:lots",
+      "@container": "@list"
+    },
+    "NewLotStats": "moment:NewLotStats",
+    "lot_status": {
+      "@id": "moment:lot_status",
+      "@type": "xsd:string"
+    },
+    "market_value_clean": {
+      "@id": "moment:market_value_clean",
+      "@type": "xsd:decimal"
+    },
+    "quantity": {
+      "@id": "moment:quantity",
+      "@type": "xsd:decimal"
+    },
+    "display_quantity": {
+      "@id": "moment:display_quantity",
+      "@type": "xsd:decimal"
+    },
+    "current_cost": {
+      "@id": "moment:current_cost",
+      "@type": "xsd:decimal"
+    },
+    "unrealized_gain_loss_pct": {
+      "@id": "moment:unrealized_gain_loss_pct",
+      "@type": "xsd:decimal"
+    },
+    "trade_date": {
+      "@id": "moment:trade_date",
+      "@type": "xsd:dateTime"
+    },
+    "settlement_date": {
+      "@id": "moment:settlement_date",
+      "@type": "xsd:dateTime"
+    },
+    "ticker": {
+      "@id": "moment:ticker",
+      "@type": "xsd:string"
+    },
+    "asset_class": {
+      "@id": "moment:asset_class",
+      "@type": "xsd:string"
+    },
+    "mpe_ytw": {
+      "@id": "moment:mpe_ytw",
+      "@type": "xsd:decimal"
+    },
+    "mpe_mid_price": {
+      "@id": "moment:mpe_mid_price",
+      "@type": "xsd:decimal"
+    },
+    "mpe_accrued_interest": {
+      "@id": "moment:mpe_accrued_interest",
+      "@type": "xsd:decimal"
+    },
+    "BatchAccountStatisticsRequest": "moment:BatchAccountStatisticsRequest",
+    "account_ids": {
+      "@id": "moment:account_ids",
+      "@container": "@list"
+    },
+    "BatchAccountStatisticsResponse": "moment:BatchAccountStatisticsResponse",
+    "accounts": {
+      "@id": "moment:accounts",
+      "@container": "@list"
+    },
+    "BookingType": "moment:BookingType",
+    "OrderRFQ": "moment:OrderRFQ",
+    "contra_quote_id": {
+      "@id": "moment:contra_quote_id",
+      "@type": "xsd:string"
+    },
+    "OrderSide": "moment:OrderSide",
+    "OrderSize": "moment:OrderSize",
+    "OrderType": "moment:OrderType",
+    "PostOrderRequest": "moment:PostOrderRequest",
+    "instrument_id": {
+      "@id": "moment:instrument_id",
+      "@type": "@id"
+    },
+    "client_order_id": {
+      "@id": "moment:client_order_id",
+      "@type": "@id"
+    },
+    "side": {
+      "@id": "moment:side",
+      "@type": "@id"
+    },
+    "limit_price": {
+      "@id": "moment:limit_price",
+      "@type": "@id"
+    },
+    "annotation": {
+      "@id": "moment:annotation",
+      "@type": "xsd:string"
+    },
+    "booking_instructions": {
+      "@id": "moment:booking_instructions"
+    },
+    "extended_hours": {
+      "@id": "moment:extended_hours",
+      "@type": "xsd:boolean"
+    },
+    "rfq": {
+      "@id": "moment:rfq",
+      "@type": "@id"
+    },
+    "booking_type": {
+      "@id": "moment:booking_type",
+      "@type": "@id"
+    },
+    "review_required": {
+      "@id": "moment:review_required",
+      "@type": "xsd:boolean"
+    },
+    "review_reason": {
+      "@id": "moment:review_reason",
+      "@type": "xsd:string"
+    },
+    "PlaceOrderResponse": "moment:PlaceOrderResponse",
+    "CreateSleeveErrorDetails": "moment:CreateSleeveErrorDetails",
+    "UpdateDoNotTradeRequest": "moment:UpdateDoNotTradeRequest",
+    "OrganizationAccount": "moment:OrganizationAccount",
+    "advisor_codes": {
+      "@id": "moment:advisor_codes",
+      "@container": "@list"
+    },
+    "APIError": "moment:APIError",
+    "error": {
+      "@id": "moment:error",
+      "@type": "xsd:string"
+    },
+    "error_details": {
+      "@id": "moment:error_details"
+    },
+    "error_type": {
+      "@id": "moment:error_type",
+      "@type": "@id"
+    },
+    "ErrorType": "moment:ErrorType",
+    "ProjectedCashResponse": "moment:ProjectedCashResponse",
+    "settled_cash": {
+      "@id": "moment:settled_cash",
+      "@type": "@id"
+    },
+    "currency_code": {
+      "@id": "moment:currency_code",
+      "@type": "xsd:string"
+    },
+    "projections": {
+      "@id": "moment:projections",
+      "@container": "@list"
+    },
+    "ProjectedCashProjection": "moment:ProjectedCashProjection",
+    "holder_type": {
+      "@id": "moment:holder_type",
+      "@type": "xsd:string"
+    },
+    "holder_id": {
+      "@id": "moment:holder_id",
+      "@type": "xsd:string"
+    },
+    "unsettled": {
+      "@id": "moment:unsettled",
+      "@type": "@id"
+    },
+    "settled": {
+      "@id": "moment:settled",
+      "@type": "@id"
+    },
+    "running_total": {
+      "@id": "moment:running_total",
+      "@type": "@id"
+    },
+    "CashRaise": "moment:CashRaise",
+    "cancel_reason": {
+      "@id": "moment:cancel_reason",
+      "@type": "xsd:string"
+    },
+    "completed_by": {
+      "@id": "moment:completed_by",
+      "@type": "xsd:string"
+    },
+    "activated_at": {
+      "@id": "moment:activated_at",
+      "@type": "xsd:dateTime"
+    },
+    "effective_at": {
+      "@id": "moment:effective_at",
+      "@type": "xsd:date"
+    },
+    "liquidation_request": {
+      "@id": "moment:liquidation_request",
+      "@type": "xsd:boolean"
+    },
+    "occurrence_date": {
+      "@id": "moment:occurrence_date",
+      "@type": "xsd:date"
+    },
+    "raised_amount": {
+      "@id": "moment:raised_amount",
+      "@type": "@id"
+    },
+    "request_type": {
+      "@id": "moment:request_type",
+      "@type": "xsd:string"
+    },
+    "requested_amount": {
+      "@id": "moment:requested_amount",
+      "@type": "@id"
+    },
+    "schedule_id": {
+      "@id": "moment:schedule_id",
+      "@type": "xsd:string"
+    },
+    "target_date": {
+      "@id": "moment:target_date",
+      "@type": "xsd:date"
+    },
+    "unsettled_cash": {
+      "@id": "moment:unsettled_cash",
+      "@type": "@id"
+    },
+    "updated_at": {
+      "@id": "moment:updated_at",
+      "@type": "xsd:dateTime"
+    },
+    "CashRaiseResolveRequest": "moment:CashRaiseResolveRequest",
+    "AdvisorCodesPerUser": "moment:AdvisorCodesPerUser",
+    "user_id": {
+      "@id": "moment:user_id",
+      "@type": "xsd:string"
+    },
+    "AccountCounts": "moment:AccountCounts",
+    "counts": {
+      "@id": "moment:counts"
+    },
+    "UserAccount": "moment:UserAccount",
+    "UserAccounts": "moment:UserAccounts",
+    "ManualAccountOverride": "moment:ManualAccountOverride",
+    "ManualAccountOverrides": "moment:ManualAccountOverrides",
+    "AdvisorCodesBatch": "moment:AdvisorCodesBatch",
+    "OrganizationAccountWithStatuses": "moment:OrganizationAccountWithStatuses",
+    "UserOrgWideAccess": "moment:UserOrgWideAccess",
+    "has_org_wide_access": {
+      "@id": "moment:has_org_wide_access",
+      "@type": "xsd:boolean"
+    },
+    "OrganizationAdvisorCode": "moment:OrganizationAdvisorCode",
+    "account_count": {
+      "@id": "moment:account_count",
+      "@type": "xsd:integer"
+    },
+    "advisor_code": {
+      "@id": "moment:advisor_code",
+      "@type": "xsd:string"
+    },
+    "AdvisorUser": "moment:AdvisorUser",
+    "AdvisorAccount": "moment:AdvisorAccount",
+    "MarkupPriceYield": "moment:MarkupPriceYield",
+    "Yields": "moment:Yields",
+    "YieldGrid": "moment:YieldGrid",
+    "PortfolioStats": "moment:PortfolioStats",
+    "maturity_years": {
+      "@id": "moment:maturity_years"
+    },
+    "cashflows": {
+      "@id": "moment:cashflows"
+    },
+    "holding": "moment:holding",
+    "size": {
+      "@id": "moment:size",
+      "@type": "@id"
+    },
+    "PositionSize": "moment:PositionSize",
+    "BondType": "moment:BondType",
+    "TreasurySubtype": "moment:TreasurySubtype",
+    "CouponFrequency": "moment:CouponFrequency",
+    "CouponType": "moment:CouponType",
+    "CallType": "moment:CallType",
+    "DayCount": "moment:DayCount",
+    "MunicipalType": "moment:MunicipalType",
+    "SpCreditwatch": "moment:SpCreditwatch",
+    "SpOutlook": "moment:SpOutlook",
+    "BondStatus": "moment:BondStatus",
+    "InstrumentsResponse": "moment:InstrumentsResponse",
+    "count": {
+      "@id": "moment:count",
+      "@type": "xsd:integer"
+    },
+    "next": {
+      "@id": "moment:next",
+      "@type": "xsd:string"
+    },
+    "prev": {
+      "@id": "moment:prev",
+      "@type": "xsd:string"
+    },
+    "data": {
+      "@id": "moment:data",
+      "@container": "@list"
+    },
+    "InstrumentInfo": "moment:InstrumentInfo",
+    "figi": {
+      "@id": "moment:figi",
+      "@type": "@id"
+    },
+    "country_issue": {
+      "@id": "moment:country_issue",
+      "@type": "@id"
+    },
+    "country_domicile": {
+      "@id": "moment:country_domicile",
+      "@type": "@id"
+    },
+    "seniority": {
+      "@id": "moment:seniority",
+      "@type": "@id"
+    },
+    "naics_sector": {
+      "@id": "moment:naics_sector",
+      "@type": "@id"
+    },
+    "naics_subsector": {
+      "@id": "moment:naics_subsector",
+      "@type": "@id"
+    },
+    "treasury_benchmark": {
+      "@id": "moment:treasury_benchmark",
+      "@type": "@id"
+    },
+    "workout_date": {
+      "@id": "moment:workout_date",
+      "@type": "@id"
+    },
+    "coupon_frequency": {
+      "@id": "moment:coupon_frequency",
+      "@type": "@id"
+    },
+    "coupon_type": {
+      "@id": "moment:coupon_type",
+      "@type": "@id"
+    },
+    "coupon_subtype": {
+      "@id": "moment:coupon_subtype",
+      "@type": "@id"
+    },
+    "first_coupon_date": {
+      "@id": "moment:first_coupon_date",
+      "@type": "@id"
+    },
+    "next_coupon_date": {
+      "@id": "moment:next_coupon_date",
+      "@type": "@id"
+    },
+    "last_coupon_date": {
+      "@id": "moment:last_coupon_date",
+      "@type": "@id"
+    },
+    "issue_size": {
+      "@id": "moment:issue_size",
+      "@type": "@id"
+    },
+    "issue_date": {
+      "@id": "moment:issue_date",
+      "@type": "@id"
+    },
+    "original_issue_date": {
+      "@id": "moment:original_issue_date",
+      "@type": "@id"
+    },
+    "original_issue_price": {
+      "@id": "moment:original_issue_price",
+      "@type": "@id"
+    },
+    "original_issue_size": {
+      "@id": "moment:original_issue_size",
+      "@type": "@id"
+    },
+    "issue_price": {
+      "@id": "moment:issue_price",
+      "@type": "@id"
+    },
+    "issue_minimum_denomination": {
+      "@id": "moment:issue_minimum_denomination",
+      "@type": "@id"
+    },
+    "call_type": {
+      "@id": "moment:call_type",
+      "@type": "@id"
+    },
+    "puttable": {
+      "@id": "moment:puttable",
+      "@type": "@id"
+    },
+    "convertible": {
+      "@id": "moment:convertible",
+      "@type": "@id"
+    },
+    "contingent_convertible": {
+      "@id": "moment:contingent_convertible",
+      "@type": "@id"
+    },
+    "trigger_event_type": {
+      "@id": "moment:trigger_event_type",
+      "@type": "@id"
+    },
+    "trigger_type": {
+      "@id": "moment:trigger_type",
+      "@type": "@id"
+    },
+    "trigger_action": {
+      "@id": "moment:trigger_action",
+      "@type": "@id"
+    },
+    "trigger_level_type": {
+      "@id": "moment:trigger_level_type",
+      "@type": "@id"
+    },
+    "trigger_level_value": {
+      "@id": "moment:trigger_level_value",
+      "@type": "@id"
+    },
+    "bond_warrant": {
+      "@id": "moment:bond_warrant",
+      "@type": "@id"
+    },
+    "is_structured_product": {
+      "@id": "moment:is_structured_product",
+      "@type": "@id"
+    },
+    "sinking_fund": {
+      "@id": "moment:sinking_fund",
+      "@type": "@id"
+    },
+    "perpetual": {
+      "@id": "moment:perpetual",
+      "@type": "@id"
+    },
+    "insured": {
+      "@id": "moment:insured",
+      "@type": "@id"
+    },
+    "private_placement": {
+      "@id": "moment:private_placement",
+      "@type": "@id"
+    },
+    "reg_s": {
+      "@id": "moment:reg_s",
+      "@type": "@id"
+    },
+    "trace_eligible": {
+      "@id": "moment:trace_eligible",
+      "@type": "@id"
+    },
+    "daycount": {
+      "@id": "moment:daycount",
+      "@type": "@id"
+    },
+    "settlement_convention": {
+      "@id": "moment:settlement_convention",
+      "@type": "@id"
+    },
+    "dated_date": {
+      "@id": "moment:dated_date",
+      "@type": "@id"
+    },
+    "municipal_type": {
+      "@id": "moment:municipal_type",
+      "@type": "@id"
+    },
+    "bank_qualified": {
+      "@id": "moment:bank_qualified",
+      "@type": "@id"
+    },
+    "is_amt_applicable": {
+      "@id": "moment:is_amt_applicable",
+      "@type": "@id"
+    },
+    "pre_refunded": {
+      "@id": "moment:pre_refunded",
+      "@type": "@id"
+    },
+    "original_maturity_date": {
+      "@id": "moment:original_maturity_date",
+      "@type": "@id"
+    },
+    "sp_rating_date": {
+      "@id": "moment:sp_rating_date",
+      "@type": "@id"
+    },
+    "sp_creditwatch": {
+      "@id": "moment:sp_creditwatch",
+      "@type": "@id"
+    },
+    "sp_creditwatch_date": {
+      "@id": "moment:sp_creditwatch_date",
+      "@type": "@id"
+    },
+    "sp_outlook": {
+      "@id": "moment:sp_outlook",
+      "@type": "@id"
+    },
+    "sp_outlook_date": {
+      "@id": "moment:sp_outlook_date",
+      "@type": "@id"
+    },
+    "moodys_rating_date": {
+      "@id": "moment:moodys_rating_date",
+      "@type": "@id"
+    },
+    "convexity": {
+      "@id": "moment:convexity",
+      "@type": "@id"
+    },
+    "liquidity_micro_buy": {
+      "@id": "moment:liquidity_micro_buy",
+      "@type": "@id"
+    },
+    "liquidity_micro_sell": {
+      "@id": "moment:liquidity_micro_sell",
+      "@type": "@id"
+    },
+    "liquidity_micro_aggregate": {
+      "@id": "moment:liquidity_micro_aggregate",
+      "@type": "@id"
+    },
+    "liquidity_retail_buy": {
+      "@id": "moment:liquidity_retail_buy",
+      "@type": "@id"
+    },
+    "liquidity_retail_sell": {
+      "@id": "moment:liquidity_retail_sell",
+      "@type": "@id"
+    },
+    "liquidity_retail_aggregate": {
+      "@id": "moment:liquidity_retail_aggregate",
+      "@type": "@id"
+    },
+    "liquidity_institutional_buy": {
+      "@id": "moment:liquidity_institutional_buy",
+      "@type": "@id"
+    },
+    "liquidity_institutional_sell": {
+      "@id": "moment:liquidity_institutional_sell",
+      "@type": "@id"
+    },
+    "liquidity_institutional_aggregate": {
+      "@id": "moment:liquidity_institutional_aggregate",
+      "@type": "@id"
+    },
+    "close_ytw": {
+      "@id": "moment:close_ytw",
+      "@type": "@id"
+    },
+    "close_ytm": {
+      "@id": "moment:close_ytm",
+      "@type": "@id"
+    },
+    "close_price_asof": {
+      "@id": "moment:close_price_asof",
+      "@type": "@id"
+    },
+    "CallSchedule": "moment:CallSchedule",
+    "call_date": {
+      "@id": "moment:call_date",
+      "@type": "xsd:date"
+    },
+    "call_price": {
+      "@id": "moment:call_price",
+      "@type": "xsd:decimal"
+    },
+    "Price": "moment:Price",
+    "PricesResponse": "moment:PricesResponse",
+    "MarkDetails": "moment:MarkDetails",
+    "dirty_price": {
+      "@id": "moment:dirty_price",
+      "@type": "xsd:decimal"
+    },
+    "Mark": "moment:Mark",
+    "details": {
+      "@id": "moment:details",
+      "@type": "@id"
+    },
+    "CorporateActionsResponse": "moment:CorporateActionsResponse",
+    "corporate_actions": {
+      "@id": "moment:corporate_actions",
+      "@container": "@list"
+    },
+    "CorporateActionFullCallInfo": "moment:CorporateActionFullCallInfo",
+    "update_id": {
+      "@id": "moment:update_id",
+      "@type": "@id"
+    },
+    "confirmation": {
+      "@id": "moment:confirmation",
+      "@type": "@id"
+    },
+    "category": {
+      "@id": "moment:category",
+      "@type": "@id"
+    },
+    "payout": {
+      "@id": "moment:payout",
+      "@type": "@id"
+    },
+    "payment_date": {
+      "@id": "moment:payment_date",
+      "@type": "@id"
+    },
+    "additional_info": {
+      "@id": "moment:additional_info",
+      "@type": "@id"
+    },
+    "cancel_info": {
+      "@id": "moment:cancel_info",
+      "@type": "@id"
+    },
+    "cancel_type": {
+      "@id": "moment:cancel_type",
+      "@type": "@id"
+    },
+    "cancel_date": {
+      "@id": "moment:cancel_date",
+      "@type": "@id"
+    },
+    "earliest_payment_date": {
+      "@id": "moment:earliest_payment_date",
+      "@type": "@id"
+    },
+    "CorporateActionPartialCallInfo": "moment:CorporateActionPartialCallInfo",
+    "results_publication_date": {
+      "@id": "moment:results_publication_date",
+      "@type": "@id"
+    },
+    "record_date": {
+      "@id": "moment:record_date",
+      "@type": "@id"
+    },
+    "lottery_type": {
+      "@id": "moment:lottery_type",
+      "@type": "@id"
+    },
+    "lottery_date": {
+      "@id": "moment:lottery_date",
+      "@type": "@id"
+    },
+    "CorporateActionPutInfo": "moment:CorporateActionPutInfo",
+    "market_deadline": {
+      "@id": "moment:market_deadline",
+      "@type": "@id"
+    },
+    "response_deadline": {
+      "@id": "moment:response_deadline",
+      "@type": "@id"
+    },
+    "put_min_quantity": {
+      "@id": "moment:put_min_quantity",
+      "@type": "@id"
+    },
+    "put_min_increment": {
+      "@id": "moment:put_min_increment",
+      "@type": "@id"
+    },
+    "CorporateActionPreRefundingInfo": "moment:CorporateActionPreRefundingInfo",
+    "refunded_security": {
+      "@id": "moment:refunded_security",
+      "@type": "@id"
+    },
+    "non_refunded_security": {
+      "@id": "moment:non_refunded_security",
+      "@type": "@id"
+    },
+    "CorporateActionRedemptionInfo": "moment:CorporateActionRedemptionInfo",
+    "CorporateActionInterestInfo": "moment:CorporateActionInterestInfo",
+    "rate_type": {
+      "@id": "moment:rate_type",
+      "@type": "@id"
+    },
+    "rate_amount": {
+      "@id": "moment:rate_amount",
+      "@type": "@id"
+    }
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Moment API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Moment's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-14) from openapi/moment-account-management-api-openapi.yml, openapi/moment-account-management-extended-api-openapi.yml, openapi/moment-analytics-api-openapi.yml.",
+  "dcterms:created": "2026-10-14",
+  "dcterms:source": [
+    "openapi/moment-account-management-api-openapi.yml",
+    "openapi/moment-account-management-extended-api-openapi.yml",
+    "openapi/moment-analytics-api-openapi.yml",
+    "openapi/moment-data-api-openapi.yml",
+    "openapi/moment-filter-lists-api-openapi.yml"
+  ]
+}

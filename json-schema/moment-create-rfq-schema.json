@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-create-rfq-schema.json",
+  "title": "CreateRFQ",
+  "description": "Request body for creating a standalone RFQ.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-orders-api-openapi.yml#/components/schemas/CreateRFQ",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "$ref": "#/$defs/OrderSize"
+    },
+    "client_rfq_id": {
+      "description": "The ID of the RFQ as provided by the client.",
+      "type": "string",
+      "title": "Client RFQ ID"
+    },
+    "custodian_id": {
+      "description": "The ID of the custodian for the RFQ. This field is required when venue is TMC.",
+      "type": "string"
+    },
+    "disclosure": {
+      "$ref": "#/$defs/DisclosureType"
+    },
+    "due_time": {
+      "description": "The time at which quotes for this RFQ are due.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "expire_time": {
+      "description": "The time at which the RFQ will expire.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "firm_until_time": {
+      "description": "The time until which the quotes for this RFQ are firm.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "ib_id": {
+      "$ref": "#/$defs/IntroducingBrokerID"
+    },
+    "instrument_id": {
+      "description": "The ISIN of the instrument being traded.",
+      "type": "string"
+    },
+    "moment_order_id": {
+      "description": "When creating an RFQ to trade against an existing order, the identifier of the corresponding order.",
+      "type": "string",
+      "title": "Moment Order ID",
+      "x-go-name": "MomentOrderID"
+    },
+    "risk_group_id": {
+      "$ref": "#/$defs/RiskGroupID"
+    },
+    "settlement_date": {
+      "description": "The date on which the trade for this RFQ is to be settled.",
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "side": {
+      "$ref": "#/$defs/OrderSide"
+    },
+    "skip_fees": {
+      "description": "Whether to skip fees for this RFQ. If true, the quotes will not include fees.",
+      "type": "boolean"
+    },
+    "type": {
+      "$ref": "#/$defs/RFQType"
+    },
+    "venue_mpid": {
+      "description": "The Market Participant Identifier (MPID) of the venue.",
+      "type": "string"
+    },
+    "venue_trader_info": {
+      "$ref": "#/$defs/VenueTraderInfo"
+    }
+  },
+  "required": [
+    "ib_id",
+    "risk_group_id",
+    "instrument_id",
+    "type",
+    "side",
+    "amount",
+    "venue_mpid",
+    "disclosure"
+  ],
+  "$defs": {
+    "DisclosureType": {
+      "description": "Disclosure types",
+      "type": "string",
+      "enum": [
+        "disclosed",
+        "anonymous",
+        "unspecified"
+      ]
+    },
+    "IntroducingBrokerID": {
+      "description": "The ID of the introducing broker placing the order. If not specified, the organization associated with the API key will be used.",
+      "type": "string"
+    },
+    "OrderSide": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "sell"
+      ],
+      "title": "OrderSide",
+      "description": "Represents which side this order is on:\n\n- buy\n- sell"
+    },
+    "OrderSize": {
+      "type": "object",
+      "title": "Amount",
+      "description": "The Amount of an order with a specified `type` indicating how the amount is represented.\n- **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).\n- **Notional:** Represents the order size in notional dollar value.\n- **Shares:** Represents the order size in number of shares (for equities).",
+      "properties": {
+        "value": {
+          "type": "number",
+          "x-go-type": "float64"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "par",
+            "notional",
+            "shares"
+          ],
+          "default": "par",
+          "x-enumNames": [
+            "SizeTypePar",
+            "SizeTypeNotional",
+            "SizeTypeShares"
+          ]
+        }
+      },
+      "required": [
+        "value",
+        "type"
+      ]
+    },
+    "RFQType": {
+      "description": "RFQ types",
+      "type": "string",
+      "enum": [
+        "bin",
+        "asap",
+        "unspecified"
+      ]
+    },
+    "RiskGroupID": {
+      "description": "The risk group ID to use for this order. If not specified, the default risk group for the organization will be used. The risk group must belong to the organization specified by ib_id. Orders for which the risk group does not belong to the specified organization will be rejected with \"invalid risk group id.\"",
+      "type": "string"
+    },
+    "VenueTraderInfo": {
+      "title": "Venue Trader Info",
+      "type": "object",
+      "required": [
+        "venue_mpid",
+        "custodian_id",
+        "venue_trader_id",
+        "custodian_account_at_venue"
+      ],
+      "properties": {
+        "venue_mpid": {
+          "type": "string",
+          "description": "The MPID of the venue.",
+          "x-go-name": "VenueMPID"
+        },
+        "custodian_id": {
+          "type": "string",
+          "description": "The ID of the custodian for the venue trader info.",
+          "x-go-name": "CustodianID"
+        },
+        "venue_trader_id": {
+          "type": "string",
+          "description": "The ID of the venue trader.",
+          "x-go-name": "VenueTraderID"
+        },
+        "custodian_account_at_venue": {
+          "type": "string",
+          "description": "The ID of the custodian account for the venue trader."
+        }
+      }
+    }
+  }
+}

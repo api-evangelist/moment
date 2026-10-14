@@ -1,0 +1,56 @@
+generated: '2026-10-14'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 4
+  own: 3
+  other_domain: 1
+  platform: 0
+  roles:
+  - other
+  - portal
+  - status
+  - website
+hosts:
+- host: docs.moment.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - DeveloperPortal
+  - Documentation
+  - APIReference
+  - GettingStarted
+  serves:
+  - docs
+  registrable_domain: moment.com
+  role: portal
+  relation: own
+- host: moment-api.com
+  found_by:
+  - apis[]
+  types: []
+  serves:
+  - api
+  registrable_domain: moment-api.com
+  role: other
+  relation: other-domain
+- host: moment.com
+  found_by:
+  - pointer
+  types:
+  - Website
+  serves: []
+  registrable_domain: moment.com
+  role: website
+  relation: own
+- host: status.moment.com
+  found_by:
+  - pointer
+  types:
+  - StatusPage
+  serves: []
+  registrable_domain: moment.com
+  role: status
+  relation: own

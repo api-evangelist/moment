@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/moment/main/json-schema/moment-yield-grid-schema.json",
+  "title": "Yield grid",
+  "description": "Yield to worst and yield to maturity for a range of prices.",
+  "x-generated": "2026-10-14",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/moment-analytics-api-openapi.yml#/components/schemas/YieldGrid",
+  "type": "object",
+  "properties": {
+    "price": {
+      "type": "array",
+      "description": "Prices, represented as a percentage of par.",
+      "items": {
+        "type": "number"
+      }
+    },
+    "yield_to_maturity": {
+      "type": "array",
+      "description": "Yield to maturity for each price.",
+      "items": {
+        "type": "number"
+      }
+    },
+    "yield_to_worst": {
+      "type": "array",
+      "description": "Yield to worst for each price, when available.",
+      "items": {
+        "type": [
+          "number",
+          "null"
+        ]
+      }
+    }
+  }
+}

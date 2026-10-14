@@ -1,0 +1,358 @@
+openapi: 3.0.0
+info:
+  title: Transactions API
+  description: An HTTP/JSON API for looking up historical agency, corporate, and municipal bond transactions.
+  version: 0.1.0
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+security:
+- ApiKeyAuth: []
+paths:
+  /v1/transactions/{instrument_id}/:
+    summary: Historical transactions for a specific bond.
+    get:
+      summary: List historical transactions.
+      tags:
+      - Transactions
+      operationId: getTransactions
+      parameters:
+      - name: instrument_id
+        in: path
+        description: CUSIP or ISIN.
+        schema:
+          type: string
+        required: true
+      - name: start
+        in: query
+        description: Exclude transactions that occurred before the 'start' time. If not specified, the server will return all transactions.
+        schema:
+          type: string
+          format: date-time
+      - name: end
+        in: query
+        description: Exclude transactions that occurred after the 'end' time. Defaults to the current time if not specified.
+        schema:
+          type: string
+          format: date-time
+      - name: page_size
+        in: query
+        description: The maximum number of results per page. Defaults to 1000 if not specified. Maximum allowed value is 1000.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+      - name: page_token
+        in: query
+        description: A pointer to the next page of results. If not specified, the server will return the first page of results. If specified, all parameters except 'page_size' must match the request that returned the token.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: One page of results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsPage'
+              example:
+                count: -1
+                data:
+                - counterparty: CUSTOMER
+                  id: BTDS-144A9022820250716
+                  isin: US501797AW48
+                  price: 102.073
+                  quantity: 50000
+                  side: SELL
+                  spread: 33
+                  timestamp: '2025-07-16T12:07:13-04:00'
+                  ytm: 5.93
+                  ytw: 5.902
+                - counterparty: CUSTOMER
+                  id: BTDS-144A1450620250716
+                  isin: US501797AW48
+                  price: 102.279
+                  quantity: 200000
+                  side: SELL
+                  spread: 28
+                  timestamp: '2025-07-16T09:17:23-04:00'
+                  ytm: 5.86
+                  ytw: 5.831
+                next: https://example.com/v1/transactions/US501797AW48/?page_size=2&page_token=eyJpc2luIjoiVVM1MDE3OTdBVzQ4Iiwic3RhcnQiOiIyMDI1LTA3LTE1VDEyOjAwOjAwLTA0OjAwIiwiZW5kIjoiMjAyNS0wNy0yN1QyMzo1MDo1Ni40MzQ4MjQtMDQ6MDAiLCJvZmZzZXQiOjJ9&start=2025-07-15T12%3A00%3A00-04%3A00
+                prev: null
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Standard error response format returned by all API endpoints.
+                properties:
+                  error:
+                    type: string
+                    description: Human-readable error message describing what went wrong.
+                  error_details:
+                    description: Additional structured information about the error.
+                    x-go-type: any
+                    x-go-type-skip-optional-pointer: true
+                    x-oapi-codegen-extra-tags:
+                      exhaustruct: optional
+                  error_type:
+                    type: string
+                    description: High-level error category for programmatic error handling.
+                    enum:
+                    - invalid_request
+                    - not_found
+                    - server_error
+                    - unauthorized
+                    - rate_limited
+                    - forbidden
+                    - closed
+                    - not_implemented
+                    - resource_conflict
+                    x-enum-varnames:
+                    - ErrorTypeInvalidRequest
+                    - ErrorTypeNotFound
+                    - ErrorTypeServerError
+                    - ErrorTypeUnauthorized
+                    - ErrorTypeRateLimited
+                    - ErrorTypeForbidden
+                    - ErrorTypeNeedsMarketState
+                    - ErrorTypeNotImplemented
+                    - ErrorTypeResourceConflict
+                required:
+                - error
+                - error_type
+  /v1/transactions/{instrument_id}/summary/:
+    summary: Daily summary statistics for a given instrument.
+    get:
+      summary: Retrieve daily summary statistics for a given instrument.
+      tags:
+      - Transactions
+      operationId: getDailyTransactionSummaries
+      parameters:
+      - name: instrument_id
+        in: path
+        description: CUSIP or ISIN.
+        schema:
+          type: string
+        required: true
+      - name: start
+        in: query
+        description: The earliest date for which we want summary statistics.
+        schema:
+          type: string
+          format: date
+      - name: end
+        in: query
+        description: The most recent date for which we care about summary statistics.
+        schema:
+          type: string
+          format: date
+      - name: page_size
+        in: query
+        description: The maximum number of daily summaries per page of results. Defaults to 1000 if not specified. Maximum allowed value is 1000.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      - name: page_token
+        in: query
+        description: A pointer to the next page of results. If not specified, the server will return the first page of results. If specified, all parameters except 'page_size' must match the request that returned the token.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: One page of results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailySummariesPage'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1transactions~1{instrument_id}~1/get/responses/400/content/application~1json/schema'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    TransactionsPage:
+      type: object
+      description: A paginated list of transactions.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+          description: List of transactions in this page.
+        count:
+          type: integer
+          description: Always -1. Retained for wire-shape compatibility; the value is no longer computed because no known consumer reads it and producing it required an extra full-history scan per request. Iterate `next` to enumerate the result set.
+        next:
+          type: string
+          description: A hyperlink to the next page of results, requesting the same page size as the current request.
+          nullable: true
+        prev:
+          type: string
+          description: Null. Paginating in reverse is not supported.
+          nullable: true
+      required:
+      - data
+      - count
+      - next
+      - prev
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this transaction.
+        isin:
+          type: string
+          description: ISIN of the bond.
+        quantity:
+          type: integer
+          description: The face value of the transaction.
+        side:
+          type: string
+          enum:
+          - BUY
+          - SELL
+          description: Whether this was a buy or sell transaction.
+        price:
+          type: number
+          description: Percentage of par value.
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        ytw:
+          type: number
+          description: Yield to worst.
+          x-go-type: decimal.NullDecimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        ytm:
+          type: number
+          description: Yield to maturity.
+          x-go-type: decimal.NullDecimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        spread:
+          type: number
+          description: Spread to benchmark in basis points.
+          x-go-type: decimal.NullDecimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        counterparty:
+          type: string
+          enum:
+          - ATS
+          - CUSTOMER
+          - DEALER
+          - NON_MEMBER_AFFILIATE
+          description: Type of counterparty in the transaction.
+        timestamp:
+          type: string
+          format: date-time
+          description: When the transaction occurred.
+      required:
+      - id
+      - isin
+      - quantity
+      - side
+      - price
+      - ytw
+      - ytm
+      - spread
+      - counterparty
+      - timestamp
+      example:
+        counterparty: CUSTOMER
+        id: BTDS-144A9022820250716
+        isin: US501797AW48
+        price: 102.073
+        quantity: 50000
+        side: SELL
+        spread: null
+        timestamp: '2025-07-16T12:07:13-04:00'
+        ytm: null
+        ytw: 5.902
+    DailySummariesPage:
+      type: object
+      description: A paginated list of daily transaction summaries.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailySummary'
+          description: List of daily summaries in this page.
+        count:
+          type: integer
+          description: Always -1. Retained for wire-shape compatibility; the value is no longer computed because no known consumer reads it.
+        next:
+          type: string
+          description: A hyperlink to the next page of results, requesting the same page size as the current request.
+          nullable: true
+        prev:
+          type: string
+          description: Null. Paginating in reverse is not supported.
+          nullable: true
+      required:
+      - data
+      - count
+      - next
+      - prev
+    DailySummary:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        buy_volume:
+          type: integer
+          description: Cumulative face value of buy transactions on 'date'.
+        sell_volume:
+          type: integer
+          description: Cumulative face value of sell transactions on 'date'.
+        inter_dealer_volume:
+          type: integer
+          description: Cumulative face value of inter-dealer transactions on 'date'.
+        high_price:
+          type: number
+          description: Highest price of any transaction on 'date'.
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        low_price:
+          type: number
+          description: Lowest price of any transaction on 'date'.
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        total_volume:
+          type: integer
+          description: Cumulative face value of all transactions on 'date'.
+      required:
+      - date
+      - buy_volume
+      - sell_volume
+      - inter_dealer_volume
+      - high_price
+      - low_price
+      - total_volume
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getdailytransactionsummaries.md
+  - https://docs.moment.com/reference/gettransactions.md
+  merge:
+    pages: 2
+    deduped: 3
+    conflicts_kept_first: 0
