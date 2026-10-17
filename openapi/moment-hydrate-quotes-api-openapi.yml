@@ -1,0 +1,173 @@
+openapi: 3.2.0
+info:
+  title: Hydrate Quotes API
+  description: 'Moment''s Quotes API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Quotes API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Hydrate Quotes
+paths:
+  /v1/trading/quotes/hydrate/:
+    post:
+      tags:
+      - Hydrate Quotes
+      summary: Hydrate Quotes
+      description: The Hydrate Quotes API accepts a list of pre fee quotes, an optional list of custom fees, and returns a list of post fee quotes with yields and spread prices.
+      operationId: hydrateQuotes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isin:
+                  description: The ISIN of the bond
+                  type: string
+                quotes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PreFeeQuote'
+                custom_fees:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CustomFee'
+                trade_size:
+                  description: The trade size of the quote
+                  type:
+                  - number
+                  - 'null'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HydratedQuote'
+components:
+  schemas:
+    PreFeeQuote:
+      type: object
+      properties:
+        id:
+          description: The ID of the quote.
+          type: string
+        pre_fee_price:
+          description: The pre fee price of the quote.
+          type: number
+        side:
+          description: The side of the quote.
+          type: string
+          enum:
+          - ask
+          - bid
+      required:
+      - id
+      - pre_fee_price
+      - side
+    HydratedQuote:
+      description: A hydrated quote with yields and spread prices.
+      type: object
+      properties:
+        id:
+          description: The ID of the quote.
+          type: string
+        percent_price:
+          description: The percent price of the quote.
+          type: number
+        pre_fee_price:
+          description: The pre fee price of the quote.
+          type: number
+        side:
+          description: The side of the quote.
+          type: string
+          enum:
+          - ask
+          - bid
+        spread_benchmark_isin:
+          description: The ISIN of the spread benchmark.
+          type: string
+        spread_to_benchmark_bps:
+          description: The spread to the benchmark in basis points.
+          type: string
+        yield_to_maturity:
+          description: The yield to maturity of the quote.
+          type: number
+        yield_to_worst:
+          description: The yield to worst of the quote.
+          type: number
+      required:
+      - id
+      - percent_price
+      - side
+    CustomFee:
+      description: Custom fees to be applied.
+      type: object
+      properties:
+        fee_amount:
+          description: The amount of the fee.
+          type: number
+        fee_amount_type:
+          description: The type of fee amount.
+          type: string
+          enum:
+          - percentage_of_par
+          - percentage_of_market_value
+          - yield_bps
+        fee_schedule_asset_level_id:
+          description: The ID of the fee schedule asset level.
+          type: string
+        fee_schedule_id:
+          description: The ID of the fee schedule.
+          type: string
+        fee_type:
+          description: The type of fee.
+          type: string
+          enum:
+          - commission
+          - markup
+        max_fee_amount:
+          description: The maximum amount of the fee.
+          type: number
+        recipient_id:
+          description: The ID of the recipient.
+          type: string
+      required:
+      - fee_schedule_id
+      - fee_schedule_asset_level_id
+      - recipient_id
+      - fee_type
+      - fee_amount_type
+      - fee_amount
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getfractionaluniverse-1.md
+  - https://docs.moment.com/reference/getfullorderbook-1.md
+  - https://docs.moment.com/reference/gettopoforderbook-1.md
+  - https://docs.moment.com/reference/gettradeprice-1.md
+  - https://docs.moment.com/reference/gettradingcalendar-1.md
+  - https://docs.moment.com/reference/getunifiedmarket-1.md
+  - https://docs.moment.com/reference/hydratequotes-1.md
+  merge:
+    pages: 7
+    deduped: 4
+    conflicts_kept_first: 0

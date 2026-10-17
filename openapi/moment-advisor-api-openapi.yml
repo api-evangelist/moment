@@ -1,0 +1,244 @@
+openapi: 3.2.0
+info:
+  title: Account Management Extended Advisor API
+  version: 1.0.0
+  description: Account Management Extended API for managing account metadata and cash raise operations.
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Advisor
+paths:
+  /v1/account/organizations/{organization_id}/advisors/{advisor_id}/accounts/:
+    get:
+      tags:
+      - Advisor
+      summary: Get accounts associated with an advisor
+      description: Lists accounts associated with an advisor, paginated
+      operationId: getAdvisorAccounts
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: advisor_id
+        in: path
+        description: Advisor ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdvisorAccount'
+                required:
+                - accounts
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization or advisor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/advisors/{advisor_id}/users/:
+    get:
+      tags:
+      - Advisor
+      summary: Get users associated with an advisor
+      description: Lists users associated with an advisor, paginated
+      operationId: getAdvisorUsers
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: advisor_id
+        in: path
+        description: Advisor ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdvisorUser'
+                required:
+                - users
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization or advisor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    AdvisorAccount:
+      type: object
+      properties:
+        account_id:
+          description: The account ID
+          type: string
+        account_name:
+          description: The account name
+          type: string
+        custodian:
+          description: The custodian
+          type: string
+      required:
+      - account_id
+      - account_name
+      - custodian
+    AdvisorUser:
+      type: object
+      properties:
+        user_id:
+          description: The user ID
+          type: string
+      required:
+      - user_id
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/cancelcashraise.md
+  - https://docs.moment.com/reference/completecashraise.md
+  - https://docs.moment.com/reference/createcashraise.md
+  - https://docs.moment.com/reference/createmanualaccountoverride.md
+  - https://docs.moment.com/reference/getaccountcounts.md
+  - https://docs.moment.com/reference/getaccountsforuser.md
+  - https://docs.moment.com/reference/getadvisoraccounts.md
+  - https://docs.moment.com/reference/getadvisorcodes.md
+  - https://docs.moment.com/reference/getadvisorcodesbatch.md
+  - https://docs.moment.com/reference/getadvisorusers.md
+  - https://docs.moment.com/reference/getcashraisebyid.md
+  - https://docs.moment.com/reference/getcashraises.md
+  - https://docs.moment.com/reference/getmanualaccountoverrides.md
+  - https://docs.moment.com/reference/getorganizationaccounts.md
+  - https://docs.moment.com/reference/getorganizationaccountstatusesforuser.md
+  - https://docs.moment.com/reference/getorganizationadvisorcodes.md
+  - https://docs.moment.com/reference/getprojectedcash.md
+  - https://docs.moment.com/reference/getuserorgaccountaccess.md
+  - https://docs.moment.com/reference/resolvecashraises.md
+  - https://docs.moment.com/reference/updateaccountmetadata.md
+  - https://docs.moment.com/reference/updatecashraise.md
+  merge:
+    pages: 21
+    deduped: 56
+    conflicts_kept_first: 0

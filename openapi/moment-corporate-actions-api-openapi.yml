@@ -1,0 +1,925 @@
+openapi: 3.2.0
+info:
+  title: Data Corporate Actions API
+  description: Access Moment's evaluative and real-time US fixed income data, as well as daily reference data, through REST API and WebSocket.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+security:
+- bearerAuth: []
+tags:
+- name: Corporate Actions
+paths:
+  /v1/data/corporate-actions/:
+    get:
+      tags:
+      - Corporate Actions
+      summary: All Corporate Actions
+      parameters:
+      - $ref: '#/components/parameters/corporate_action_start_date'
+      - $ref: '#/components/parameters/corporate_action_end_date'
+      - $ref: '#/components/parameters/corporate_action_instrument_ids'
+      - $ref: '#/components/parameters/corporate_action_event_types'
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/page_size'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorporateActionsResponse'
+      operationId: listCorporateActions
+      description: 'List the corporate actions that occurred in a particular time period. Optionally filter by security and event type. The returned events will be sorted in descending order by the update time.
+
+
+        Currently, the supported event types are:
+
+
+        * "DRAW" - Partial Call
+
+        * "MCAL" - Full Call
+
+        * "BPUT" - Partial Mandatory Put
+
+        * "PDEF" - Pre-Refunding / Defeasance
+
+        * "PRED" - Partial Redemption With Pool Factor Reduction
+
+        * "INTR" - Interest Payment
+
+        * "REDM" - Redemption (Final Maturity)
+
+        * "TEND" - Tender Offer
+
+        * "BIDS" - Repurchase Offer
+
+        * "CAPI" - Capitalization
+
+
+        Each event will have a different set of fields, depending on the event type. These are detailed in the schema for each event type.'
+  /v1/data/corporate-actions/{event_id}/:
+    get:
+      tags:
+      - Corporate Actions
+      summary: Single Corporate Action
+      parameters:
+      - $ref: '#/components/parameters/corporate_action_event_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorporateActionDetailResponse'
+      operationId: retrieveCorporateAction
+      description: 'Retrieve complete details for the specified corporate action event including event details, past lifecycle details, and associated instruments. These will all have the same event ID and event type.
+
+
+        The returned events will be sorted in descending order by the update time.'
+components:
+  parameters:
+    corporate_action_end_date:
+      name: end
+      in: query
+      required: true
+      description: 'The inclusive end of the date range when searching corporate action announcements, formatted as YYYY-MM-DD.
+
+
+        The maximum range is 31 days.'
+      schema:
+        type: string
+        format: date
+        example: '2024-09-01'
+    corporate_action_event_types:
+      name: event_types
+      in: query
+      required: false
+      description: 'Comma separated list of corporate action event types to filter on.
+
+
+        These follow the standard ISO 20022 event types.'
+      schema:
+        type: string
+        example: MCAL,DRAW
+    corporate_action_instrument_ids:
+      name: instrument_ids
+      in: query
+      required: false
+      description: 'Comma separated list of ISINs to filter on.
+
+
+        At most 1000 ISINs may be specified.'
+      schema:
+        type: string
+        example: US84858WAA45,US17298CHQ42
+    page_size:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+      description: Number of items to return. Must be in range 1-1000, defaults to 100.
+    corporate_action_event_id:
+      name: event_id
+      in: path
+      required: true
+      description: Corporate action event ID.
+      schema:
+        type: string
+        example: US144543665
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: Page number of results to return. Defaults to 1.
+    corporate_action_start_date:
+      name: start
+      in: query
+      required: true
+      description: 'The inclusive start of the date range when searching corporate action announcements, formatted as YYYY-MM-DD.
+
+
+        The maximum range is 31 days.'
+      schema:
+        type: string
+        format: date
+        example: '2024-08-01'
+  schemas:
+    CorporateActionUpdatedAt:
+      type: string
+      description: The time at which the corporate action event was last updated in RFC-3339 format.
+      example: '2023-12-06T18:09:07Z'
+      format: date-time
+    CorporateActionEventInstructionExpirationDate:
+      type:
+      - string
+      - 'null'
+      format: date-time
+      example: '2024-09-30T17:00:00-04:00'
+      description: Date/time that the account servicer has set as the deadline to respond, with instructions, to an outstanding event, giving the holder eligibility to incentives.
+    CorporateActionEventLotteryDate:
+      type:
+      - string
+      - 'null'
+      description: The lottery date of the corporate action event.
+      format: date
+      example: '2023-12-06'
+    CorporateActionEventStatus:
+      type: string
+      description: 'The status of the corporate action event.
+
+
+        * "COMP" - Complete
+
+        * "INCO" - Incomplete'
+      example: COMP
+      enum:
+      - COMP
+      - INCO
+    CorporateActionEventResponseDeadline:
+      type: string
+      description: The deadline for an account servicer to respond to an outstanding event.
+      example: '2023-12-06T18:00:00Z'
+      format: date-time
+    CorporateActionTenderInfo:
+      title: tender
+      type: object
+      description: TEND (Tender) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: TEND
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        instruction_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventInstructionExpirationDate'
+        withdrawal_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventWithdrawalExpirationDate'
+        actual_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventActualExpirationDate'
+        dispursed_security:
+          $ref: '#/components/schemas/CorporateActionEventDispursedSecurity'
+        option_price:
+          $ref: '#/components/schemas/CorporateActionEventOptionPrice'
+        option_quantity:
+          $ref: '#/components/schemas/CorporateActionEventOptionQuantity'
+    CorporateActionEventCancelInfo:
+      type:
+      - string
+      - 'null'
+      description: Additional information provided by the issuer, only populated when the corporate action is a cancellation.
+      format: string
+      example: 'As of the current date, the variable rate CMO has a normal payment structure, and interest is paid monthly.
+
+        '
+    CorporateActionEventRecordDate:
+      type:
+      - string
+      - 'null'
+      description: The record date of the corporate action event.
+      format: date
+      example: '2023-12-06'
+    CorporateActionEventCusip:
+      type: string
+      description: The instrument Cusip of the corporate action event.
+      example: 594918AD6
+    CorporateActionEventOptionPrice:
+      type:
+      - string
+      - 'null'
+      description: Price of financial instruments that can be actioned upon.
+    CorporateActionEventPrice:
+      type: number
+      description: The price that applies for the corporate action event.
+      example: 103.25
+    CorporateActionPartialRedemptionWithPoolFactorReductionInfo:
+      title: pred
+      type: object
+      description: Partial Redemption With Pool Factor Reduction Info (PRED) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: PRED
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        position_capture_date:
+          $ref: '#/components/schemas/CorporateActionEventPositionCaptureDate'
+    CorporateActionEventActualExpirationDate:
+      type:
+      - string
+      - 'null'
+      format: date-time
+      example: '2024-09-30T17:00:00-04:00'
+      description: Issuer or issuer's agent deadline to respond with an instruction to an outstanding offer or privilege.
+    CorporateActionEventISIN:
+      type: string
+      description: The instrument ISIN of the corporate action event.
+      example: US594918AD66
+    CorporateActionFullCallInfo:
+      title: full_call
+      type: object
+      description: MCAL (Full Call) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: MCAL
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        earliest_payment_date:
+          $ref: '#/components/schemas/CorporateActionEventEarliestPaymentDate'
+    CorporateActionEventResultsPublicationDate:
+      type:
+      - string
+      - 'null'
+      description: The lottery results publication date of the corporate action event.
+      format: date
+      example: '2023-09-06'
+    CorporateActionEventPayout:
+      type: string
+      description: 'The payout type of the corporate action event.
+
+
+        * "CASH" - Cash
+
+        * "SECU" - Securities
+
+        * "CASE" - Cash and Securities'
+      example: CASH
+      enum:
+      - CASH
+      - SECU
+      - CASE
+    CorporateActionEventNonRefundedSecurity:
+      type: string
+      description: The non-refunded security of a PDEF corporate action event.
+      example: US594918AE71
+    CorporateActionPutInfo:
+      title: put
+      type: object
+      description: BPUT (Put) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: BPUT
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        market_deadline:
+          $ref: '#/components/schemas/CorporateActionEventMarketDeadline'
+        response_deadline:
+          $ref: '#/components/schemas/CorporateActionEventResponseDeadline'
+        put_min_quantity:
+          $ref: '#/components/schemas/CorporateActionEventPutMinQuantity'
+        put_min_increment:
+          $ref: '#/components/schemas/CorporateActionEventPutMinIncrement'
+    CorporateActionEventCancelType:
+      type: string
+      description: 'The cancellation type of the corporate action event. Only populated when the corporate action is a cancellation.
+
+
+        * "PROC" - Canceled due to processing error
+
+        * "WITH" - Withdrawn/canceled by the issuer'
+      example: PROC
+      enum:
+      - PROC
+      - WITH
+    CorporateActionPartialCallInfo:
+      title: partial_call
+      type: object
+      description: DRAW (Partial Call) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: DRAW
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        results_publication_date:
+          $ref: '#/components/schemas/CorporateActionEventResultsPublicationDate'
+        record_date:
+          $ref: '#/components/schemas/CorporateActionEventRecordDate'
+        lottery_type:
+          $ref: '#/components/schemas/CorporateActionEventLotteryType'
+        lottery_date:
+          $ref: '#/components/schemas/CorporateActionEventLotteryDate'
+    CorporateActionEventEarliestPaymentDate:
+      type:
+      - string
+      - 'null'
+      description: The earliest payment date of the corporate action event.
+      format: date
+      example: '2023-09-06'
+    CorporateActionEventRateAmount:
+      type:
+      - string
+      - 'null'
+      description: Rate of the corporate action event.
+    CorporateActionEventOptionQuantity:
+      type:
+      - string
+      - 'null'
+      description: Quantity of financial instruments that can be actioned upon.
+    CorporateActionEventCancelDate:
+      type:
+      - string
+      - 'null'
+      description: Record date of the cancellation, optionally present when corporate action is a cancellation. YYYY-MM-DD.
+      format: string
+      example: '2010-08-18
+
+        '
+    CorporateActionEventConfirmation:
+      type: string
+      description: 'The confirmation status of the corporate action event.
+
+
+        * "CONF" - Confirmed
+
+        * "UCON" - Unconfirmed'
+      example: CONF
+      enum:
+      - CONF
+      - UCON
+    CorporateActionEventLotteryType:
+      type: string
+      description: 'The lottery type of the corporate action event, if applicable.
+
+
+        * "ORIG" - Original, As Announced
+
+        * "SUPP" - Supplemental, Additional'
+      example: ORIG
+      enum:
+      - ORIG
+      - SUPP
+    CorporateActionEventPutMinQuantity:
+      type: number
+      description: The minimum put quantity of the corporate action event.
+      example: 10000
+    CorporateActionBidsInfo:
+      title: bids
+      type: object
+      description: BIDS (Bid) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: BIDS
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        instruction_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventInstructionExpirationDate'
+        withdrawal_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventWithdrawalExpirationDate'
+        actual_expiration_date:
+          $ref: '#/components/schemas/CorporateActionEventActualExpirationDate'
+        dispursed_security:
+          $ref: '#/components/schemas/CorporateActionEventDispursedSecurity'
+        option_price:
+          $ref: '#/components/schemas/CorporateActionEventOptionPrice'
+        option_quantity:
+          $ref: '#/components/schemas/CorporateActionEventOptionQuantity'
+    CorporateActionEventPutMinIncrement:
+      type: number
+      description: The minimum put increment of the corporate action event.
+      example: 1000
+    CorporateActionCapitalizationInfo:
+      title: capitalization
+      type: object
+      description: Capitalization (CAPI) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: CAPI
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        rate_amount:
+          $ref: '#/components/schemas/CorporateActionEventRateAmount'
+    CorporateActionRedemptionInfo:
+      title: redemption
+      type: object
+      description: REDM (Redemption) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: REDM
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        earliest_payment_date:
+          $ref: '#/components/schemas/CorporateActionEventEarliestPaymentDate'
+    CorporateActionEventRefundedSecurity:
+      type: string
+      description: The refunded security of a PDEF corporate action event.
+      example: US594918AD60
+    CorporateActionEventMarketDeadline:
+      type: string
+      description: The deadline for an issuer or agent to respond to an outstanding offer by account servicer.
+      example: '2023-12-06T18:00:00Z'
+      format: date-time
+    CorporateActionUpdateId:
+      type: string
+      description: Unique message identifier.
+      example: '2024072434604568'
+    CorporateActionsResponse:
+      title: CorporateActionsResponse
+      type: object
+      description: Provides corporate action details for every event that matches the query.
+      properties:
+        count:
+          type: integer
+          description: The total number of corporate actions found that match the query.
+        next:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the next page of results (if any exist). Null if no more pages.
+        prev:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the previous page of results (if any exist). Null if no earlier pages.
+        corporate_actions:
+          type: array
+          description: Array of corporate action events requested.
+          items:
+            anyOf:
+            - $ref: '#/components/schemas/CorporateActionFullCallInfo'
+            - $ref: '#/components/schemas/CorporateActionPartialCallInfo'
+            - $ref: '#/components/schemas/CorporateActionPutInfo'
+            - $ref: '#/components/schemas/CorporateActionPreRefundingInfo'
+            - $ref: '#/components/schemas/CorporateActionPartialRedemptionWithPoolFactorReductionInfo'
+            - $ref: '#/components/schemas/CorporateActionInterestInfo'
+            - $ref: '#/components/schemas/CorporateActionRedemptionInfo'
+            - $ref: '#/components/schemas/CorporateActionTenderInfo'
+            - $ref: '#/components/schemas/CorporateActionBidsInfo'
+            - $ref: '#/components/schemas/CorporateActionCapitalizationInfo'
+      required:
+      - corporate_actions
+    CorporateActionPreRefundingInfo:
+      title: pre_refunding
+      type: object
+      description: PDEF (Pre-Refunding / Defeasance) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: PDEF
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        results_publication_date:
+          $ref: '#/components/schemas/CorporateActionEventResultsPublicationDate'
+        lottery_type:
+          $ref: '#/components/schemas/CorporateActionEventLotteryType'
+        lottery_date:
+          $ref: '#/components/schemas/CorporateActionEventLotteryDate'
+        refunded_security:
+          $ref: '#/components/schemas/CorporateActionEventRefundedSecurity'
+        non_refunded_security:
+          $ref: '#/components/schemas/CorporateActionEventNonRefundedSecurity'
+    CorporateActionId:
+      type: string
+      description: Unique corporate action event ID.
+      example: US144595949
+    CorporateActionEventDispursedSecurity:
+      type:
+      - string
+      - 'null'
+      description: The security that is being distributed as a result of a corporate action as declared by the issuer or offeror on the market.
+    CorporateActionEventRateType:
+      type:
+      - string
+      - 'null'
+      description: Type of the corporate action event rate.
+    CorporateActionEventAdditionalInfo:
+      type:
+      - string
+      - 'null'
+      description: Additional information provided by the issuer.
+      format: string
+      example: 'Contact Number: 123-456-7890
+
+        '
+    CorporateActionEventPaymentDate:
+      type:
+      - string
+      - 'null'
+      description: The payment date of the corporate action event.
+      format: date
+      example: '2023-09-06'
+    CorporateActionDetailResponse:
+      title: CorporateActionDetailResponse
+      type: object
+      description: Provides corporate action details for a single corporate action.
+      properties:
+        corporate_actions:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/CorporateActionFullCallInfo'
+            - $ref: '#/components/schemas/CorporateActionPartialCallInfo'
+            - $ref: '#/components/schemas/CorporateActionPutInfo'
+            - $ref: '#/components/schemas/CorporateActionPreRefundingInfo'
+            - $ref: '#/components/schemas/CorporateActionPartialRedemptionWithPoolFactorReductionInfo'
+            - $ref: '#/components/schemas/CorporateActionInterestInfo'
+            - $ref: '#/components/schemas/CorporateActionRedemptionInfo'
+            - $ref: '#/components/schemas/CorporateActionTenderInfo'
+            - $ref: '#/components/schemas/CorporateActionBidsInfo'
+            - $ref: '#/components/schemas/CorporateActionCapitalizationInfo'
+    CorporateActionEventPositionCaptureDate:
+      type:
+      - string
+      - 'null'
+      format: date
+      example: '2024-10-14'
+      description: Date when positions are captured and entitlements are calculated in the system at DTC.
+    CorporateActionInterestInfo:
+      title: interest
+      type: object
+      description: INTR (Interest) corporate action event details
+      properties:
+        id:
+          $ref: '#/components/schemas/CorporateActionId'
+        update_id:
+          $ref: '#/components/schemas/CorporateActionUpdateId'
+        updated_at:
+          $ref: '#/components/schemas/CorporateActionUpdatedAt'
+        type:
+          type: string
+          description: The ISO event code of the corporate action event.
+          example: INTR
+        isin:
+          $ref: '#/components/schemas/CorporateActionEventISIN'
+        cusip:
+          $ref: '#/components/schemas/CorporateActionEventCusip'
+        status:
+          $ref: '#/components/schemas/CorporateActionEventStatus'
+        confirmation:
+          $ref: '#/components/schemas/CorporateActionEventConfirmation'
+        category:
+          $ref: '#/components/schemas/CorporateActionEventCategory'
+        price:
+          $ref: '#/components/schemas/CorporateActionEventPrice'
+        payout:
+          $ref: '#/components/schemas/CorporateActionEventPayout'
+        payment_date:
+          $ref: '#/components/schemas/CorporateActionEventPaymentDate'
+        additional_info:
+          $ref: '#/components/schemas/CorporateActionEventAdditionalInfo'
+        cancel_info:
+          $ref: '#/components/schemas/CorporateActionEventCancelInfo'
+        cancel_type:
+          $ref: '#/components/schemas/CorporateActionEventCancelType'
+        cancel_date:
+          $ref: '#/components/schemas/CorporateActionEventCancelDate'
+        rate_type:
+          $ref: '#/components/schemas/CorporateActionEventRateType'
+        rate_amount:
+          $ref: '#/components/schemas/CorporateActionEventRateAmount'
+    CorporateActionEventCategory:
+      type: string
+      description: "The category of the corporate action event.\n\n  * \"MAND\" - Mandatory\n  * \"VOLU\" - Voluntary\n  * \"CHOS\" - Mandatory with Options"
+      example: MAND
+      enum:
+      - MAND
+      - VOLU
+      - CHOS
+    CorporateActionEventWithdrawalExpirationDate:
+      type:
+      - string
+      - 'null'
+      format: date-time
+      example: '2024-09-30T17:00:00-04:00'
+      description: Period during which the participant of the account servicer can revoke change or withdraw its instructions.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/bulkdownloadinfo.md
+  - https://docs.moment.com/reference/bulkdownloadreference.md
+  - https://docs.moment.com/reference/getmarks.md
+  - https://docs.moment.com/reference/getprices.md
+  - https://docs.moment.com/reference/listcorporateactions.md
+  - https://docs.moment.com/reference/listinstruments.md
+  - https://docs.moment.com/reference/retrievecorporateaction.md
+  - https://docs.moment.com/reference/retrieveinstrument.md
+  merge:
+    pages: 8
+    deduped: 152
+    conflicts_kept_first: 0

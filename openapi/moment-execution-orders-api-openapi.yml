@@ -1,0 +1,1524 @@
+openapi: 3.2.0
+info:
+  title: Execution Orders API
+  description: 'Moment''s Orders API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Orders API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Execution Orders
+paths:
+  /v1/trading/order/{id}/execution-order/custodian/manual/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create a Custodian Manual Execution Order
+      description: 'Creates an execution order routed directly to a custodian for the given parent order.
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - `amount.type` must be `shares` or `notional`. `par` is not supported on this endpoint.
+
+        - `limit_price`, when provided, is interpreted as price per share.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderCustodianManual
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_CustodianManual'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/external/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create an External Trade Execution Order
+      description: 'Creates an execution order for processing an external trade for the specified order. A user may want to trade off-platform and report the trade to Moment for record-keeping & updating the order status, this endpoint facilitates that.
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderExternalTrade
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_External'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/lob/manual/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create a LOB Manual Execution Order
+      description: 'Creates an execution order for trading on the limit order book for a specific venue and ISIN.
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderLobManual
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_LOBManual'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/lob/sor/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create a LOB SOR Execution Order
+      description: 'Creates an execution order for trading on the limit order books using Smart Order Routing (SOR).
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderLobSor
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_LOBSOR'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/rfq/autoex/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create an AutoEx RFQ Execution Order
+      description: 'Creates an AutoEx RFQ execution order for the given order.
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderAutoExRFQ
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_AutoExRFQ'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/rfq/manual/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Create an RFQ Quote Response Execution Order
+      description: 'Creates an execution order in response to an RFQ quote for the given order.
+
+
+        **Requirements:**
+
+        - The parent order must be in the `pending_execution` or `partially_filled` state.
+
+        - Multiple execution orders can be created for a single order provided that the sum of their open quantities does not exceed the open quantity of the order.
+
+
+        Once submitted, you will receive one of the following events:
+
+        - A `system_update` event with an `event_type` of `execution_order_request` that indicates the request was received.
+
+        - A `system_update` event with an `event_type` of `execution_order_reject` if the request fails.
+
+        - An `order_update` event with an `event_type` of `execution_order_create` if the request succeeds & is pending execution.
+
+
+        All events include the `execution_order_id`.'
+      operationId: createExecutionOrderManualRFQ
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionOrderRequest_ManualRFQ'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionOrderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/{execution_order_id}/:
+    delete:
+      tags:
+      - Execution Orders
+      summary: Cancel an Execution Order
+      description: 'Cancels the specified execution order for the given order.
+
+
+        **Requirements:**
+
+        - The execution order must be in the `pending_execution` or `partially_filled` state.
+
+
+        Event notifications:
+
+        - On Reciept: a `system_update` event with an `event_type` of `execution_order_cancel_request`.
+
+        - On failure: a `system_update` event with an `event_type` of `execution_order_cancel_reject`.
+
+        - On success: an `order_update` event with an `event_type` of `execution_order_cancel`.
+
+
+        All events include the `execution_order_id`.'
+      operationId: cancelExecutionOrder
+      parameters:
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: execution_order_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExecutionOrderID'
+      responses:
+        '204':
+          description: The cancellation request for the execution order has been submitted.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/execution-order/{execution_order_id}/external/trade-report/:
+    post:
+      tags:
+      - Execution Orders
+      summary: Report an External Trade
+      description: 'Reports an executed external trade for a pre-existing execution order.
+
+
+        **Requirements:**
+
+        - An execution order of protocol `external` must exist.
+
+        - The execution order must be in the `pending_execution` state.
+
+
+        Event notifications:
+
+        - On Reciept: a `system_update` event with an `event_type` of `external_trade_report_request`.
+
+        - On failure: a `system_update` event with an `event_type` of `external_trade_report_rejected`.
+
+        - On success: an `order_update` event with an `event_type` of `execution` which includes the trade details & the execution order ID linked to the trade.
+
+
+        All events include the `external_trade_report_id`.'
+      operationId: reportExternalTrade
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/OrderID'
+      - name: execution_order_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ExecutionOrderID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalTradeReport'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalTradeReportResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    ExecutionOrderID:
+      description: The unique ID of the execution order.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+    PriceValueType:
+      title: Price Value Type
+      type: string
+      description: The method used to represent the price value.
+      enum:
+      - percent
+      - discount_yield
+      - spread
+      - money_market_yield
+      - per_share
+      x-enumNames:
+      - PriceValueTypePercent
+      - PriceValueTypeDiscountYield
+      - PriceValueTypeSpread
+      - PriceValueTypeMMYield
+      - PriceValueTypePerShare
+      default: percent
+    FeeType:
+      title: Fee Type
+      type: string
+      description: The type of fee to apply to the order. Valid values are "markup", "commission", and "sales_credit".
+      enum:
+      - markup
+      - commission
+      - sales_credit
+      x-enumNames:
+      - FeeTypeMarkup
+      - FeeTypeCommission
+      - FeeTypeSalesCredit
+    SnapshotQuote:
+      type: object
+      properties:
+        yield_to_maturity:
+          type: number
+          format: double
+          description: 'Deprecated: not mapped to domain model, will be removed. Use post_fee_ytm instead.'
+          deprecated: true
+        yield_to_worst:
+          type: number
+          format: double
+          description: 'Deprecated: not mapped to domain model, will be removed. Use post_fee_ytw instead.'
+          deprecated: true
+        size:
+          type: integer
+        min_size:
+          type: integer
+        venue_mpid:
+          type: string
+        spread_benchmark_isin:
+          type:
+          - string
+          - 'null'
+        spread_to_benchmark_bps:
+          type:
+          - string
+          - 'null'
+        min_balance_remaining:
+          type:
+          - integer
+          - 'null'
+        min_increment:
+          type:
+          - integer
+          - 'null'
+        source:
+          type: string
+          enum:
+          - LOB
+          - RFQ
+        pre_fee_price:
+          type: number
+          format: double
+        post_fee_price:
+          type: number
+          format: double
+        pre_fee_ytw:
+          type: number
+          format: double
+          description: Pre-fee yield to worst (street price, no fees).
+        post_fee_ytw:
+          type: number
+          format: double
+          description: Post-fee yield to worst (inclusive of Moment fees).
+        pre_fee_ytm:
+          type: number
+          format: double
+          description: Pre-fee yield to maturity (street price, no fees).
+        post_fee_ytm:
+          type: number
+          format: double
+          description: Post-fee yield to maturity (inclusive of Moment fees).
+        pre_fee_spread_bps:
+          type:
+          - number
+          - 'null'
+          format: double
+        post_fee_spread_bps:
+          type:
+          - number
+          - 'null'
+          format: double
+        side:
+          type: string
+          enum:
+          - bid
+          - ask
+        disabled:
+          type: boolean
+        rfq_quote_status:
+          type: string
+        rfq_id:
+          type: string
+        venue_quote_id:
+          type: string
+        settlement_date:
+          type: integer
+          format: int64
+      required:
+      - size
+      - min_size
+      - venue_mpid
+      - source
+      - pre_fee_price
+      - post_fee_price
+      - pre_fee_ytm
+      - pre_fee_ytw
+      - post_fee_ytm
+      - post_fee_ytw
+      - side
+      - disabled
+      - settlement_date
+    ExternalTradeReportResponse:
+      type: object
+      properties:
+        external_trade_report_id:
+          $ref: '#/components/schemas/ExternalTradeReportID'
+      required:
+      - external_trade_report_id
+    ExternalTradeReport:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the trade.
+          type:
+          - string
+          - 'null'
+        bypass_street_side_leg:
+          description: Flag to bypass street side leg. If true, we will not send the street side to the custodian.
+          type: boolean
+          example: false
+          default: false
+          x-go-type-skip-optional-pointer: true
+        bypass_trade_booking:
+          description: Flag to bypass trade booking. If true, the trade will not be booked in the system.
+          type: boolean
+          example: true
+        client_external_trade_report_id:
+          description: The client-provided idempotency key.
+          type: string
+        counterparty_clearing_firm_id:
+          description: DTC ID of the counterparty's clearing firm.
+          type: string
+          example: '0123'
+          x-go-type-skip-optional-pointer: true
+        counterparty_id:
+          description: MPID of the counterparty involved in the street trade.
+          type: string
+          example: MMNT
+          x-go-type-skip-optional-pointer: true
+        execution_id:
+          description: Trade ID. Often times this will be the ID of the execution made at an external venue.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        external_trade_report_id:
+          description: 'Optional external trade report ID. If provided, this ID will be used instead of auto-generating one.
+
+            Must start with ''etr_'' followed by a valid ULID.
+
+            If not provided, the system will generate a unique ID automatically.
+
+            '
+          type: string
+          example: etr_01JBFQZXMWZ08XDMTG08P2Z4XT
+        price:
+          description: The trade price. For mutual funds, if not provided, the backend will use the parent order's estimated price (NAV).
+          type:
+          - number
+          - 'null'
+          format: double
+        settle_date:
+          description: The settlement date for the trade.
+          type: string
+          format: date-time
+        snapshot_id:
+          description: Optional quote snapshot ID. If provided, this snapshot ID will be used instead of creating a new one.
+          type: string
+        trade_time:
+          description: The timestamp when the trade occurred.
+          type: string
+          format: date-time
+      required:
+      - client_external_trade_report_id
+      - amount
+      - trade_time
+      - settle_date
+      - bypass_trade_booking
+      title: External Trade Report
+    OrderSize:
+      type: object
+      title: Amount
+      description: 'The Amount of an order with a specified `type` indicating how the amount is represented.
+
+        - **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).
+
+        - **Notional:** Represents the order size in notional dollar value.
+
+        - **Shares:** Represents the order size in number of shares (for equities).'
+      properties:
+        value:
+          type: number
+          example: 10000
+          x-go-type: float64
+        type:
+          type: string
+          enum:
+          - par
+          - notional
+          - shares
+          default: par
+          x-enumNames:
+          - SizeTypePar
+          - SizeTypeNotional
+          - SizeTypeShares
+      required:
+      - value
+      - type
+    ExecutionOrderResponse:
+      type: object
+      properties:
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+      required:
+      - execution_order_id
+    TwapParameters:
+      title: TWAP Parameters
+      type: object
+      description: 'Parameters for a time-weighted average price (TWAP) algo. The algo slices the order into
+
+        smaller pieces and works them evenly over the specified time window, aiming to match the
+
+        time-weighted average price of the instrument over that window.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    Price:
+      title: Price
+      type: object
+      description: Price value with type specification for different pricing methods.
+      required:
+      - value
+      - type
+      properties:
+        value:
+          $ref: '#/components/schemas/Decimal'
+        type:
+          $ref: '#/components/schemas/PriceValueType'
+        benchmark_isin:
+          type:
+          - string
+          - 'null'
+          description: The ISIN of the benchmark security, required when type is 'spread'.
+    TimeInForce:
+      title: Time In Force
+      type: string
+      description: Specifies how long the order remains in effect. Absence of this field is interpreted as DAY.
+      enum:
+      - day
+      - good_till_date
+      - at_the_opening
+      - at_the_close
+      x-enumNames:
+      - Day
+      - GoodTillDate
+      - AtTheOpening
+      - AtTheClose
+    VwapParameters:
+      title: VWAP Parameters
+      type: object
+      description: 'Parameters for a volume-weighted average price (VWAP) algo. The algo works the order in
+
+        proportion to the expected market volume profile over the specified time window, aiming to
+
+        match the volume-weighted average price of the instrument over that window.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    FeeAmountType:
+      title: Fee Amount Type
+      type: string
+      description: "The method used to calculate the fee amount. Supported types include:\n\n- `percentage_of_par`: Fee as a percentage of par value.\n  Example: `0.10` = 10 basis points of par value.\n\n- `percentage_of_market_value`: Fee as a percentage of the quote price (market value).\n  Example: `1` = 1% of market value.\n\n- `yield_bps`: Fee expressed in yield terms, in basis points.\n  Example: `100` = 100 basis points of yield.\n\n- `percentage_of_concession`: Fee applies to concession based quoting mechanism, especially for new issue CDs.\n  Example: `50` = 50 percent of all concession from the dealer.\n"
+      enum:
+      - percentage_of_par
+      - percentage_of_market_value
+      - yield_bps
+      - percentage_of_concession
+      x-enumNames:
+      - FeeAmountTypePercentageOfPar
+      - FeeAmountTypePercentageOfMarketValue
+      - FeeAmountTypeYieldBps
+      - FeeAmountTypePercentageOfConcession
+    ExitCriteria:
+      type: object
+      title: Exit Criteria
+      required:
+      - timeout
+      properties:
+        timeout:
+          type: string
+          format: duration
+          description: Timeout for the execution order.
+    Decimal:
+      title: Decimal
+      oneOf:
+      - type: number
+      - type: string
+      description: Decimal number.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+    ExecutionCriteria:
+      type: object
+      title: Execution Criteria
+      required:
+      - min_wait_time
+      - min_number_quotes
+      properties:
+        min_wait_time:
+          type: string
+          format: duration
+          description: Minimum wait time for the execution order.
+        min_number_quotes:
+          type: integer
+          description: Minimum number of quotes required on the side of the order, before execution can proceed. If the protocol is `request_for_quote`, this is the minimum number of RFQ quotes required. If the protocol is `limit_order_book`, this is the minimum number of LOB quotes required.
+        max_transaction_cost_dollar:
+          type: string
+          description: Maximum transaction cost in dollars. Max buy price = estimated price * par value + maxDollar, Min sell price = estimated price * par value - maxDollar. Ex. a value of `5` would mean the transaction cost must be within $5 of the instrument's estimated price in dollars, meaning when buying a bond with a estimated price of $100 and a par value of $1000, the transaction cost must be below $1005.
+          example: '5'
+        max_transaction_cost_percent:
+          type: string
+          description: Maximum transaction cost in percent. Max buy price = estimated price * (1 + maxPct / 100), Min sell price = estimated price * (1 - maxPct / 100). Ex. a value of `5` would mean the transaction cost must be within 5% of the instrument's estimated price in percent, meaning when buying a bond with a estimated price of $100, the transaction cost must be below $105.
+          example: '5'
+        max_transaction_cost_yield:
+          type: string
+          description: Maximum transaction cost in yield. Max buy yield = estimated ytw - maxYTW, Max sell yield = estimated ytw + maxYTW. Ex. a value of `0.5` would mean the transaction cost must be within 50 bps of the instrument's estimated yield, meaning when buying a bond with an estimated yield to worst of 1.5%, the transaction cost must be above 1.0%.
+          example: '0.5'
+    Fee:
+      title: Fee
+      type: object
+      description: The fee to apply to the order.
+      properties:
+        fee_type:
+          $ref: '#/components/schemas/FeeType'
+        fee_amount_type:
+          $ref: '#/components/schemas/FeeAmountType'
+        recipient_id:
+          type: string
+          description: Unique ID of the recipient of the fee.
+          x-go-name: RecipientID
+          x-go-type-skip-optional-pointer: true
+        recipient_type:
+          $ref: '#/components/schemas/RecipientType'
+        fee_amount:
+          description: Fee amount to apply to the order.
+          $ref: '#/components/schemas/Decimal'
+        max_fee_amount:
+          description: Maximum fee amount to apply to the order.
+          $ref: '#/components/schemas/NullableDecimal'
+        max_fee_amount_type:
+          $ref: '#/components/schemas/FeeAmountType'
+        fee_name:
+          type: string
+          description: Optional name for the fee, for easier identification.
+      required:
+      - fee_type
+      - fee_amount_type
+      - fee_amount
+    ExecutionOrderRequest_CustodianManual:
+      type: object
+      properties:
+        algo_parameters:
+          $ref: '#/components/schemas/AlgoParameters'
+        all_or_none:
+          description: Flag to indicate if the order should be executed as an All or None order.
+          type: boolean
+          example: true
+          x-go-type-skip-optional-pointer: true
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the execution order.
+          type:
+          - string
+          - 'null'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        limit_price:
+          description: 'Limit price (per share) of the execution order request. If omitted, the execution order inherits its price and order type from the parent order: market parent orders ship as market orders, limit parent orders use the parent limit price.'
+          type:
+          - number
+          - 'null'
+          format: double
+        principal_account_id:
+          $ref: '#/components/schemas/PrincipalAccountID'
+        suppress_pmp_check:
+          description: Flag to toggle if the Prevailing Market Price (PMP) check should be suppressed for the execution order.
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        time_in_force:
+          description: Time in force for the execution order. Absence is interpreted as day.
+          allOf:
+          - $ref: '#/components/schemas/TimeInForce'
+          x-go-type-skip-optional-pointer: true
+        trader_id:
+          description: an option to supply with a new trader ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - amount
+    ExecutionOrderRequest_AutoExRFQ:
+      type: object
+      properties:
+        all_or_none:
+          description: Flag to indicate if the order should be executed as an All or None order.
+          type: boolean
+          example: true
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the execution order.
+          type:
+          - string
+          - 'null'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        execution_criteria:
+          $ref: '#/components/schemas/ExecutionCriteria'
+        exit_criteria:
+          $ref: '#/components/schemas/ExitCriteria'
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+          x-go-type-skip-optional-pointer: true
+        limit_price:
+          description: Limit price of the execution order request. If omitted, the order will inherit the limit price of the order, if exists.
+          type:
+          - number
+          - 'null'
+          format: double
+        principal_account_id:
+          $ref: '#/components/schemas/PrincipalAccountID'
+        rfq_protocol_parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/RFQProtocolParameters'
+        skip_lob_quotes:
+          description: Flag to indicate whether to skip matching LOB quotes and only use RFQ quotes.
+          type: boolean
+          default: false
+        trader_id:
+          description: an option to supply with a new trader ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - amount
+      - rfq_protocol_parameters
+      - execution_criteria
+      - skip_lob_quotes
+    AggressivenessLevel:
+      title: Aggressiveness Level
+      type: string
+      description: 'Execution aggressiveness for a custodian algo. Required by some custodians (e.g. Fidelity);
+
+        ignored by custodians without an equivalent concept (e.g. Schwab).'
+      enum:
+      - passive
+      - neutral
+      - aggressive
+      x-enumNames:
+      - AggressivenessLevelPassive
+      - AggressivenessLevelNeutral
+      - AggressivenessLevelAggressive
+    RFQProtocolParameters:
+      type: object
+      title: RFQ Protocol Parameters
+      required:
+      - venue_mpid
+      - type
+      - disclosure
+      properties:
+        venue_mpid:
+          type: string
+          description: The MPID of the venue.
+        type:
+          type: string
+          description: The type of the RFQ.
+          enum:
+          - bin
+          - asap
+        disclosure:
+          type: string
+          description: The disclosure for the RFQ. Currently, only `disclosed` is supported.
+          enum:
+          - disclosed
+          - anonymous
+        due_after:
+          type: string
+          format: duration
+          description: Specifies how duration following RFQ creation, after which the RFQ becomes due.
+          example: 20m
+        subject_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the due time (or submission time if no due time is defined) during which quotes are considered subject.
+        expire_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the latest of due time, subject time, or submission time, after which the RFQ expires.
+    RecipientType:
+      title: Recipient Type
+      type: string
+      description: The type of recipient for the fee.
+      enum:
+      - executing_broker
+      - introducing_broker
+      - advisor
+      - customer
+      x-enumNames:
+      - RecipientTypeExecutingBroker
+      - RecipientTypeIntroducingBroker
+      - RecipientTypeAdvisor
+      - RecipientTypeCustomer
+    PovParameters:
+      title: POV Parameters
+      type: object
+      description: 'Parameters for a percentage-of-volume (POV) algo. The algo participates in the market at a
+
+        target percentage of the traded volume, speeding up or slowing down as market volume changes
+
+        rather than working to a fixed time schedule.'
+      required:
+      - target_participation_percent
+      properties:
+        target_participation_percent:
+          type: integer
+          format: int64
+          description: Target participation rate of market volume, as a percent (e.g. 20 = 20%).
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation, distinct from the target percent.
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    ExternalTradeReportID:
+      description: The ID of the external trade report generated by Moment.
+      type: string
+      example: etr_01JBFQZXMWZ08XDMTG08P2Z4XT
+    OrderRFQ:
+      type: object
+      title: Order RFQ
+      description: Contains the required information about the RFQ that prompted the order.
+      required:
+      - id
+      - contra_quote_id
+      properties:
+        id:
+          type: string
+          description: The ID of the RFQ that initiated the order request.
+        contra_quote_id:
+          type: string
+          title: Contra Quote ID
+          description: The ID of the quote that is being traded against.
+    IsParameters:
+      title: IS Parameters
+      type: object
+      description: 'Parameters for an implementation-shortfall (arrival price) algo. The algo balances market
+
+        impact against timing risk to minimize slippage versus the arrival price, working more or
+
+        less aggressively based on the aggressiveness level. Order type and limit price are carried
+
+        on the order itself, not in these parameters.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    NullableDecimal:
+      title: Nullable Decimal
+      oneOf:
+      - type: number
+      - type: string
+      description: Nullable Decimal number.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+    ExecutionOrderRequest_ManualRFQ:
+      type: object
+      properties:
+        all_or_none:
+          description: Flag to indicate if the order should be executed as an All or None order.
+          type: boolean
+          example: true
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the execution order.
+          type:
+          - string
+          - 'null'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        counter_expiry_time:
+          description: Duration in seconds until which the counter is valid
+          type:
+          - string
+          - 'null'
+        counter_price:
+          description: Price of the counter. If is_counter is true, this field is required.
+          $ref: '#/components/schemas/Price'
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+          x-go-type-skip-optional-pointer: true
+        is_counter:
+          description: Flag to indicate if the order is a counter
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        principal_account_id:
+          $ref: '#/components/schemas/PrincipalAccountID'
+        quotes_snapshot:
+          $ref: '#/components/schemas/QuotesSnapshot'
+        rfq:
+          $ref: '#/components/schemas/OrderRFQ'
+        trader_id:
+          description: an option to supply with a new trader ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - amount
+      - rfq
+    ExecutionOrderRequest_External:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the execution order.
+          type:
+          - string
+          - 'null'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        external_trade_report:
+          $ref: '#/components/schemas/ExternalTradeReport'
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+          x-go-type-skip-optional-pointer: true
+        principal_account_id:
+          $ref: '#/components/schemas/PrincipalAccountID'
+        quotes_snapshot:
+          $ref: '#/components/schemas/QuotesSnapshot'
+        trader_id:
+          description: an option to supply with a new trader ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - amount
+    AlgoParameters:
+      title: Algo Parameters
+      type: object
+      description: 'Execution parameters for custodian algos. Exactly one of `twap`, `vwap`, `pov`, or `is` must be set.
+
+        Only supported on the custodian protocol with the manual strategy. Fields or values not accepted
+
+        by a given custodian are rejected downstream.'
+      properties:
+        twap:
+          $ref: '#/components/schemas/TwapParameters'
+        vwap:
+          $ref: '#/components/schemas/VwapParameters'
+        pov:
+          $ref: '#/components/schemas/PovParameters'
+        is:
+          $ref: '#/components/schemas/IsParameters'
+    PrincipalAccountID:
+      description: Moment account ID of the principal account (book) the execution order is booked to.
+      type: string
+      x-go-type-skip-optional-pointer: true
+    ExecutionOrderRequest_LOBManual:
+      allOf:
+      - $ref: '#/components/schemas/ExecutionOrderRequest_LOBSOR'
+      - type: object
+        required:
+        - venue_mpid
+        properties:
+          quotes_snapshot:
+            $ref: '#/components/schemas/QuotesSnapshot'
+          venue_mpid:
+            description: The MPID of the venue trader to use for the execution order.
+            type: string
+            example: TWDA
+    QuotesSnapshot:
+      type: object
+      required:
+      - isin
+      - bids
+      - asks
+      - organization_id
+      properties:
+        isin:
+          type: string
+        organization_id:
+          type: string
+        bids:
+          type: array
+          items:
+            $ref: '#/components/schemas/SnapshotQuote'
+        asks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SnapshotQuote'
+    ExecutionOrderRequest_LOBSOR:
+      type: object
+      properties:
+        all_or_none:
+          description: Flag to indicate if the order should be executed as an All or None order.
+          type: boolean
+          example: true
+          x-go-type-skip-optional-pointer: true
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the execution order.
+          type:
+          - string
+          - 'null'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+          x-go-type-skip-optional-pointer: true
+        limit_price:
+          description: Limit price of the execution order request. If omitted, the order will inherit the limit price of the order, if exists.
+          type:
+          - number
+          - 'null'
+          format: double
+        principal_account_id:
+          $ref: '#/components/schemas/PrincipalAccountID'
+        suppress_pmp_check:
+          description: Flag to toggle if the Prevailing Market Price (PMP) check should be suppressed for the execution order.
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        trader_id:
+          description: an option to supply with a new trader ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - amount
+    WouldParameters:
+      title: Would Parameters
+      type: object
+      description: 'Models the "I-Would" trigger: a price at which the algo becomes aggressive / completes.'
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        trigger_quantity:
+          $ref: '#/components/schemas/OrderSize'
+        trigger_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Percentage of the order quantity to complete when the trigger price is reached.
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    OrderID:
+      description: Unique, Moment-generated ID for the order.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+      title: Order ID
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/allocateorderbyorderid.md
+  - https://docs.moment.com/reference/approveorderbyorderid-1.md
+  - https://docs.moment.com/reference/bulkordersubmission.md
+  - https://docs.moment.com/reference/cancelexecutionorder-1.md
+  - https://docs.moment.com/reference/createbatchlistrfqwithautoex.md
+  - https://docs.moment.com/reference/createexecutionorderautoexrfq.md
+  - https://docs.moment.com/reference/createexecutionordercustodianmanual.md
+  - https://docs.moment.com/reference/createexecutionorderexternaltrade-1.md
+  - https://docs.moment.com/reference/createexecutionorderlobmanual.md
+  - https://docs.moment.com/reference/createexecutionorderlobsor-1.md
+  - https://docs.moment.com/reference/createexecutionordermanualrfq-1.md
+  - https://docs.moment.com/reference/createrfq-1.md
+  - https://docs.moment.com/reference/deleteallocation-2.md
+  - https://docs.moment.com/reference/deletebookingconfigurationbyid.md
+  - https://docs.moment.com/reference/deleteorderbyorderid-1.md
+  - https://docs.moment.com/reference/deleterfq-1.md
+  - https://docs.moment.com/reference/getallorders-1.md
+  - https://docs.moment.com/reference/getevents-1.md
+  - https://docs.moment.com/reference/getorderbyorderid-1.md
+  - https://docs.moment.com/reference/postorder-1.md
+  - https://docs.moment.com/reference/rejectorderbyorderid-1.md
+  - https://docs.moment.com/reference/reportexternaltrade-1.md
+  merge:
+    pages: 22
+    deduped: 363
+    conflicts_kept_first: 0

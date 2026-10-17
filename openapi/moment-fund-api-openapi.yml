@@ -1,0 +1,289 @@
+openapi: 3.2.0
+info:
+  title: Refdata Service Fund API
+  version: 1.0.0
+  description: API for accessing reference data internally.
+tags:
+- name: Fund
+paths:
+  /v1/fund/snapshot:
+    get:
+      summary: Get Fund Snapshot
+      description: 'Returns fund records as newline-delimited JSON (NDJSON).
+
+        Use the filter parameter to narrow results and the fields parameter to
+
+        select which fields are returned.
+
+
+        When the filter targets the cache key field (isin) with an "in" operator,
+
+        the server performs direct cache lookups instead of scanning all records.
+
+        Additional filters in the same request are applied to the narrowed set.'
+      operationId: getFundSnapshot
+      tags:
+      - Fund
+      parameters:
+      - $ref: '#/components/parameters/SnapshotFields'
+      - $ref: '#/components/parameters/SnapshotFilter'
+      responses:
+        '200':
+          description: Successful response (NDJSON stream)
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/Fund'
+        '400':
+          description: Invalid filter expression
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/fund/{id}:
+    get:
+      summary: Get Fund by identifier
+      description: 'Returns a single fund record by ISIN. If the identifier is not
+
+        an ISIN, the service attempts to auto-detect the symbol type and
+
+        resolve it to the underlying ISIN.'
+      operationId: getFundByID
+      tags:
+      - Fund
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Security identifier. ISINs are looked up directly; other formats
+
+          (e.g., CUSIP) are auto-detected and resolved.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fund'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+    Fund:
+      type: object
+      properties:
+        isin:
+          type:
+          - string
+          - 'null'
+        cusip:
+          type:
+          - string
+          - 'null'
+        issuer:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        symbol:
+          type:
+          - string
+          - 'null'
+        country_of_sales_code:
+          type:
+          - string
+          - 'null'
+        country_of_domicile_code:
+          type:
+          - string
+          - 'null'
+        exchange_name:
+          type:
+          - string
+          - 'null'
+        exchange:
+          type:
+          - string
+          - 'null'
+        inactive_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        share_class:
+          type:
+          - string
+          - 'null'
+        inception_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        vendor_category:
+          type:
+          - string
+          - 'null'
+        index_fund:
+          type:
+          - boolean
+          - 'null'
+        fund_of_funds:
+          type:
+          - boolean
+          - 'null'
+        exchange_traded_note:
+          type:
+          - boolean
+          - 'null'
+        leveraged_fund:
+          type:
+          - boolean
+          - 'null'
+        no_load_fund:
+          type:
+          - boolean
+          - 'null'
+        closed_to_new_investors:
+          type:
+          - boolean
+          - 'null'
+        closed_to_all_investors:
+          type:
+          - boolean
+          - 'null'
+        price_to_earnings:
+          type:
+          - number
+          - 'null'
+          format: double
+        annual_report_gross_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        annual_report_net_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        prospectus_gross_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        prospectus_net_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        actual_12b1_fee:
+          type:
+          - number
+          - 'null'
+          format: double
+        actual_management_fee:
+          type:
+          - number
+          - 'null'
+          format: double
+        asset_subtype:
+          type:
+          - string
+          - 'null'
+        asset_type:
+          type:
+          - string
+          - 'null'
+        active:
+          type:
+          - boolean
+          - 'null'
+        close_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        close_price_asof:
+          type:
+          - string
+          - 'null'
+          format: date
+  parameters:
+    SnapshotFilter:
+      name: filter
+      in: query
+      required: false
+      description: 'JSON filter expression. Supported operators: equal_to, not_equal_to,
+
+        greater_than, greater_than_or_equal_to, less_than, less_than_or_equal_to,
+
+        in, not_in, is_null, includes, not_includes, starts_with, ends_with.
+
+        Logical combinators: and, or, not.'
+      schema:
+        type: string
+      example: '{"isin":{"in":["US0378331005","US5949181045"]}}'
+    SnapshotFields:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated list of fields to include in the response
+      schema:
+        type: string
+      example: isin,cusip,issuer
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getequitybyid-1.md
+  - https://docs.moment.com/reference/getequitybyid.md
+  - https://docs.moment.com/reference/getequitysnapshot-1.md
+  - https://docs.moment.com/reference/getequitysnapshot.md
+  - https://docs.moment.com/reference/getfixedincomebyid-1.md
+  - https://docs.moment.com/reference/getfixedincomebyid.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot-1.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot.md
+  - https://docs.moment.com/reference/getfundbyid-1.md
+  - https://docs.moment.com/reference/getfundbyid.md
+  - https://docs.moment.com/reference/getfundholdings-1.md
+  - https://docs.moment.com/reference/getfundholdings.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot-1.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot.md
+  - https://docs.moment.com/reference/getfundsnapshot-1.md
+  - https://docs.moment.com/reference/getfundsnapshot.md
+  - https://docs.moment.com/reference/gethealth-3.md
+  - https://docs.moment.com/reference/gethealth.md
+  - https://docs.moment.com/reference/getsecuritybyid-1.md
+  - https://docs.moment.com/reference/getsecuritybyid.md
+  - https://docs.moment.com/reference/getsecuritysnapshot-1.md
+  - https://docs.moment.com/reference/getsecuritysnapshot.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics-1.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics.md
+  - https://docs.moment.com/reference/postsecurityresolve.md
+  merge:
+    pages: 25
+    deduped: 67
+    conflicts_kept_first: 17

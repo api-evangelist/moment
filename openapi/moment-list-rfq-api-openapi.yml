@@ -1,0 +1,356 @@
+openapi: 3.2.0
+info:
+  title: Orders List RFQ API
+  description: 'Moment''s Orders API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Orders API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: List RFQ
+paths:
+  /v1/trading/list-rfq/batch/:
+    post:
+      tags:
+      - List RFQ
+      summary: Create Batch List RFQs with Auto-Ex Execution Orders
+      description: Creates multiple List RFQs and their corresponding Auto-Ex RFQ execution orders in a single request.
+      operationId: createBatchListRFQWithAutoEx
+      parameters:
+      - name: Moment-User
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: Moment-Parent-Organization
+        in: header
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBatchListRFQRequest'
+        required: true
+      responses:
+        '202':
+          description: Accepted - the request has been received and will be processed.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    OrderSize:
+      type: object
+      title: Amount
+      description: 'The Amount of an order with a specified `type` indicating how the amount is represented.
+
+        - **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).
+
+        - **Notional:** Represents the order size in notional dollar value.
+
+        - **Shares:** Represents the order size in number of shares (for equities).'
+      properties:
+        value:
+          type: number
+          example: 10000
+          x-go-type: float64
+        type:
+          type: string
+          enum:
+          - par
+          - notional
+          - shares
+          default: par
+          x-enumNames:
+          - SizeTypePar
+          - SizeTypeNotional
+          - SizeTypeShares
+      required:
+      - value
+      - type
+    IntroducingBrokerID:
+      description: The ID of the introducing broker placing the order. If not specified, the organization associated with the API key will be used.
+      type: string
+    CreateBatchListRFQRequest:
+      description: Request body for creating multiple List RFQs and their corresponding Auto-Ex execution orders.
+      type: object
+      properties:
+        list_rfqs:
+          description: List RFQ definitions, one per asset class grouping.
+          type: array
+          items:
+            $ref: '#/components/schemas/ListRFQ'
+          minItems: 1
+      required:
+      - list_rfqs
+    OrderSide:
+      type: string
+      enum:
+      - buy
+      - sell
+      example: buy
+      title: OrderSide
+      description: 'Represents which side this order is on:
+
+
+        - buy
+
+        - sell'
+    RFQProtocolParameters:
+      type: object
+      title: RFQ Protocol Parameters
+      required:
+      - venue_mpid
+      - type
+      - disclosure
+      properties:
+        venue_mpid:
+          type: string
+          description: The MPID of the venue.
+        type:
+          type: string
+          description: The type of the RFQ.
+          enum:
+          - bin
+          - asap
+        disclosure:
+          type: string
+          description: The disclosure for the RFQ. Currently, only `disclosed` is supported.
+          enum:
+          - disclosed
+          - anonymous
+        due_after:
+          type: string
+          format: duration
+          description: Specifies how duration following RFQ creation, after which the RFQ becomes due.
+          example: 20m
+        subject_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the due time (or submission time if no due time is defined) during which quotes are considered subject.
+        expire_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the latest of due time, subject time, or submission time, after which the RFQ expires.
+    BatchAutoExConfig:
+      description: Configuration applied to auto-ex execution orders created for this List RFQ.
+      type: object
+      properties:
+        client_execution_order_id:
+          description: Client-generated idempotency key for the auto-ex execution order.
+          type: string
+        execution_criteria:
+          $ref: '#/components/schemas/ExecutionCriteria'
+        exit_criteria:
+          $ref: '#/components/schemas/ExitCriteria'
+        trader_id:
+          description: Trader ID for the execution orders. Duplicative but maintained for parity with existing execution order creation.
+          type: string
+          x-go-type-skip-optional-pointer: true
+      required:
+      - client_execution_order_id
+      - execution_criteria
+      - exit_criteria
+    ListRFQ:
+      description: A single List RFQ grouping.
+      type: object
+      properties:
+        asset_class:
+          description: The asset class for this List RFQ grouping.
+          type: string
+        auto_ex_config:
+          $ref: '#/components/schemas/BatchAutoExConfig'
+        custodian_id:
+          description: The ID of the custodian for the List RFQ. This field is required when venue is TMC.
+          type: string
+        executing_broker_id:
+          $ref: '#/components/schemas/ExecutingBrokerID'
+        rfq_items:
+          description: Individual RFQ items within this list, one per order.
+          type: array
+          items:
+            $ref: '#/components/schemas/ListRFQItem'
+          minItems: 1
+        rfq_protocol_parameters:
+          $ref: '#/components/schemas/RFQProtocolParameters'
+      required:
+      - asset_class
+      - executing_broker_id
+      - rfq_protocol_parameters
+      - rfq_items
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    ExecutingBrokerID:
+      description: The ID of the executing broker for the order.
+      type: string
+    ExitCriteria:
+      type: object
+      title: Exit Criteria
+      required:
+      - timeout
+      properties:
+        timeout:
+          type: string
+          format: duration
+          description: Timeout for the execution order.
+    ExecutionCriteria:
+      type: object
+      title: Execution Criteria
+      required:
+      - min_wait_time
+      - min_number_quotes
+      properties:
+        min_wait_time:
+          type: string
+          format: duration
+          description: Minimum wait time for the execution order.
+        min_number_quotes:
+          type: integer
+          description: Minimum number of quotes required on the side of the order, before execution can proceed. If the protocol is `request_for_quote`, this is the minimum number of RFQ quotes required. If the protocol is `limit_order_book`, this is the minimum number of LOB quotes required.
+        max_transaction_cost_dollar:
+          type: string
+          description: Maximum transaction cost in dollars. Max buy price = estimated price * par value + maxDollar, Min sell price = estimated price * par value - maxDollar. Ex. a value of `5` would mean the transaction cost must be within $5 of the instrument's estimated price in dollars, meaning when buying a bond with a estimated price of $100 and a par value of $1000, the transaction cost must be below $1005.
+          example: '5'
+        max_transaction_cost_percent:
+          type: string
+          description: Maximum transaction cost in percent. Max buy price = estimated price * (1 + maxPct / 100), Min sell price = estimated price * (1 - maxPct / 100). Ex. a value of `5` would mean the transaction cost must be within 5% of the instrument's estimated price in percent, meaning when buying a bond with a estimated price of $100, the transaction cost must be below $105.
+          example: '5'
+        max_transaction_cost_yield:
+          type: string
+          description: Maximum transaction cost in yield. Max buy yield = estimated ytw - maxYTW, Max sell yield = estimated ytw + maxYTW. Ex. a value of `0.5` would mean the transaction cost must be within 50 bps of the instrument's estimated yield, meaning when buying a bond with an estimated yield to worst of 1.5%, the transaction cost must be above 1.0%.
+          example: '0.5'
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    ListRFQItem:
+      description: A single item within a List RFQ, corresponding to one order. A matching auto-ex execution order will be created for each item.
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        client_rfq_id:
+          description: Client-generated idempotency key for the RFQ.
+          type: string
+        introducing_broker_id:
+          $ref: '#/components/schemas/IntroducingBrokerID'
+        isin:
+          description: The ISIN identifier for the security to trade.
+          type: string
+        moment_order_id:
+          description: The Moment order ID this RFQ item and execution order correspond to.
+          type: string
+          x-go-name: MomentOrderID
+        risk_group_id:
+          description: The risk group ID for the order.
+          type: string
+        settlement_date:
+          description: The targeted settlement date for the order in the format of YYYYMMDD, like 20090101.
+          type:
+          - integer
+          - 'null'
+          format: int64
+        side:
+          $ref: '#/components/schemas/OrderSide'
+      required:
+      - client_rfq_id
+      - moment_order_id
+      - isin
+      - side
+      - amount
+      - introducing_broker_id
+      - risk_group_id
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/allocateorderbyorderid.md
+  - https://docs.moment.com/reference/approveorderbyorderid-1.md
+  - https://docs.moment.com/reference/bulkordersubmission.md
+  - https://docs.moment.com/reference/cancelexecutionorder-1.md
+  - https://docs.moment.com/reference/createbatchlistrfqwithautoex.md
+  - https://docs.moment.com/reference/createexecutionorderautoexrfq.md
+  - https://docs.moment.com/reference/createexecutionordercustodianmanual.md
+  - https://docs.moment.com/reference/createexecutionorderexternaltrade-1.md
+  - https://docs.moment.com/reference/createexecutionorderlobmanual.md
+  - https://docs.moment.com/reference/createexecutionorderlobsor-1.md
+  - https://docs.moment.com/reference/createexecutionordermanualrfq-1.md
+  - https://docs.moment.com/reference/createrfq-1.md
+  - https://docs.moment.com/reference/deleteallocation-2.md
+  - https://docs.moment.com/reference/deletebookingconfigurationbyid.md
+  - https://docs.moment.com/reference/deleteorderbyorderid-1.md
+  - https://docs.moment.com/reference/deleterfq-1.md
+  - https://docs.moment.com/reference/getallorders-1.md
+  - https://docs.moment.com/reference/getevents-1.md
+  - https://docs.moment.com/reference/getorderbyorderid-1.md
+  - https://docs.moment.com/reference/postorder-1.md
+  - https://docs.moment.com/reference/rejectorderbyorderid-1.md
+  - https://docs.moment.com/reference/reportexternaltrade-1.md
+  merge:
+    pages: 22
+    deduped: 363
+    conflicts_kept_first: 0

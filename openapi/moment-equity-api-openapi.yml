@@ -1,0 +1,195 @@
+openapi: 3.2.0
+info:
+  title: Refdata Service Equity API
+  version: 1.0.0
+  description: API for accessing reference data internally.
+tags:
+- name: Equity
+paths:
+  /v1/equity/snapshot:
+    get:
+      summary: Get Equity Snapshot
+      description: 'Returns equity records as newline-delimited JSON (NDJSON).
+
+        Use the filter parameter to narrow results and the fields parameter to
+
+        select which fields are returned.
+
+
+        When the filter targets the cache key field (isin) with an "in" operator,
+
+        the server performs direct cache lookups instead of scanning all records.
+
+        Additional filters in the same request are applied to the narrowed set.'
+      operationId: getEquitySnapshot
+      tags:
+      - Equity
+      parameters:
+      - $ref: '#/components/parameters/SnapshotFields'
+      - $ref: '#/components/parameters/SnapshotFilter'
+      responses:
+        '200':
+          description: Successful response (NDJSON stream)
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/Equity'
+        '400':
+          description: Invalid filter expression
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/equity/{id}:
+    get:
+      summary: Get Equity by identifier
+      description: 'Returns a single equity record by ISIN. If the identifier is not
+
+        an ISIN, the service attempts to auto-detect the symbol type and
+
+        resolve it to the underlying ISIN.'
+      operationId: getEquityByID
+      tags:
+      - Equity
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Security identifier. ISINs are looked up directly; other formats
+
+          (e.g., CUSIP) are auto-detected and resolved.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equity'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Equity:
+      type: object
+      properties:
+        isin:
+          type:
+          - string
+          - 'null'
+        cusip:
+          type:
+          - string
+          - 'null'
+        issuer:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        symbol:
+          type:
+          - string
+          - 'null'
+        cfi_code:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        inactive_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        active:
+          type:
+          - boolean
+          - 'null'
+        asset_subtype:
+          type:
+          - string
+          - 'null'
+        asset_type:
+          type:
+          - string
+          - 'null'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+  parameters:
+    SnapshotFilter:
+      name: filter
+      in: query
+      required: false
+      description: 'JSON filter expression. Supported operators: equal_to, not_equal_to,
+
+        greater_than, greater_than_or_equal_to, less_than, less_than_or_equal_to,
+
+        in, not_in, is_null, includes, not_includes, starts_with, ends_with.
+
+        Logical combinators: and, or, not.'
+      schema:
+        type: string
+      example: '{"isin":{"in":["US0378331005","US5949181045"]}}'
+    SnapshotFields:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated list of fields to include in the response
+      schema:
+        type: string
+      example: isin,cusip,issuer
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getequitybyid-1.md
+  - https://docs.moment.com/reference/getequitybyid.md
+  - https://docs.moment.com/reference/getequitysnapshot-1.md
+  - https://docs.moment.com/reference/getequitysnapshot.md
+  - https://docs.moment.com/reference/getfixedincomebyid-1.md
+  - https://docs.moment.com/reference/getfixedincomebyid.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot-1.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot.md
+  - https://docs.moment.com/reference/getfundbyid-1.md
+  - https://docs.moment.com/reference/getfundbyid.md
+  - https://docs.moment.com/reference/getfundholdings-1.md
+  - https://docs.moment.com/reference/getfundholdings.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot-1.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot.md
+  - https://docs.moment.com/reference/getfundsnapshot-1.md
+  - https://docs.moment.com/reference/getfundsnapshot.md
+  - https://docs.moment.com/reference/gethealth-3.md
+  - https://docs.moment.com/reference/gethealth.md
+  - https://docs.moment.com/reference/getsecuritybyid-1.md
+  - https://docs.moment.com/reference/getsecuritybyid.md
+  - https://docs.moment.com/reference/getsecuritysnapshot-1.md
+  - https://docs.moment.com/reference/getsecuritysnapshot.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics-1.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics.md
+  - https://docs.moment.com/reference/postsecurityresolve.md
+  merge:
+    pages: 25
+    deduped: 67
+    conflicts_kept_first: 17

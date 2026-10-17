@@ -159,8 +159,9 @@ common:
 
 apis:
 - name: Moment Fixed Income API
-  description: REST and WebSocket API for fixed-income reference data, evaluated pricing, order books, analytics, order/RFQ execution, and portfolio
-    optimization.
+  description: >-
+    REST and WebSocket API for fixed-income reference data, evaluated pricing, order books, analytics,
+    order/RFQ execution, and portfolio optimization.
   humanURL: https://docs.moment.com
   baseURL: https://moment-api.com/v1
   properties:
@@ -171,92 +172,6 @@ apis:
   - type: GettingStarted
     url: https://docs.moment.com/docs/getting-started
   aid: moment:moment-fixed-income-api
-- aid: moment:moment-account-management-api
-  name: Moment Accounts API
-  description: The Accounts API from Moment — 18 operation(s) for accounts.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Accounts
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-account-management-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-account-snapshot-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-post-order-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-cashflow-target-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-customizations-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-model-assignment-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-account-setting-key-schema.json
-- aid: moment:moment-account-management-extended-api
-  name: Moment Account Management Extended API
-  description: The Account Management Extended API from Moment — 17 operation(s) for account management extended.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Account Management Extended
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-account-management-extended-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-cash-raise-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-projected-cash-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-organization-account-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-organization-advisor-code-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-advisor-account-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-cent-amount-schema.json
-- aid: moment:moment-analytics-api
-  name: Moment Bond Calculator API
-  description: The Bond Calculator API from Moment — 4 operation(s) for bond calculator.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Bond Calculator
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-analytics-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-portfolio-stats-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-yield-grid-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-markup-price-yield-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-yields-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-current-holdings-schema.json
-- aid: moment:moment-data-api
-  name: Moment Reference Data API
-  description: The Reference Data API from Moment — 8 operation(s) for reference data.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Reference Data
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-data-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-corporate-actions-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-corporate-action-detail-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-mark-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-instruments-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-prices-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-instrument-info-detail-schema.json
 - aid: moment:moment-filter-lists-api
   name: Moment Filter Lists API
   description: The Filter Lists API from Moment — 4 operation(s) for filter lists.
@@ -277,28 +192,6 @@ apis:
     url: json-schema/moment-create-filter-list-request-schema.json
   - type: JSONSchema
     url: json-schema/moment-update-filter-list-request-schema.json
-- aid: moment:moment-live-inventory-api
-  name: Moment Reference Data API
-  description: The Reference Data API from Moment — 3 operation(s) for reference data.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Reference Data
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-live-inventory-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-live-inventory-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-maturity-bucket-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-live-inventory-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-live-inventory-response-post-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
 - aid: moment:moment-models-api
   name: Moment Models API
   description: The Models API from Moment — 16 operation(s) for models.
@@ -355,85 +248,6 @@ apis:
     url: openapi/moment-organizations-api-openapi.yml
   - type: JSONSchema
     url: json-schema/moment-organization-info-schema.json
-- aid: moment:moment-organizations-roles-users-permissions-apis
-  name: Moment Organizations Roles Users Permissions Apis Openapi.Yml API
-  description: The Organizations Roles Users Permissions Apis Openapi.Yml API from Moment — 3 operation(s) for organizations roles users permissions
-    apis openapi.yml.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Organizations Roles Users Permissions Apis Openapi.Yml
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-organizations-roles-users-permissions-apis-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-organization-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-ipallowlist-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-add-fixipallowlist-request-schema.json
-- aid: moment:moment-portfolio-optimizer-api
-  name: Moment Optimization API
-  description: The Optimization API from Moment — 7 operation(s) for optimization.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Optimization
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-portfolio-optimizer-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-order-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-optimization-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-replacement-candidates-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-preview-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-backtest-request-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-backtest-result-schema.json
-- aid: moment:moment-quotes-api
-  name: Moment Hydrate Quotes API
-  description: The Hydrate Quotes API from Moment — 7 operation(s) for hydrate quotes.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Hydrate Quotes
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-quotes-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-full-order-book-response-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-custom-fee-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-hydrated-quote-schema.json
-  - type: JSONSchema
-    url: json-schema/moment-pre-fee-quote-schema.json
-- aid: moment:moment-refdata-service-api
-  name: Moment Refdata Service API
-  description: The Refdata Service API from Moment — 13 operation(s) for refdata service.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Refdata Service
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-refdata-service-api-openapi.yml
-  - type: JSONSchema
-    url: json-schema/moment-fixed-income-schema.json
-- aid: moment:moment-reporting-api
-  name: Moment Reports API
-  description: The Reports API from Moment — 1 operation(s) for reports.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Reports
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-reporting-api-openapi.yml
 - aid: moment:moment-rfq-api
   name: Moment RFQ API
   description: The RFQ API from Moment — 4 operation(s) for rfq.
@@ -454,16 +268,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/moment-risk-api-openapi.yml
-- aid: moment:moment-risk-control-api
-  name: Moment Risk API
-  description: The Risk API from Moment — 1 operation(s) for risk.
-  humanURL: https://docs.moment.com
-  baseURL: https://moment-api.com/v1
-  tags:
-  - Risk
-  properties:
-  - type: OpenAPI
-    url: openapi/moment-risk-control-api-openapi.yml
 - aid: moment:moment-transactions-api
   name: Moment Transactions API
   description: The Transactions API from Moment — 2 operation(s) for transactions.
@@ -474,7 +278,3561 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/moment-transactions-api-openapi.yml
-
+- aid: moment:moment-accounts-api
+  name: Moment Accounts API
+  description: The Accounts API from Moment — 13 operation(s) for accounts.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-accounts-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-advisor-api
+  name: Moment Advisor API
+  description: The Advisor API from Moment — 2 operation(s) for advisor.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Advisor
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-advisor-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-allocations-api
+  name: Moment Allocations API
+  description: The Allocations API from Moment — 2 operation(s) for allocations.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Allocations
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-allocations-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-asset-allocation-template-assignments-api
+  name: Moment Asset Allocation Template Assignments API
+  description: >-
+    The Asset Allocation Template Assignments API from Moment — 3 operation(s) for asset allocation template
+    assignments.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Asset Allocation Template Assignments
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-asset-allocation-template-assignments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-asset-allocation-templates-api
+  name: Moment Asset Allocation Templates API
+  description: >-
+    The Asset Allocation Templates API from Moment — 9 operation(s) for asset allocation templates.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Asset Allocation Templates
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-asset-allocation-templates-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-backtesting-api
+  name: Moment Backtesting API
+  description: The Backtesting API from Moment — 2 operation(s) for backtesting.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Backtesting
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-backtesting-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-bond-calculator-api
+  name: Moment Bond Calculator API
+  description: The Bond Calculator API from Moment — 4 operation(s) for bond calculator.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Bond Calculator
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-bond-calculator-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-booking-configuration-api
+  name: Moment Booking Configuration API
+  description: The Booking Configuration API from Moment — 1 operation(s) for booking configuration.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Booking Configuration
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-booking-configuration-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-calendar-api
+  name: Moment Calendar API
+  description: The Calendar API from Moment — 1 operation(s) for calendar.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Calendar
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-calendar-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-cash-raises-api
+  name: Moment Cash Raises API
+  description: The Cash Raises API from Moment — 4 operation(s) for cash raises.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Cash Raises
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-cash-raises-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-corporate-actions-api
+  name: Moment Corporate Actions API
+  description: The Corporate Actions API from Moment — 2 operation(s) for corporate actions.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Corporate Actions
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-corporate-actions-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-equity-api
+  name: Moment Equity API
+  description: The Equity API from Moment — 2 operation(s) for equity.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Equity
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-equity-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-events-api
+  name: Moment Events API
+  description: The Events API from Moment — 1 operation(s) for events.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-events-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-execution-orders-api
+  name: Moment Execution Orders API
+  description: The Execution Orders API from Moment — 8 operation(s) for execution orders.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Execution Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-execution-orders-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-fixedincome-api
+  name: Moment Fixed Income API
+  description: The FixedIncome API from Moment — 3 operation(s) for fixedincome.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - FixedIncome
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-fixedincome-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-fractional-universe-api
+  name: Moment Fractional Universe API
+  description: The Fractional Universe API from Moment — 1 operation(s) for fractional universe.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Fractional Universe
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-fractional-universe-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-fund-api
+  name: Moment Fund API
+  description: The Fund API from Moment — 2 operation(s) for fund.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Fund
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-fund-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-fundholding-api
+  name: Moment Fund Holding API
+  description: The FundHolding API from Moment — 2 operation(s) for fundholding.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - FundHolding
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-fundholding-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-hydrate-quotes-api
+  name: Moment Hydrate Quotes API
+  description: The Hydrate Quotes API from Moment — 1 operation(s) for hydrate quotes.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Hydrate Quotes
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-hydrate-quotes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-instruments-api
+  name: Moment Instruments API
+  description: The Instruments API from Moment — 1 operation(s) for instruments.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Instruments
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-instruments-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-ip-allowlist-api
+  name: Moment IP Allowlist API
+  description: The IP Allowlist API from Moment — 3 operation(s) for ip allowlist.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - IP Allowlist
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-ip-allowlist-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-list-rfq-api
+  name: Moment List RFQ API
+  description: The List RFQ API from Moment — 1 operation(s) for list rfq.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - List RFQ
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-list-rfq-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-market-data-api
+  name: Moment Market Data API
+  description: The Market Data API from Moment — 4 operation(s) for market data.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Market Data
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-market-data-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-metadata-api
+  name: Moment Metadata API
+  description: The Metadata API from Moment — 1 operation(s) for metadata.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Metadata
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-metadata-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-optimization-api
+  name: Moment Optimization API
+  description: The Optimization API from Moment — 5 operation(s) for optimization.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Optimization
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-optimization-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-organization-api
+  name: Moment Organization API
+  description: The Organization API from Moment — 1 operation(s) for organization.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Organization
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-organization-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-projected-cash-api
+  name: Moment Projected Cash API
+  description: The Projected Cash API from Moment — 1 operation(s) for projected cash.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Projected Cash
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-projected-cash-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-reference-data-api
+  name: Moment Reference Data API
+  description: The Reference Data API from Moment — 5 operation(s) for reference data.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Reference Data
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-reference-data-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-reports-api
+  name: Moment Reports API
+  description: The Reports API from Moment — 1 operation(s) for reports.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Reports
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-reports-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-risk-groups-api
+  name: Moment Risk Groups API
+  description: The Risk Groups API from Moment — 1 operation(s) for risk groups.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Risk Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-risk-groups-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-security-api
+  name: Moment Security API
+  description: The Security API from Moment — 3 operation(s) for security.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Security
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-security-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-sleeves-api
+  name: Moment Sleeves API
+  description: The Sleeves API from Moment — 4 operation(s) for sleeves.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Sleeves
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-sleeves-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-system-api
+  name: Moment System API
+  description: The System API from Moment — 1 operation(s) for system.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - System
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-system-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-trade-price-api
+  name: Moment Trade Price API
+  description: The Trade Price API from Moment — 1 operation(s) for trade price.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Trade Price
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-trade-price-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-unified-market-api
+  name: Moment Unified Market API
+  description: The Unified Market API from Moment — 1 operation(s) for unified market.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Unified Market
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-unified-market-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-user-api
+  name: Moment User API
+  description: The User API from Moment — 7 operation(s) for user.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - User
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-user-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
+- aid: moment:moment-orderbook-api
+  name: Moment Orderbook API
+  description: The Orderbook API from Moment — 2 operation(s) for orderbook.
+  humanURL: https://docs.moment.com
+  baseURL: https://moment-api.com/v1
+  tags:
+  - Orderbook
+  properties:
+  - type: OpenAPI
+    url: openapi/moment-orderbook-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/moment-account-snapshot-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-post-order-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cashflow-target-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-customizations-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-model-assignment-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-account-setting-key-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cash-raise-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-projected-cash-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-advisor-code-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-advisor-account-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-cent-amount-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-portfolio-stats-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yield-grid-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-markup-price-yield-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-yields-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-current-holdings-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-actions-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-corporate-action-detail-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-mark-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instruments-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-prices-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-instrument-info-detail-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-live-inventory-response-post-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-maturity-bucket-percentile-batch-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-organization-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-ipallowlist-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-add-fixipallowlist-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-order-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-optimization-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-replacement-candidates-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-preview-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-request-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-backtest-result-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-full-order-book-response-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-custom-fee-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-hydrated-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-pre-fee-quote-schema.json
+  - type: JSONSchema
+    url: json-schema/moment-fixed-income-schema.json
 x-enrichment:
   date: '2026-07-20'
   status: enriched

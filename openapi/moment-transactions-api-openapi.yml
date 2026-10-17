@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
   title: Transactions API
   description: An HTTP/JSON API for looking up historical agency, corporate, and municipal bond transactions.
@@ -8,11 +8,13 @@ servers:
 - url: https://paper.moment-api.com
 security:
 - ApiKeyAuth: []
+tags:
+- name: Transactions
 paths:
   /v1/transactions/{instrument_id}/:
     summary: Historical transactions for a specific bond.
     get:
-      summary: List historical transactions.
+      summary: List historical transactions
       tags:
       - Transactions
       operationId: getTransactions
@@ -125,7 +127,7 @@ paths:
   /v1/transactions/{instrument_id}/summary/:
     summary: Daily summary statistics for a given instrument.
     get:
-      summary: Retrieve daily summary statistics for a given instrument.
+      summary: Retrieve daily summary statistics for a given instrument
       tags:
       - Transactions
       operationId: getDailyTransactionSummaries
@@ -174,36 +176,45 @@ paths:
               schema:
                 $ref: '#/paths/~1v1~1transactions~1{instrument_id}~1/get/responses/400/content/application~1json/schema'
 components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: http
-      scheme: bearer
   schemas:
-    TransactionsPage:
+    DailySummary:
       type: object
-      description: A paginated list of transactions.
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Transaction'
-          description: List of transactions in this page.
-        count:
+        date:
+          type: string
+          format: date
+        buy_volume:
           type: integer
-          description: Always -1. Retained for wire-shape compatibility; the value is no longer computed because no known consumer reads it and producing it required an extra full-history scan per request. Iterate `next` to enumerate the result set.
-        next:
-          type: string
-          description: A hyperlink to the next page of results, requesting the same page size as the current request.
-          nullable: true
-        prev:
-          type: string
-          description: Null. Paginating in reverse is not supported.
-          nullable: true
+          description: Cumulative face value of buy transactions on 'date'.
+        sell_volume:
+          type: integer
+          description: Cumulative face value of sell transactions on 'date'.
+        inter_dealer_volume:
+          type: integer
+          description: Cumulative face value of inter-dealer transactions on 'date'.
+        high_price:
+          type: number
+          description: Highest price of any transaction on 'date'.
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        low_price:
+          type: number
+          description: Lowest price of any transaction on 'date'.
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        total_volume:
+          type: integer
+          description: Cumulative face value of all transactions on 'date'.
       required:
-      - data
-      - count
-      - next
-      - prev
+      - date
+      - buy_volume
+      - sell_volume
+      - inter_dealer_volume
+      - high_price
+      - low_price
+      - total_volume
     Transaction:
       type: object
       properties:
@@ -280,6 +291,33 @@ components:
         timestamp: '2025-07-16T12:07:13-04:00'
         ytm: null
         ytw: 5.902
+    TransactionsPage:
+      type: object
+      description: A paginated list of transactions.
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+          description: List of transactions in this page.
+        count:
+          type: integer
+          description: Always -1. Retained for wire-shape compatibility; the value is no longer computed because no known consumer reads it and producing it required an extra full-history scan per request. Iterate `next` to enumerate the result set.
+        next:
+          type:
+          - string
+          - 'null'
+          description: A hyperlink to the next page of results, requesting the same page size as the current request.
+        prev:
+          type:
+          - string
+          - 'null'
+          description: Null. Paginating in reverse is not supported.
+      required:
+      - data
+      - count
+      - next
+      - prev
     DailySummariesPage:
       type: object
       description: A paginated list of daily transaction summaries.
@@ -293,56 +331,24 @@ components:
           type: integer
           description: Always -1. Retained for wire-shape compatibility; the value is no longer computed because no known consumer reads it.
         next:
-          type: string
+          type:
+          - string
+          - 'null'
           description: A hyperlink to the next page of results, requesting the same page size as the current request.
-          nullable: true
         prev:
-          type: string
+          type:
+          - string
+          - 'null'
           description: Null. Paginating in reverse is not supported.
-          nullable: true
       required:
       - data
       - count
       - next
       - prev
-    DailySummary:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        buy_volume:
-          type: integer
-          description: Cumulative face value of buy transactions on 'date'.
-        sell_volume:
-          type: integer
-          description: Cumulative face value of sell transactions on 'date'.
-        inter_dealer_volume:
-          type: integer
-          description: Cumulative face value of inter-dealer transactions on 'date'.
-        high_price:
-          type: number
-          description: Highest price of any transaction on 'date'.
-          x-go-type: decimal.Decimal
-          x-go-type-import:
-            path: github.com/shopspring/decimal
-        low_price:
-          type: number
-          description: Lowest price of any transaction on 'date'.
-          x-go-type: decimal.Decimal
-          x-go-type-import:
-            path: github.com/shopspring/decimal
-        total_volume:
-          type: integer
-          description: Cumulative face value of all transactions on 'date'.
-      required:
-      - date
-      - buy_volume
-      - sell_volume
-      - inter_dealer_volume
-      - high_price
-      - low_price
-      - total_volume
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
 x-provenance:
   method: searched
   source: https://docs.moment.com/reference

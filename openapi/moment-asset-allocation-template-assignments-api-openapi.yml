@@ -1,0 +1,1053 @@
+openapi: 3.2.0
+info:
+  title: Models Asset Allocation Template Assignments API
+  description: Moment's Models API allows Clients to manage their portfolio models.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Asset Allocation Template Assignments
+paths:
+  /v1/allocation-template-assignment/:
+    get:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: List Asset Allocation Template Assignments
+      operationId: ListAllocationTemplateAssignments
+      parameters:
+      - name: account_id
+        in: query
+        description: Filter to the assignment for this account
+        required: false
+        schema:
+          type: string
+      - name: template_id
+        in: query
+        description: Filter to assignments of this template
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: Filter by assignment status
+        required: false
+        schema:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentStatus'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: Create an Asset Allocation Template Assignment
+      description: Assigns a published template to an account. Server-side Resolve(assigned_version, overrides) persists materialized_config. Unique on account_id. Materializes the tree on the account's sleeves in the same operation — one sleeve per funded slot created, updated, or adopted, displaced sleeves marked transitioning — reported in the response's sleeve_results; a refused push rolls the assignment back (409). If accounts gives no clear answer the assignment is kept, still assigning, and the response is 202 with it; reading the assignment by id finishes it.
+      operationId: CreateAllocationTemplateAssignment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAllocationTemplateAssignmentRequest'
+        required: true
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentWriteResponse'
+        '202':
+          description: The assignment is recorded, but accounts gave no clear answer on the sleeve changes. It is still assigning; reading it by id finishes it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignment'
+        '400':
+          description: Validation failed - the structured conflicts identify the failing nodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: 'Nothing was assigned: the account already has a template, the template is archived or cannot be assigned, the account rejected the sleeve changes, or a create of this template is still being applied (change_in_flight). The response says which.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentConflictError'
+  /v1/allocation-template-assignment/{assignment_id}/:
+    get:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: Get an Asset Allocation Template Assignment
+      operationId: GetAllocationTemplateAssignment
+      parameters:
+      - $ref: '#/components/parameters/assignment_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignment'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    patch:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: Update an Asset Allocation Template Assignment's overrides
+      description: Replaces the assignment's overrides, recomputes materialized_config from the assigned published version, and updates the account's sleeves the same way create does. The sleeve changes are listed in sleeve_results. Send the revision you last read as expected_revision. If the assignment was saved after that, nothing is written and the response is 409 stale_revision. If accounts refuses the sleeve update, nothing is saved, on the assignment or the account, and the response is 409 sleeve_push_rejected. If accounts gives no clear answer the change is kept, still applying, and the response is 202 with the assignment; reading it by id finishes it, and the revision says whether it was applied. If an earlier change is still being applied, nothing is written and the response is 409 change_in_flight.
+      operationId: UpdateAllocationTemplateAssignment
+      parameters:
+      - $ref: '#/components/parameters/assignment_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAllocationTemplateAssignmentRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentWriteResponse'
+        '202':
+          description: The change is recorded, but accounts gave no clear answer on the sleeve changes. It is still applying; reading the assignment by id finishes it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignment'
+        '400':
+          description: Validation failed - the structured conflicts identify the failing nodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: 'Nothing was saved. The reason says why: the assignment changed since it was read, the account rejected the sleeve changes, the assignment is unassigning, or an earlier change is still being applied (change_in_flight).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentUpdateConflictError'
+    delete:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: Unassign an Asset Allocation Template Assignment
+      description: 'Removes the assignment and detaches the template from the account''s sleeves: they stay on the account with their strategies and targets and are no longer template-managed. If accounts gives no clear answer the unassign is kept, still unassigning, and the response is 202 with the assignment; reading it by id or sending the delete again finishes it. A delete that finds an earlier create or edit still being applied answers 409 change_in_flight, without recording the unassign.'
+      operationId: UnassignAllocationTemplateAssignment
+      parameters:
+      - $ref: '#/components/parameters/assignment_id'
+      responses:
+        '202':
+          description: The unassign is recorded, but accounts gave no clear answer on detaching the sleeves. The assignment is still unassigning; reading it by id finishes it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignment'
+        '204':
+          description: Unassigned
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: Nothing was unassigned; the reason says why
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentUnassignConflictError'
+  /v1/allocation-template-assignment/{assignment_id}/preview/:
+    post:
+      tags:
+      - Asset Allocation Template Assignments
+      summary: Preview an Asset Allocation Template Assignment update
+      description: 'Plans a candidate override set exactly as the update would — same resolution, validation and sleeve plan — and writes nothing: no assignment, buffer cash, or sleeve changes. Invalid overrides get the same 400 conflicts as the update. The sleeve plan can still differ from the save''s if the account''s sleeves change in between, and accounts-side refusals only surface on the save.'
+      operationId: PreviewAllocationTemplateAssignment
+      parameters:
+      - $ref: '#/components/parameters/assignment_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewAllocationTemplateAssignmentRequest'
+        required: true
+      responses:
+        '200':
+          description: What the update would do
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentPreview'
+        '400':
+          description: Validation failed - the structured conflicts identify the failing nodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: The assignment or its account was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: The assignment cannot be previewed in its current state; the reason says why
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateAssignmentPreviewConflictError'
+components:
+  schemas:
+    AllocationTemplateStrategyEntry:
+      description: A reference from a leaf node's menu to an existing strategy, with a relative weight. A 0% weight means the strategy is approved for selection but not allocated by default.
+      type: object
+      properties:
+        strategy_id:
+          description: The ID of the referenced strategy
+          type: string
+        relative_weight:
+          description: The entry's share of its menu as a decimal string (never a number). Null means unset.
+          type:
+          - string
+          - 'null'
+        min_weight:
+          description: Optional lower range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        max_weight:
+          description: Optional upper range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+      required:
+      - strategy_id
+      title: AllocationTemplateStrategyEntry
+    AllocationTemplateAssignment:
+      description: An account's assignment to a published asset allocation template
+      type: object
+      properties:
+        id:
+          description: The ID of the assignment
+          type: string
+        template_id:
+          description: The assigned template
+          type: string
+        account_id:
+          description: The assigned account
+          type: string
+        household_id:
+          description: Optional household scope
+          type:
+          - string
+          - 'null'
+        assigned_version_id:
+          description: The published template version this assignment resolved against
+          type: string
+        overrides:
+          $ref: '#/components/schemas/AllocationTemplateOverrides'
+        materialized_config:
+          description: Resolved effective tree for this account
+          $ref: '#/components/schemas/AllocationTemplateConfig'
+        flattened_groups:
+          description: The materialized tree flattened for display, in display order. Served on detail, create, and update responses, and on list responses only when filtered by account_id; absent on unfiltered lists and on legacy rows whose stored config no longer flattens.
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentGroup'
+        status:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentStatus'
+        parent_organization_id:
+          description: The parent organization that owns the assignment
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          description: The user who created the assignment
+          allOf:
+          - $ref: '#/components/schemas/User'
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          description: The user who last updated the assignment
+          allOf:
+          - $ref: '#/components/schemas/User'
+        revision:
+          description: Counts applied changes; starts at 1 and moves when a change to the overrides is applied. An update sends back the revision it was edited against as expected_revision.
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - id
+      - template_id
+      - account_id
+      - household_id
+      - assigned_version_id
+      - overrides
+      - materialized_config
+      - status
+      - parent_organization_id
+      - created_at
+      - created_by
+      - updated_at
+      - updated_by
+      - revision
+      title: AllocationTemplateAssignment
+    AllocationTemplateAssignmentSleeveOutcome:
+      description: 'What accounts did: created a new sleeve, updated the sleeve already stamped for the slot, or adopted an existing unstamped sleeve in place'
+      type: string
+      enum:
+      - created
+      - updated
+      - adopted
+      title: AllocationTemplateAssignmentSleeveOutcome
+    AllocationTemplateNode:
+      description: A node in the template tree. It holds either child nodes or a strategy menu, never both; cash holds neither. A model_category is a section defined by strategy tags — those tags filter which strategies show up in menus under it, and at least one is required. Ordinary sections and cash must not carry tags.
+      type: object
+      properties:
+        id:
+          description: 'Stable node id (''aatn_'' ULID). Minted server-side for new nodes: omit or send empty on creation, keep it verbatim on later publishes - child overrides are keyed by it.'
+          type: string
+        name:
+          description: Display name; the root node may have an empty name
+          type: string
+        kind:
+          description: What this node is. A node is a free-text section; a model_category is a section defined by strategy tags; cash is the funding buffer.
+          type: string
+          enum:
+          - node
+          - model_category
+          - cash
+        relative_weight:
+          description: The node's share of its parent as a decimal string (never a number). Null means unset; the root carries an implicit 100% and keeps this null.
+          type:
+          - string
+          - 'null'
+        min_weight:
+          description: Optional lower range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        max_weight:
+          description: Optional upper range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        tag_ids:
+          description: Strategy tag ids from the tags service. Required on a model_category (at least one). Must be omitted or empty on ordinary sections and cash. A nested model_category cannot reuse a tag already set by an ancestor.
+          type: array
+          items:
+            type: string
+        children:
+          description: Child nodes; mutually exclusive with strategies
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateNode'
+        strategies:
+          description: The leaf node's strategy menu; mutually exclusive with children
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateStrategyEntry'
+      required:
+      - kind
+      title: AllocationTemplateNode
+    AllocationTemplateAssignmentChangeInFlightError:
+      description: Another change to the assignment is still being applied because accounts gave no clear answer, so this request wrote nothing. Read the assignment by id, which finishes that change, then retry if this one is still wanted.
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          type: string
+          enum:
+          - change_in_flight
+          x-enum-varnames:
+          - UpdateConflictChangeInFlight
+      required:
+      - error
+      - error_type
+      - reason
+      title: AllocationTemplateAssignmentChangeInFlightError
+    AllocationTemplateAssignmentUnassigningError:
+      description: The assignment is being unassigned and cannot be changed
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          type: string
+          enum:
+          - assignment_unassigning
+          x-enum-varnames:
+          - UpdateConflictAssignmentUnassigning
+      required:
+      - error
+      - error_type
+      - reason
+      title: AllocationTemplateAssignmentUnassigningError
+    AllocationTemplateAssignmentCashPlan:
+      description: 'What the update would do to the account''s buffer cash: set it to the tree''s cash node, or clear it when the tree has no cash node. A 0% buffer is a set, not a clear.'
+      discriminator:
+        propertyName: action
+        mapping:
+          set: '#/components/schemas/AllocationTemplateAssignmentCashSet'
+          clear: '#/components/schemas/AllocationTemplateAssignmentCashClear'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentCashSet'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentCashClear'
+    AllocationTemplateAssignmentConflictReason:
+      description: Why an assignment write was refused with 409
+      type: string
+      enum:
+      - account_assigned
+      - template_archived
+      - template_not_assignable
+      - sleeve_push_rejected
+      - change_in_flight
+      title: AllocationTemplateAssignmentConflictReason
+    PreviewAllocationTemplateAssignmentRequest:
+      type: object
+      properties:
+        overrides:
+          description: Candidate replacement override set, as the update would take it
+          $ref: '#/components/schemas/AllocationTemplateOverrides'
+      required:
+      - overrides
+      title: PreviewAllocationTemplateAssignmentRequest
+    AllocationTemplateAssignmentPlannedCreate:
+      description: No sleeve holds the slot yet, so accounts would create one; its id arrives in the update's sleeve_results
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - create
+          x-enum-varnames:
+          - PlannedSleeveCreate
+        node_id:
+          type: string
+        strategy_id:
+          type: string
+        absolute_target:
+          description: The sleeve's target share of the account's managed value as a percent decimal string (never a number)
+          type: string
+      required:
+      - action
+      - node_id
+      - strategy_id
+      - absolute_target
+      title: AllocationTemplateAssignmentPlannedCreate
+    AllocationTemplateAssignmentWriteResponse:
+      description: An assignment create or update, plus the report of the sleeve push the write performed on the account. The report is an event of this push, not assignment state, so it appears only on write responses; reads serve the bare assignment.
+      type: object
+      properties:
+        assignment:
+          $ref: '#/components/schemas/AllocationTemplateAssignment'
+        sleeve_results:
+          description: What accounts did with each funded slot, keyed by (node_id, strategy_id) — join against the assignment's flattened_groups slots. Empty when the tree has no funded slots.
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentSleeveResult'
+        transitioned_sleeve_ids:
+          description: 'Every sleeve the push left marked transitioning (winding down at zero target) on the account. A set, not a delta: accounts re-sends every unclaimed eligible sleeve on each push.'
+          type: array
+          items:
+            type: string
+      required:
+      - assignment
+      - sleeve_results
+      - transitioned_sleeve_ids
+      title: AllocationTemplateAssignmentWriteResponse
+    AllocationTemplateAssignmentPreviewConflictError:
+      description: A preview refused because of the assignment's current state; the reason picks the variant
+      discriminator:
+        propertyName: reason
+        mapping:
+          assignment_unassigning: '#/components/schemas/AllocationTemplateAssignmentUnassigningError'
+          change_in_flight: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentUnassigningError'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+    AllocationTemplateConfig:
+      description: A fully materialized template tree. The document root is itself a node.
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/AllocationTemplateNode'
+      required:
+      - root
+      title: AllocationTemplateConfig
+    AllocationTemplateAssignmentPlannedAdopt:
+      description: An existing unstamped sleeve holding the slot's strategy would be stamped for the slot in place
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - adopt
+          x-enum-varnames:
+          - PlannedSleeveAdopt
+        node_id:
+          type: string
+        strategy_id:
+          type: string
+        sleeve_id:
+          description: The existing account sleeve ('slv_' id)
+          type: string
+        absolute_target:
+          description: The sleeve's target share of the account's managed value as a percent decimal string (never a number)
+          type: string
+      required:
+      - action
+      - node_id
+      - strategy_id
+      - sleeve_id
+      - absolute_target
+      title: AllocationTemplateAssignmentPlannedAdopt
+    UpdateAllocationTemplateAssignmentRequest:
+      type: object
+      properties:
+        overrides:
+          description: Replacement override set. Re-resolved against the assigned published version.
+          $ref: '#/components/schemas/AllocationTemplateOverrides'
+        expected_revision:
+          description: The assignment revision the override set was edited against; a mismatch fails with 409 stale_revision
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - overrides
+      - expected_revision
+      title: UpdateAllocationTemplateAssignmentRequest
+    AllocationTemplateValidationError:
+      description: Structured publish-validation failure
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateConflict'
+      required:
+      - error
+      - error_type
+      - conflicts
+      title: AllocationTemplateValidationError
+    CreateAllocationTemplateAssignmentRequest:
+      type: object
+      properties:
+        account_id:
+          description: The account to assign the template to
+          type: string
+        template_id:
+          description: The published template to assign
+          type: string
+        household_id:
+          description: Optional household scope for a later household-level assignment model
+          type:
+          - string
+          - 'null'
+        overrides:
+          description: Sparse advisor deviations, same shape as child-template overrides. Weights and ranges only; added/removed strategy entries are rejected.
+          $ref: '#/components/schemas/AllocationTemplateOverrides'
+      required:
+      - account_id
+      - template_id
+      title: CreateAllocationTemplateAssignmentRequest
+    AllocationTemplateAssignmentCashClear:
+      description: The tree has no cash node, so the update would remove the account's buffer cash
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - clear
+          x-enum-varnames:
+          - CashPlanClear
+      required:
+      - action
+      title: AllocationTemplateAssignmentCashClear
+    AllocationTemplateAssignmentSlot:
+      description: One expected sleeve under a group's node, keyed on the account by (node_id, strategy_id)
+      type: object
+      properties:
+        strategy_id:
+          description: The funded strategy
+          type: string
+      required:
+      - strategy_id
+      title: AllocationTemplateAssignmentSlot
+    AllocationTemplateOverrides:
+      description: 'A linked template''s delta against its base, keyed by stable node id. Field semantics are tri-state and load-bearing: an absent field inherits from the base, an explicit null is an unset/clear override, a value is an override. Per node: relative_weight/min_weight/max_weight plus a strategies map keyed by strategy id with relative_weight/min_weight/max_weight (value overrides), added (child-added entry), and removed (child-removed base entry). Typed loosely so absent and null survive the wire.'
+      type: object
+      additionalProperties: true
+      x-go-type: stdjson.RawMessage
+      x-go-type-import:
+        path: encoding/json
+        name: stdjson
+      title: AllocationTemplateOverrides
+    AllocationTemplateAssignmentConflictError:
+      description: An assignment write refused because of the current state of the account or template
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentConflictReason'
+      required:
+      - error
+      - error_type
+      - reason
+      title: AllocationTemplateAssignmentConflictError
+    AllocationTemplateAssignmentCashSet:
+      description: The update would set the account's buffer cash to the tree's cash node
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - set
+          x-enum-varnames:
+          - CashPlanSet
+        absolute_target:
+          description: The buffer's target share of the account's managed value as a percent decimal string (never a number)
+          type: string
+      required:
+      - action
+      - absolute_target
+      title: AllocationTemplateAssignmentCashSet
+    AllocationTemplateAssignmentPlannedSleeve:
+      description: What the update would do with one funded slot, keyed by (node_id, strategy_id). Only update and adopt land on an existing sleeve, so only they carry a sleeve_id.
+      discriminator:
+        propertyName: action
+        mapping:
+          create: '#/components/schemas/AllocationTemplateAssignmentPlannedCreate'
+          update: '#/components/schemas/AllocationTemplateAssignmentPlannedUpdate'
+          adopt: '#/components/schemas/AllocationTemplateAssignmentPlannedAdopt'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentPlannedCreate'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentPlannedUpdate'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentPlannedAdopt'
+    AllocationTemplateAssignmentUnassignConflictError:
+      description: An unassign that has not finished; the reason picks the variant
+      discriminator:
+        propertyName: reason
+        mapping:
+          change_in_flight: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+    AllocationTemplateAssignmentGroup:
+      description: 'One non-cash node of the materialized tree, flattened for display: relative weights pre-multiplied into an absolute target, in DFS document order (parent before children = display order). Cash nodes are omitted but their weights still shape siblings'' absolute targets. A root that directly carries a strategy menu appears as a depth-0 group (empty path, null parent_name and relative_weight).'
+      type: object
+      properties:
+        node_id:
+          description: The node's stable id ('aatn_' ULID), never empty
+          type: string
+        name:
+          description: Display name
+          type: string
+        path:
+          description: Node ids from the root down to and including this node, exclusive of the root, so its length is the node's depth
+          type: array
+          items:
+            type: string
+        parent_name:
+          description: The parent node's name; null when the parent is the root
+          type:
+          - string
+          - 'null'
+        absolute_target:
+          description: The node's share of the account's managed value as a percent decimal string (never a number)
+          type: string
+        relative_weight:
+          description: The node's share of its parent as a percent decimal string (never a number)
+          type:
+          - string
+          - 'null'
+        slots:
+          description: 'The expected sleeves under this node: one entry per funded strategy. (node_id, strategy_id) pairs are unique across groups.'
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentSlot'
+      required:
+      - node_id
+      - name
+      - path
+      - parent_name
+      - absolute_target
+      - relative_weight
+      - slots
+      title: AllocationTemplateAssignmentGroup
+    AllocationTemplateAssignmentPreview:
+      description: What an update with the candidate overrides would do, computed without writing anything. The sleeve plan is the one the update would send to accounts if nothing changes in between.
+      type: object
+      properties:
+        revision:
+          description: The assignment revision the preview was computed against
+          type: integer
+          format: int64
+          minimum: 1
+        assigned_version_id:
+          description: The published template version the overrides resolve against
+          type: string
+        materialized_config:
+          description: The resolved effective tree the update would store
+          $ref: '#/components/schemas/AllocationTemplateConfig'
+        flattened_groups:
+          description: The resolved tree flattened for display, as on the assignment
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentGroup'
+        sleeve_plan:
+          description: What the update would do with each funded slot, in flattened_groups order
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentPlannedSleeve'
+        transitioning_sleeve_ids:
+          description: Every sleeve the update would leave marked transitioning (winding down at zero target). A set, as on the update response.
+          type: array
+          items:
+            type: string
+        cash:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentCashPlan'
+      required:
+      - revision
+      - assigned_version_id
+      - materialized_config
+      - flattened_groups
+      - sleeve_plan
+      - transitioning_sleeve_ids
+      - cash
+      title: AllocationTemplateAssignmentPreview
+    AllocationTemplateConflict:
+      description: A validation or resolution conflict identifying a failing node (and optionally a menu entry)
+      type: object
+      properties:
+        node_id:
+          description: The ID of the node the conflict is attached to
+          type: string
+        strategy_id:
+          description: The menu entry the conflict is attached to, when applicable
+          type:
+          - string
+          - 'null'
+        code:
+          description: Machine-readable conflict code
+          type: string
+          enum:
+          - sum_mismatch
+          - mixed_unset_group
+          - weight_out_of_bounds
+          - range_violation
+          - empty_leaf_menu
+          - empty_node
+          - unknown_strategy
+          - archived_strategy
+          - override_target_missing
+          - structure_violation
+          - unset_inherited_value
+          - incomplete_weights
+        message:
+          description: Human-readable explanation
+          type: string
+      required:
+      - node_id
+      - strategy_id
+      - code
+      - message
+      title: AllocationTemplateConflict
+    AllocationTemplateAssignmentUpdateConflictError:
+      description: An assignment update that was not saved; the reason picks the variant
+      discriminator:
+        propertyName: reason
+        mapping:
+          stale_revision: '#/components/schemas/AllocationTemplateAssignmentStaleRevisionError'
+          sleeve_push_rejected: '#/components/schemas/AllocationTemplateAssignmentSleevePushRejectedError'
+          assignment_unassigning: '#/components/schemas/AllocationTemplateAssignmentUnassigningError'
+          change_in_flight: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+      oneOf:
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentStaleRevisionError'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentSleevePushRejectedError'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentUnassigningError'
+      - $ref: '#/components/schemas/AllocationTemplateAssignmentChangeInFlightError'
+    AllocationTemplateAssignmentList:
+      type: object
+      properties:
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignment'
+      required:
+      - assignments
+      title: AllocationTemplateAssignmentList
+    AllocationTemplateAssignmentPlannedUpdate:
+      description: The sleeve already stamped for the slot would be updated in place
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+          - update
+          x-enum-varnames:
+          - PlannedSleeveUpdate
+        node_id:
+          type: string
+        strategy_id:
+          type: string
+        sleeve_id:
+          description: The existing account sleeve ('slv_' id)
+          type: string
+        absolute_target:
+          description: The sleeve's target share of the account's managed value as a percent decimal string (never a number)
+          type: string
+      required:
+      - action
+      - node_id
+      - strategy_id
+      - sleeve_id
+      - absolute_target
+      title: AllocationTemplateAssignmentPlannedUpdate
+    AllocationTemplateAssignmentSleeveResult:
+      description: The sleeve accounts created, updated, or adopted for one funded slot during this write's push
+      type: object
+      properties:
+        node_id:
+          description: The node whose slot this sleeve materializes
+          type: string
+        strategy_id:
+          description: The funded strategy
+          type: string
+        sleeve_id:
+          description: The account sleeve ('slv_' id) — the id to await in downstream sleeve reads
+          type: string
+        outcome:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentSleeveOutcome'
+      required:
+      - node_id
+      - strategy_id
+      - sleeve_id
+      - outcome
+      title: AllocationTemplateAssignmentSleeveResult
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    AllocationTemplateAssignmentStaleRevisionError:
+      description: The assignment was written after the caller read it; reload before saving again
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          type: string
+          enum:
+          - stale_revision
+          x-enum-varnames:
+          - UpdateConflictStaleRevision
+        current_revision:
+          description: The assignment's revision now
+          type: integer
+          format: int64
+          minimum: 1
+      required:
+      - error
+      - error_type
+      - reason
+      - current_revision
+      title: AllocationTemplateAssignmentStaleRevisionError
+    User:
+      type: object
+      properties:
+        display_name:
+          description: The display name of the user
+          type: string
+        id:
+          description: The ID of the user
+          type: string
+      required:
+      - id
+      - display_name
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    AllocationTemplateAssignmentStatus:
+      description: Lifecycle status of a template-to-account assignment. assigning, applying and unassigning mean a write to the account is in flight; reading the assignment by id finishes it.
+      type: string
+      enum:
+      - active
+      - needs_resolution
+      - assigning
+      - applying
+      - unassigning
+      title: AllocationTemplateAssignmentStatus
+    AllocationTemplateAssignmentSleevePushRejectedError:
+      description: Accounts refused the sleeve and buffer cash changes; the error says why. Neither was written.
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          type: string
+          enum:
+          - sleeve_push_rejected
+          x-enum-varnames:
+          - UpdateConflictSleevePushRejected
+      required:
+      - error
+      - error_type
+      - reason
+      title: AllocationTemplateAssignmentSleevePushRejectedError
+  parameters:
+    assignment_id:
+      name: assignment_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The ID of the asset allocation template assignment
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/archiveallocationtemplate.md
+  - https://docs.moment.com/reference/createallocationtemplate.md
+  - https://docs.moment.com/reference/createallocationtemplateassignment.md
+  - https://docs.moment.com/reference/createmodel.md
+  - https://docs.moment.com/reference/deletemodel.md
+  - https://docs.moment.com/reference/getallocationtemplate.md
+  - https://docs.moment.com/reference/getallocationtemplateassignment.md
+  - https://docs.moment.com/reference/getallocationtemplateversion.md
+  - https://docs.moment.com/reference/getmodel.md
+  - https://docs.moment.com/reference/getmodelhistory.md
+  - https://docs.moment.com/reference/listallocationtemplateassignments.md
+  - https://docs.moment.com/reference/listallocationtemplates.md
+  - https://docs.moment.com/reference/listallocationtemplateversions.md
+  - https://docs.moment.com/reference/listmodels.md
+  - https://docs.moment.com/reference/previewallocationtemplateassignment.md
+  - https://docs.moment.com/reference/previewallocationtemplatepublish.md
+  - https://docs.moment.com/reference/previewmodel.md
+  - https://docs.moment.com/reference/publishallocationtemplate.md
+  - https://docs.moment.com/reference/restoreallocationtemplate.md
+  - https://docs.moment.com/reference/unarchiveallocationtemplate.md
+  - https://docs.moment.com/reference/unassignallocationtemplateassignment.md
+  - https://docs.moment.com/reference/updateallocationtemplateassignment.md
+  - https://docs.moment.com/reference/updateallocationtemplatemetadata.md
+  - https://docs.moment.com/reference/updatemodel.md
+  merge:
+    pages: 24
+    deduped: 319
+    conflicts_kept_first: 0

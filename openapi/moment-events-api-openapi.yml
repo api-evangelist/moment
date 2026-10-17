@@ -1,0 +1,3132 @@
+openapi: 3.2.0
+info:
+  title: Orders Events API
+  description: 'Moment''s Orders API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Orders API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Events
+paths:
+  /v1/trading/events/:
+    get:
+      tags:
+      - Events
+      summary: Events
+      description: The Events API returns a list of order-related events that have occurred. When 'start' is omitted, the endpoint defaults to events from the last two trading days. When 'start' is provided, any range up to 30 days wide is honored; a wider range, or a 'start' after 'end', is rejected with a 400.
+      operationId: getEvents
+      parameters:
+      - name: start
+        in: query
+        description: The starting message number to retrieve events from. If not provided, defaults to two trading days ago.
+        schema:
+          type: string
+        example: '202410010000000000'
+      - name: end
+        in: query
+        description: The ending message number to retrieve events up to. If not provided, we will retrieve events up to the most recent event.
+        schema:
+          type: string
+        example: '202410010000000000'
+      - name: event_type
+        in: query
+        description: Filter events by type.
+        schema:
+          $ref: '#/components/schemas/EventType'
+      - name: order_id
+        in: query
+        description: Filter events by order ID.
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: The maximum number of events to return. To fetch the next page, pass the `msg_number` of the last event in `data` as `start` — `start` is inclusive, so that event repeats at the head of the next page — and stop when `has_more` is false.
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventData'
+                  has_more:
+                    description: Whether there are more events beyond the returned page.
+                    type: boolean
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    AllocationFailEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        code:
+          description: The error code for the failure.
+          type: number
+        event_type:
+          type: string
+          example: allocation_fail
+          enum:
+          - allocation_fail
+          x-enum-varnames: null
+        reason:
+          description: The reason for the failure.
+          type: string
+        time:
+          type: string
+          format: date-time
+    AllOrNone:
+      description: If set to true, the entire order quantity will be filled or none at all. There will be no partial fills.
+      type: boolean
+      default: false
+      title: All or None
+      x-go-type-skip-optional-pointer: true
+    ApproveEventEventPayload:
+      type: object
+      properties:
+        client_order_id:
+          type: string
+        event_type:
+          type: string
+          example: approve
+          enum:
+          - approve
+          x-enum-varnames:
+          - EventTypeApprove
+        order_id:
+          type: string
+        time:
+          type: string
+          format: date-time
+    ManualApproveFailureEventEventPayload:
+      type: object
+      properties:
+        event_type:
+          type: string
+          example: manual_approve_fail
+          enum:
+          - manual_approve_fail
+          x-enum-varnames:
+          - EventTypeManualApproveFail
+        manual_approve_id:
+          description: The ID of the manual approval request.
+          type: string
+        order_id:
+          description: The ID of the order.
+          type: string
+        reason:
+          description: The reason for the failure.
+          type: string
+        time:
+          type: string
+          format: date-time
+    LimitPrice:
+      title: Limit Price
+      description: The Percentage Price is represented as a percentage of par. For a typical $1,000 par value bond, a percentage price of $90 values the bond at $900. This is a clean price, which does not include accrued interest. Accepts a JSON number or a decimal string.
+      example: 90
+      x-go-type: PriceValue
+      oneOf:
+      - type:
+        - number
+        - 'null'
+        minimum: 0
+      - type: string
+    RequestEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/RequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          description: The type of message.
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Request Event
+    OrderSize:
+      type: object
+      title: Amount
+      description: 'The Amount of an order with a specified `type` indicating how the amount is represented.
+
+        - **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).
+
+        - **Notional:** Represents the order size in notional dollar value.
+
+        - **Shares:** Represents the order size in number of shares (for equities).'
+      properties:
+        value:
+          type: number
+          example: 10000
+          x-go-type: float64
+        type:
+          type: string
+          enum:
+          - par
+          - notional
+          - shares
+          default: par
+          x-enumNames:
+          - SizeTypePar
+          - SizeTypeNotional
+          - SizeTypeShares
+      required:
+      - value
+      - type
+    TimeInForce:
+      title: Time In Force
+      type: string
+      description: Specifies how long the order remains in effect. Absence of this field is interpreted as DAY.
+      enum:
+      - day
+      - good_till_date
+      - at_the_opening
+      - at_the_close
+      x-enumNames:
+      - Day
+      - GoodTillDate
+      - AtTheOpening
+      - AtTheClose
+    AllocationCreateEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        allocation_strategy:
+          $ref: '#/components/schemas/AllocationStrategy'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        client_order_id:
+          type: string
+        custodian_id:
+          type: string
+        event_type:
+          type: string
+          example: allocation_create
+          enum:
+          - allocation_create
+          x-enum-varnames:
+          - EventTypeAllocationCreate
+        ib_id:
+          $ref: '#/components/schemas/IntroducingBrokerID'
+        order_id:
+          type: string
+        risk_group_id:
+          type: string
+        time:
+          type: string
+          format: date-time
+    Decimal:
+      title: Decimal
+      oneOf:
+      - type: number
+      - type: string
+      description: Decimal number.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+    CancelAllocationRejectEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        cancel_reject_code:
+          type: number
+        cancel_reject_reason:
+          type: string
+        cancel_request_id:
+          type: string
+        event_type:
+          type: string
+          example: cancel_allocation_reject
+          enum:
+          - cancel_allocation_reject
+          x-enum-varnames:
+          - EventTypeCancelAllocationReject
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        time:
+          type: string
+          format: date-time
+    AccountAllocationDetails:
+      description: The account allocation details specify the amount of the order that was allocated to a specific account.
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        accrued_interest:
+          description: The pro-rated coupon payment that will be either paid or received when the trade is settled. Expressed in USD.
+          type: number
+        actual_amount:
+          $ref: '#/components/schemas/OrderSize'
+        client_account_allocation_id:
+          description: Client-provided unique ID for the account allocation; for example, to cross-reference with an internal system. Values must be unique within the trading day.
+          type: string
+          example: allocacctID1
+        fill_price:
+          $ref: '#/components/schemas/LimitPrice'
+        net_money:
+          description: Actual cash flow of the order.
+          type: number
+        pre_fee_net_money:
+          description: Net money of the order before fees are applied.
+          type: number
+        requested_amount:
+          $ref: '#/components/schemas/OrderSize'
+        venue_execution_id:
+          description: The identifier for the trade as provided by the venue.
+          type: string
+        venue_mpid:
+          description: The Market Participant Identifier (MPID) of the venue where the trade was executed.
+          type: string
+      title: Account Allocation Details
+    RFQMetadata:
+      type: object
+      title: RFQ Metadata
+      description: Metadata related to the RFQ.
+      properties:
+        moment_rfq_id:
+          type: string
+          description: The ID of the RFQ.
+          x-go-type-skip-optional-pointer: true
+        contra_quote_id:
+          type: string
+          description: The ID of the contra quote for the RFQ.
+          x-go-type-skip-optional-pointer: true
+    ClientOrderID:
+      type: string
+      title: Client Order ID
+      description: Client-provided unique ID for the order; for example, to cross-reference with an internal system. Must be unique within the trading day, otherwise duplicate orders will be rejected during pre-trade checks.
+    RFQProtocolParameters:
+      type: object
+      title: RFQ Protocol Parameters
+      required:
+      - venue_mpid
+      - type
+      - disclosure
+      properties:
+        venue_mpid:
+          type: string
+          description: The MPID of the venue.
+        type:
+          type: string
+          description: The type of the RFQ.
+          enum:
+          - bin
+          - asap
+        disclosure:
+          type: string
+          description: The disclosure for the RFQ. Currently, only `disclosed` is supported.
+          enum:
+          - disclosed
+          - anonymous
+        due_after:
+          type: string
+          format: duration
+          description: Specifies how duration following RFQ creation, after which the RFQ becomes due.
+          example: 20m
+        subject_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the due time (or submission time if no due time is defined) during which quotes are considered subject.
+        expire_after:
+          type: string
+          format: duration
+          description: Specifies the duration following the latest of due time, subject time, or submission time, after which the RFQ expires.
+    ExtendedHours:
+      description: 'Deprecated. The value provided here is ignored — acceptance hours are
+
+        determined by the instrument''s asset class: fixed income orders are
+
+        accepted from 7:30 am to 5:30 pm ET, orders for other asset classes
+
+        from 7:30 am to 4:00 pm ET. The field is kept for backwards
+
+        compatibility and will be removed in a future release.
+
+        '
+      type: boolean
+      default: false
+      deprecated: true
+      x-go-type-skip-optional-pointer: true
+    VenueTraderInfo:
+      title: Venue Trader Info
+      type: object
+      required:
+      - venue_mpid
+      - custodian_id
+      - venue_trader_id
+      - custodian_account_at_venue
+      properties:
+        venue_mpid:
+          type: string
+          description: The MPID of the venue.
+          x-go-name: VenueMPID
+        custodian_id:
+          type: string
+          description: The ID of the custodian for the venue trader info.
+          x-go-name: CustodianID
+        venue_trader_id:
+          type: string
+          description: The ID of the venue trader.
+          x-go-name: VenueTraderID
+        custodian_account_at_venue:
+          type: string
+          description: The ID of the custodian account for the venue trader.
+    AllocationCancelEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        code:
+          type: number
+        event_type:
+          type: string
+          example: allocation_cancel
+          enum:
+          - allocation_cancel
+          x-enum-varnames:
+          - EventTypeAllocationCancel
+        reason:
+          type: string
+        time:
+          type: string
+          format: date-time
+    PovParameters:
+      title: POV Parameters
+      type: object
+      description: 'Parameters for a percentage-of-volume (POV) algo. The algo participates in the market at a
+
+        target percentage of the traded volume, speeding up or slowing down as market volume changes
+
+        rather than working to a fixed time schedule.'
+      required:
+      - target_participation_percent
+      properties:
+        target_participation_percent:
+          type: integer
+          format: int64
+          description: Target participation rate of market volume, as a percent (e.g. 20 = 20%).
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation, distinct from the target percent.
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+    RulesetMetadata:
+      type: object
+      title: Ruleset Metadata
+      description: Metadata about the ruleset that auto generated the order.
+      required:
+      - proposal_id
+      - tree_version_id
+      properties:
+        proposal_id:
+          type: string
+          description: The ID of the proposal.
+        tree_version_id:
+          type: string
+          description: The version ID of the ruleset that auto generated the order.
+    OrderRFQ:
+      type: object
+      title: Order RFQ
+      description: Contains the required information about the RFQ that prompted the order.
+      required:
+      - id
+      - contra_quote_id
+      properties:
+        id:
+          type: string
+          description: The ID of the RFQ that initiated the order request.
+        contra_quote_id:
+          type: string
+          title: Contra Quote ID
+          description: The ID of the quote that is being traded against.
+    NullableDecimal:
+      title: Nullable Decimal
+      oneOf:
+      - type: number
+      - type: string
+      description: Nullable Decimal number.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+    ExternalTradeReportRequestEvent:
+      description: 'Sent when a request to report an external trade is received. This system update acknowledges the request.
+
+        If the request is accepted, an order_update event of execution will follow; if rejected, a system update of type external_trade_report_reject is sent.
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExternalTradeReportRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: External Trade Report Request Event
+    AllocationRequest:
+      title: Allocation Request
+      type: object
+      required:
+      - strategy
+      - client_allocation_id
+      - account_allocations
+      properties:
+        strategy:
+          type: string
+          enum:
+          - fifo_without_averaging
+          - fifo_with_averaging
+          - pro_rata_with_averaging
+          description: 'Strategy for allocation. Determines how the block''s filled quantity is distributed across requested accounts.
+
+            - `fifo_without_averaging`: allocates on a first-in, first-out basis without averaging; preserves individual trade prices per allocation.
+
+            - `fifo_with_averaging`: allocates first-in, first-out and applies the block''s average fill price to each allocation.
+
+            - `pro_rata_with_averaging`: allocates pro-rata across requested accounts and applies the block''s average fill price. Typically used for equity and ETF block orders.
+
+
+            **RIA accounts must use `fifo_without_averaging`.** The averaging
+
+            strategies (`fifo_with_averaging`, `pro_rata_with_averaging`) require a
+
+            principal/averaging trading account to average executions before they are
+
+            booked to client accounts. RIAs trade in an agency capacity and must report
+
+            the actual street-execution prices and quantities to their custodian (e.g.
+
+            Schwab), so each allocation has to match a real executed trade. Because there
+
+            is no averaging account to absorb the difference, averaged allocation is not
+
+            available to RIAs — only the non-averaging FIFO strategy, which preserves the
+
+            true per-trade execution prices, is supported.
+
+            '
+        client_allocation_id:
+          type: string
+          description: Client-provided ID for the allocation
+          x-go-name: ClientAllocationID
+        account_allocations:
+          type: array
+          description: Account allocations for an individual order
+          items:
+            $ref: '#/components/schemas/AllocationAccountRequest'
+    AlgoParameters:
+      title: Algo Parameters
+      type: object
+      description: 'Execution parameters for custodian algos. Exactly one of `twap`, `vwap`, `pov`, or `is` must be set.
+
+        Only supported on the custodian protocol with the manual strategy. Fields or values not accepted
+
+        by a given custodian are rejected downstream.'
+      properties:
+        twap:
+          $ref: '#/components/schemas/TwapParameters'
+        vwap:
+          $ref: '#/components/schemas/VwapParameters'
+        pov:
+          $ref: '#/components/schemas/PovParameters'
+        is:
+          $ref: '#/components/schemas/IsParameters'
+    OrderSide:
+      type: string
+      enum:
+      - buy
+      - sell
+      example: buy
+      title: OrderSide
+      description: 'Represents which side this order is on:
+
+
+        - buy
+
+        - sell'
+    TraderIDs:
+      title: Trader IDs
+      type: object
+      description: the IDs of a trader
+      required:
+      - user_id
+      properties:
+        user_id:
+          type: string
+          description: the Moment ID for this user
+          x-go-name: UserID
+        bloomberg_id:
+          type: string
+          description: the registered Bloomberg ID for this user
+          x-go-name: BloombergID
+          x-go-type-skip-optional-pointer: true
+    ManualApproveRequestEvent:
+      description: 'This event is sent when a request to approve an order is received.
+
+        It is used to acknowledge the request. If the request is rejected, the client
+
+        will receive a `ManualApproveFailureEvent` as a `system_update`. If the request
+
+        is accepted, the client will receive an `Approve` event as an `order_update`.'
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ManualApproveRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Manual Approve Request Event
+    WouldParameters:
+      title: Would Parameters
+      type: object
+      description: 'Models the "I-Would" trigger: a price at which the algo becomes aggressive / completes.'
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        trigger_quantity:
+          $ref: '#/components/schemas/OrderSize'
+        trigger_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Percentage of the order quantity to complete when the trigger price is reached.
+    ExecutionOrderCancelRequestEvent:
+      description: 'Sent when a request to cancel an execution order is received. This system update
+
+        acknowledges the request. If the request is accepted, an order_update event
+
+        (ExecutionOrderCancel) will follow; if rejected, a failure event
+
+        (ExecutionOrderCancelRejectEvent) is sent.
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderCancelRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Cancel Execution Order Request Event
+    AllocationStrategy:
+      description: "The allocation strategy to use for the order. The allocation strategy must be valid for the custodian and determines how the order is allocated across multiple accounts.\n-\t`fifo_without_averaging`\n  Allocates the filled quantity on a first-in, first-out basis (FIFO) without averaging; maintaining the individual trade prices for each allocation.\n-\t`fifo_with_averaging`\n  Allocates the filled quantity on a first-in, first-out basis (FIFO) and applies the block's average fill price to each allocation.\n-\t`pro_rata_with_averaging`\n  Allocates the filled quantity pro-rata across requested accounts and applies the block's average fill price to each allocation. Typically used for equity and ETF block orders."
+      type: string
+      enum:
+      - fifo_without_averaging
+      - fifo_with_averaging
+      - pro_rata_with_averaging
+      title: Allocation Strategy
+    OrderID:
+      description: Unique, Moment-generated ID for the order.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+      title: Order ID
+    ExecutionOrderID:
+      description: The unique ID of the execution order.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+    EventData:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/RequestEvent'
+      - $ref: '#/components/schemas/RejectEvent'
+      - $ref: '#/components/schemas/ApproveEvent'
+      - $ref: '#/components/schemas/CancelEvent'
+      - $ref: '#/components/schemas/ExecutionEvent'
+      - $ref: '#/components/schemas/AllocationCreateEvent'
+      - $ref: '#/components/schemas/AllocationRejectEvent'
+      - $ref: '#/components/schemas/AllocationApproveEvent'
+      - $ref: '#/components/schemas/AllocationCancelEvent'
+      - $ref: '#/components/schemas/AllocationCalculateEvent'
+      - $ref: '#/components/schemas/AllocationSubmitEvent'
+      - $ref: '#/components/schemas/AllocationFailEvent'
+      - $ref: '#/components/schemas/CancelRequestEvent'
+      - $ref: '#/components/schemas/CancelRejectEvent'
+      - $ref: '#/components/schemas/CancelAllocationRequestEvent'
+      - $ref: '#/components/schemas/CancelAllocationRejectEvent'
+      - $ref: '#/components/schemas/FlaggedForReviewEvent'
+      - $ref: '#/components/schemas/ManualApproveRequestEvent'
+      - $ref: '#/components/schemas/ManualApproveFailureEvent'
+      - $ref: '#/components/schemas/ManualRejectRequestEvent'
+      - $ref: '#/components/schemas/ManualRejectFailureEvent'
+      - $ref: '#/components/schemas/ExternalTradeReportRequestEvent'
+      - $ref: '#/components/schemas/ExternalTradeReportRejectEvent'
+      - $ref: '#/components/schemas/ExecutionOrderRequestEvent'
+      - $ref: '#/components/schemas/ExecutionOrderRejectEvent'
+      - $ref: '#/components/schemas/ExecutionOrderCreateEvent'
+      - $ref: '#/components/schemas/ExecutionOrderCancelRequestEvent'
+      - $ref: '#/components/schemas/ExecutionOrderCancelRejectEvent'
+      - $ref: '#/components/schemas/ExecutionOrderCancelEvent'
+      - $ref: '#/components/schemas/RFQCreateEvent'
+      title: Event Data
+    ExternalTradeReportRequestEventEventPayload:
+      description: Details of the external trade report request.
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the trade.
+          type:
+          - string
+          - 'null'
+        bypass_trade_booking:
+          description: Flag to bypass trade booking.
+          type:
+          - boolean
+          - 'null'
+        client_external_trade_report_id:
+          description: The client-provided idempotency key.
+          type: string
+        counterparty_clearing_firm_id:
+          description: NSCC ID of the counterparty's clearing firm.
+          type: string
+          example: '0123'
+        counterparty_id:
+          description: MPID of the counterparty involved in the street trade.
+          type: string
+          example: MMNT
+        event_type:
+          type: string
+          example: external_trade_report_request
+          enum:
+          - external_trade_report_request
+          x-enum-varnames:
+          - EventTypeExternalTradeReportRequest
+        execution_id:
+          description: Trade ID. Often times this will be the ID of the execution made at an external venue.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        external_trade_report_id:
+          $ref: '#/components/schemas/ExternalTradeReportID'
+        order_id:
+          description: The ID of the order.
+          type: string
+        price:
+          description: The trade price.
+          type: number
+        settle_date:
+          description: The settlement date for the trade.
+          type: string
+          format: date-time
+        time:
+          type: string
+          format: date-time
+        trade_time:
+          description: The timestamp when the trade occurred.
+          type: string
+          format: date-time
+    AllocationSubmitEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationSubmitEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Submit Event
+    RejectEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/RejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Reject Event
+    GroupMember:
+      title: Group Member
+      type: object
+      description: A group member for an order
+      required:
+      - moment_order_id
+      properties:
+        moment_order_id:
+          type: string
+          description: The ID of the order in the group
+          x-go-name: MomentOrderID
+    MsgNumber:
+      description: The `msg_number` for the event, as per the [Real-Time Orders API](https://docs.moment.com/reference/real-time-orders-api#message-playback). This is a string representation of a 64-bit unsigned integer `YYYYMMDDxxxxxxxxxx` where the `x`'s are an incrementing index starting at `0000000000`.
+      type: string
+      title: Message Number
+    AllocationCancelEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationCancelEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Cancel Event
+    Price:
+      title: Price
+      type: object
+      description: Price value with type specification for different pricing methods.
+      required:
+      - value
+      - type
+      properties:
+        value:
+          $ref: '#/components/schemas/Decimal'
+        type:
+          $ref: '#/components/schemas/PriceValueType'
+        benchmark_isin:
+          type:
+          - string
+          - 'null'
+          description: The ISIN of the benchmark security, required when type is 'spread'.
+    AllocationCalculateEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationCalculateEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Calculate Event
+    FeeAmountType:
+      title: Fee Amount Type
+      type: string
+      description: "The method used to calculate the fee amount. Supported types include:\n\n- `percentage_of_par`: Fee as a percentage of par value.\n  Example: `0.10` = 10 basis points of par value.\n\n- `percentage_of_market_value`: Fee as a percentage of the quote price (market value).\n  Example: `1` = 1% of market value.\n\n- `yield_bps`: Fee expressed in yield terms, in basis points.\n  Example: `100` = 100 basis points of yield.\n\n- `percentage_of_concession`: Fee applies to concession based quoting mechanism, especially for new issue CDs.\n  Example: `50` = 50 percent of all concession from the dealer.\n"
+      enum:
+      - percentage_of_par
+      - percentage_of_market_value
+      - yield_bps
+      - percentage_of_concession
+      x-enumNames:
+      - FeeAmountTypePercentageOfPar
+      - FeeAmountTypePercentageOfMarketValue
+      - FeeAmountTypeYieldBps
+      - FeeAmountTypePercentageOfConcession
+    ExecutionOrderRejectEvent:
+      description: 'Emitted when the system rejects the request to create an execution order due to issues such as invalid
+
+        input or a non-existent order.
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Execution Order Reject Event
+    RejectEventEventPayload:
+      type: object
+      properties:
+        client_order_id:
+          type: string
+        event_type:
+          type: string
+          example: reject
+          enum:
+          - reject
+          x-enum-varnames:
+          - EventTypeReject
+        order_id:
+          type: string
+        reject_code:
+          type: number
+        reject_reason:
+          type: string
+        time:
+          type: string
+          format: date-time
+    AllocationTrade:
+      type: object
+      properties:
+        accrued_interest:
+          description: The pro-rated coupon payment that will be either paid or received when the trade is settled. Expressed in USD.
+          type: number
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        net_money:
+          description: Actual cash flow of the order.
+          type: number
+        pre_fee_net_money:
+          description: Net money of the order before fees are applied.
+          type: number
+        price:
+          $ref: '#/components/schemas/LimitPrice'
+        venue_execution_id:
+          description: The identifier for the trade as provided by the venue.
+          type: string
+        venue_mpid:
+          description: The Market Participant Identifier (MPID) of the venue where the trade was executed.
+          type: string
+      title: Allocation Trade
+    AllocationCreateEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationCreateEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Create Event
+    CancelRejectEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/CancelRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Cancel Reject Event
+    AccountID:
+      type: string
+      title: AccountID
+      description: Unique ID of user account
+      example: 5f7b9c9f-7b9c-9f7b-9c9f-7b9c9f7b9c9f
+    ExecutionInstruction:
+      title: Execution Instruction
+      type: object
+      description: Instructions for the EMS on how to execute the order.
+      required:
+      - client_execution_order_id
+      - protocol
+      - strategy
+      - quantity
+      properties:
+        client_execution_order_id:
+          type: string
+          description: The client-provided ID for the execution order.
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        strategy:
+          $ref: '#/components/schemas/Strategy'
+        quantity:
+          $ref: '#/components/schemas/OrderSize'
+        limit_price:
+          $ref: '#/components/schemas/LimitPrice'
+        rfq_metadata:
+          $ref: '#/components/schemas/RFQMetadata'
+        suppress_pmp_check:
+          type: boolean
+          description: Flag to toggle if the Prevailing Market Price (PMP) check should be suppressed for the execution order.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        venue_trader_info:
+          type: array
+          description: A list of venue trader info for the execution order.
+          items:
+            $ref: '#/components/schemas/VenueTraderInfo'
+          x-go-type-skip-optional-pointer: true
+        rfq_protocol_parameters:
+          type: array
+          description: A list of RFQ protocol parameters for the execution order.
+          items:
+            $ref: '#/components/schemas/RFQProtocolParameters'
+          x-go-type-skip-optional-pointer: true
+        execution_criteria:
+          $ref: '#/components/schemas/ExecutionCriteria'
+        exit_criteria:
+          $ref: '#/components/schemas/ExitCriteria'
+        venue_mpid:
+          type: string
+          description: MPID of the venue to trade on.
+        skip_lob_quotes:
+          type: boolean
+          description: Only for auto-RFQ orders, flag to determine whether to skip matching against the limit order book quotes and only match against RFQ quotes. Must be set if the protocol is `request_for_quote` and the strategy is `auto_ex`.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        all_or_none:
+          type: boolean
+          description: Flag to indicate whether the order should be executed as an all-or-none order. If set to true, the order will only be executed if the entire quantity can be filled.
+          x-go-type-skip-optional-pointer: true
+        trader_profile:
+          $ref: '#/components/schemas/TraderIDs'
+          description: The trader assigned to this execution instruction.
+        ruleset_metadata:
+          $ref: '#/components/schemas/RulesetMetadata'
+          description: Metadata about the ruleset that auto generated the order.
+        is_counter:
+          type: boolean
+          description: Flag to indicate if the order is a counter
+          default: false
+          x-go-type-skip-optional-pointer: true
+        counter_expires_after:
+          type:
+          - string
+          - 'null'
+          description: Duration in seconds until which the counter is valid
+        external_trade_report:
+          $ref: '#/components/schemas/ExternalTradeReport'
+        quotes_snapshot:
+          $ref: '#/components/schemas/QuotesSnapshot'
+        algo_parameters:
+          $ref: '#/components/schemas/AlgoParameters'
+        time_in_force:
+          description: Time in force for the execution instruction. Acceptable values are `day`, `good_till_date`, `at_the_opening`, and `at_the_close`. Absence is interpreted as `day`.
+          allOf:
+          - $ref: '#/components/schemas/TimeInForce'
+          x-go-type-skip-optional-pointer: true
+    ApproveEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ApproveEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Approve Event
+    ManualRejectRequestEventEventPayload:
+      type: object
+      properties:
+        annotation:
+          description: The annotation to be added to the order for the rejection.
+          type: string
+        client_manual_reject_id:
+          description: The client-provided ID of the manual reject request.
+          type: string
+        event_type:
+          type: string
+          example: manual_reject_request
+          enum:
+          - manual_reject_request
+          x-enum-varnames:
+          - EventTypeManualRejectRequest
+        manual_reject_id:
+          description: The ID of the manual reject request.
+          type: string
+        order_id:
+          description: The ID of the order to be rejected.
+          type: string
+        time:
+          type: string
+          format: date-time
+    ManualApproveFailureEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ManualApproveFailureEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Manual Approve Failure Event
+    RecipientType:
+      title: Recipient Type
+      type: string
+      description: The type of recipient for the fee.
+      enum:
+      - executing_broker
+      - introducing_broker
+      - advisor
+      - customer
+      x-enumNames:
+      - RecipientTypeExecutingBroker
+      - RecipientTypeIntroducingBroker
+      - RecipientTypeAdvisor
+      - RecipientTypeCustomer
+    OfferingID:
+      description: The ID of the new-issue offering this order is placed against. Required for `ioi` orders; ignored for all other order types.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+      title: Offering ID
+    ExternalTradeReportRejectEvent:
+      description: 'Emitted when the system fails to book an external trade due to issues such as invalid trade
+
+        details or errors with the external broker.
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExternalTradeReportRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: External Trade Report Reject Event
+    ExecutionOrderCreateEventEventPayload:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        event_type:
+          type: string
+          example: execution_order_create
+          enum:
+          - execution_order_create
+          x-enum-varnames:
+          - EventTypeExecutionOrderCreate
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        limit_price:
+          $ref: '#/components/schemas/LimitPrice'
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        rfq:
+          $ref: '#/components/schemas/OrderRFQ'
+        strategy:
+          $ref: '#/components/schemas/Strategy'
+        suppress_pmp_check:
+          $ref: '#/components/schemas/SuppressPMPCheck'
+        time:
+          type: string
+          format: date-time
+      required:
+      - client_execution_order_id
+    RequestEventEventPayload:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          $ref: '#/components/schemas/annotation'
+        client_order_id:
+          type: string
+        cusip:
+          type: string
+        event_type:
+          type: string
+          example: request
+          enum:
+          - request
+          x-enum-varnames:
+          - EventTypeRequest
+        extended_hours:
+          type: boolean
+          deprecated: true
+        isin:
+          type: string
+        limit_price:
+          $ref: '#/components/schemas/LimitPrice'
+        order_id:
+          type: string
+        risk_group_id:
+          type: string
+        side:
+          $ref: '#/components/schemas/OrderSide'
+        time:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/OrderType'
+    ExecutionOrderRequestEventEventPayload:
+      description: Details of the execution order request.
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        client_execution_order_id:
+          description: Idempotency key for the execution order request.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        event_type:
+          type: string
+          example: execution_order_request
+          enum:
+          - execution_order_request
+          x-enum-varnames:
+          - EventTypeExecutionOrderRequest
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        rfq:
+          $ref: '#/components/schemas/OrderRFQ'
+        time:
+          description: The time when the request was received.
+          type: string
+          format: date-time
+    CounterExpiryTime:
+      description: The time until which the counter is valid.
+      type: string
+      format: date-time
+    ExternalTradeReportRejectEventEventPayload:
+      description: Details of the failure.
+      type: object
+      properties:
+        client_external_trade_report_id:
+          description: The client-provided idempotency key.
+          type: string
+        event_type:
+          type: string
+          example: external_trade_report_reject
+          enum:
+          - external_trade_report_reject
+          x-enum-varnames:
+          - EventTypeExternalTradeReportReject
+        external_trade_report_id:
+          $ref: '#/components/schemas/ExternalTradeReportID'
+        order_id:
+          description: The ID of the order.
+          type: string
+        reason:
+          description: The reason for the rejection.
+          type: string
+        time:
+          description: The time when the failure occurred.
+          type: string
+          format: date-time
+    Order:
+      description: Each order has a unique identifier generated by Moment. The ID will be returned when an order is placed and can be used to check the status of the order via the `GET /v1/trading/order/{id}/` endpoint. Updates on open orders at Moment will also be sent over the real-time API, which is the recommended method of maintaining order state.
+      type: object
+      properties:
+        account_booking_type:
+          description: Deprecated, will be removed soon. Use account_configuration.booking_type instead.
+          allOf:
+          - $ref: '#/components/schemas/BookingType'
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        account_configuration:
+          $ref: '#/components/schemas/AccountConfiguration'
+        account_id:
+          description: Unique ID of user account
+          type:
+          - string
+          - 'null'
+          example: 5f7b9c9f-7b9c-9f7b-9c9f-7b9c9f7b9c9f
+          x-go-type-skip-optional-pointer: true
+        all_or_none:
+          $ref: '#/components/schemas/AllOrNone'
+        allocations:
+          description: Allocations for the order
+          $ref: '#/components/schemas/AllocationRequest'
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          $ref: '#/components/schemas/Annotation'
+        booking_instructions:
+          description: Client-provided information to configure trade booking for the order, as a map from string to string. Passing a multi-layer JSON map or something other than "string":"string" key-value pairs will result in an error. The specific contents of this field should be determined in conjunction with the back-office integration.
+          type: object
+          example:
+            booking_counterparty_id: some_counterparty_id
+            booking_capacity: some_booking_capacity
+          additionalProperties:
+            type: string
+          title: booking_instructions
+          x-go-type-skip-optional-pointer: true
+        bypass_auto_execution:
+          description: Flag to indicate if auto execution rules should be bypassed
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        counter_expiry_time:
+          description: The time until which the counter is valid
+          $ref: '#/components/schemas/CounterExpiryTime'
+        custodian_id:
+          description: 'The Moment-provided custodian ID that the corresponding account belongs to.
+
+
+            For organizations with CTM enabled, this field should be left empty for both single and block fixed-income orders.
+
+            For brokerages firms, `custodian_id` and `account_id` are both required to identify the inventory account.
+
+            For RIAs, this field is optional as each account allocation has its own custodian_id field.
+
+
+            When available, it is recommended to populate this field.'
+          type: string
+          title: Custodian ID
+          x-go-name: CustodianID
+          x-go-type-skip-optional-pointer: true
+        execution_instructions:
+          description: A list of execution instructions for the order
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionInstruction'
+          x-go-type-skip-optional-pointer: true
+        expire_date:
+          description: Date of order expiration (last day the order can trade), always expressed in terms of the local market date. The maximum expire_date is 90 calendar days out. If the expire_date does not fall on a trading day, the next trading day is automatically selected.
+          type:
+          - integer
+          - 'null'
+          format: int64
+        explicit_cancelation_required:
+          description: 'Deprecated. The value provided here is ignored — orders are always
+
+            treated as if explicit cancellation is required. The field is kept
+
+            for backwards compatibility and will be removed in a future release.
+
+            '
+          type: boolean
+          default: false
+          deprecated: true
+          x-go-type-skip-optional-pointer: true
+        extended_hours:
+          $ref: '#/components/schemas/ExtendedHours'
+        fees:
+          description: "Custom fees to be applied to the order. If provided, this list overrides the default fees defined in the system.\n\nFor each fee recipient based on the trade structure, a separate fee object should be included.\nFor example, in a trade flow like:\n\n  Street <-> Executing Broker <-> Introducing Broker <-> Customer\n\nwhere both brokers are charging fees, you would specify:\n\n  \"fees\": [\n    {\n      \"fee_type\": \"markup\",\n      \"fee_amount_type\": \"percentage_of_par\",\n      \"fee_amount\": 0.01,\n      \"recipient\": \"<org_id_of_executing_broker>\"\n    },\n    {\n      \"fee_type\": \"markup\",\n      \"fee_amount_type\": \"percentage_of_par\",\n      \"fee_amount\": 0.05,\n      \"recipient\": \"<org_id_of_introducing_broker>\"\n    }\n  ]\n"
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+          x-go-type-skip-optional-pointer: true
+        for_block_trade:
+          description: Flag to indicate if the order is for a block trade, used for post order allocation
+          type:
+          - boolean
+          - 'null'
+        group_members:
+          description: List of group members for the order
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupMember'
+          x-go-type-skip-optional-pointer: true
+        ib_id:
+          description: The introducing broker ID to use for this specific order. If not specified, will use the introducing broker ID from the bulk request.
+          $ref: '#/components/schemas/IntroducingBrokerID'
+        instrument_id:
+          $ref: '#/components/schemas/InstrumentID'
+        is_counter:
+          description: Flag to indicate if the order is a counter
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        is_group_order:
+          description: Flag to indicate if the order is a group order
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        limit_price:
+          $ref: '#/components/schemas/LimitPrice'
+        liquidate_fund_position:
+          description: Flag to instruct the custodian to sell the entire position rather than just the quantity on the order. Fund sells only and notional. The notional dollar value should be the current notional value of the position.
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        metadata:
+          description: Custom metadata for the order. This can be used to store additional information about the order that is not covered by the other fields. The keys and values are both strings.
+          type:
+          - object
+          - 'null'
+          example:
+            trader_assignment: John Doe
+            trader_email: john.doe@trading.com
+          additionalProperties:
+            type: string
+          x-go-type-skip-optional-pointer: true
+        offering_id:
+          $ref: '#/components/schemas/OfferingID'
+        order_rfq_ids:
+          description: A list of existing RFQ IDs to associate with this order.
+          type: array
+          items:
+            type: string
+        review_reason:
+          description: Reason for why the order requires review. Only applicable when review_required is true.
+          type: string
+          default: ''
+          x-go-type-skip-optional-pointer: true
+        review_required:
+          description: Flag to indicate if the order requires manual review before execution.
+          type: boolean
+          default: false
+          x-go-type-skip-optional-pointer: true
+        risk_group_id:
+          description: The risk group ID to use for this specific order. If not specified, will use the risk group ID from the bulk request.
+          $ref: '#/components/schemas/RiskGroupID'
+        settlement_date:
+          description: The targeted settlement date for the order in the format of YYYYMMDD, like 20090101
+          type:
+          - integer
+          - 'null'
+          format: int64
+        side:
+          $ref: '#/components/schemas/OrderSide'
+        time_in_force:
+          description: Time in force for the order. Acceptable values are `day` and `good_till_date`. Absence is interpreted as `day`.
+          allOf:
+          - $ref: '#/components/schemas/TimeInForce'
+          x-go-type-skip-optional-pointer: true
+        type:
+          $ref: '#/components/schemas/OrderType'
+      required:
+      - instrument_id
+      - amount
+      - side
+      - type
+      - client_order_id
+      title: Order Request
+    PriceValueType:
+      title: Price Value Type
+      type: string
+      description: The method used to represent the price value.
+      enum:
+      - percent
+      - discount_yield
+      - spread
+      - money_market_yield
+      - per_share
+      x-enumNames:
+      - PriceValueTypePercent
+      - PriceValueTypeDiscountYield
+      - PriceValueTypeSpread
+      - PriceValueTypeMMYield
+      - PriceValueTypePerShare
+      default: percent
+    FeeType:
+      title: Fee Type
+      type: string
+      description: The type of fee to apply to the order. Valid values are "markup", "commission", and "sales_credit".
+      enum:
+      - markup
+      - commission
+      - sales_credit
+      x-enumNames:
+      - FeeTypeMarkup
+      - FeeTypeCommission
+      - FeeTypeSalesCredit
+    InstrumentID:
+      description: Instrument CUSIP or ISIN
+      type: string
+      example: US594918AD66
+      title: Instrument ID
+    SnapshotQuote:
+      type: object
+      properties:
+        yield_to_maturity:
+          type: number
+          format: double
+          description: 'Deprecated: not mapped to domain model, will be removed. Use post_fee_ytm instead.'
+          deprecated: true
+        yield_to_worst:
+          type: number
+          format: double
+          description: 'Deprecated: not mapped to domain model, will be removed. Use post_fee_ytw instead.'
+          deprecated: true
+        size:
+          type: integer
+        min_size:
+          type: integer
+        venue_mpid:
+          type: string
+        spread_benchmark_isin:
+          type:
+          - string
+          - 'null'
+        spread_to_benchmark_bps:
+          type:
+          - string
+          - 'null'
+        min_balance_remaining:
+          type:
+          - integer
+          - 'null'
+        min_increment:
+          type:
+          - integer
+          - 'null'
+        source:
+          type: string
+          enum:
+          - LOB
+          - RFQ
+        pre_fee_price:
+          type: number
+          format: double
+        post_fee_price:
+          type: number
+          format: double
+        pre_fee_ytw:
+          type: number
+          format: double
+          description: Pre-fee yield to worst (street price, no fees).
+        post_fee_ytw:
+          type: number
+          format: double
+          description: Post-fee yield to worst (inclusive of Moment fees).
+        pre_fee_ytm:
+          type: number
+          format: double
+          description: Pre-fee yield to maturity (street price, no fees).
+        post_fee_ytm:
+          type: number
+          format: double
+          description: Post-fee yield to maturity (inclusive of Moment fees).
+        pre_fee_spread_bps:
+          type:
+          - number
+          - 'null'
+          format: double
+        post_fee_spread_bps:
+          type:
+          - number
+          - 'null'
+          format: double
+        side:
+          type: string
+          enum:
+          - bid
+          - ask
+        disabled:
+          type: boolean
+        rfq_quote_status:
+          type: string
+        rfq_id:
+          type: string
+        venue_quote_id:
+          type: string
+        settlement_date:
+          type: integer
+          format: int64
+      required:
+      - size
+      - min_size
+      - venue_mpid
+      - source
+      - pre_fee_price
+      - post_fee_price
+      - pre_fee_ytm
+      - pre_fee_ytw
+      - post_fee_ytm
+      - post_fee_ytw
+      - side
+      - disabled
+      - settlement_date
+    AllocationApproveEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationApproveEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Approve Event
+    Strategy:
+      title: Strategy
+      type: string
+      description: The strategy used for the execution order.
+      enum:
+      - smart_order_routing
+      - manual
+      - report
+      - auto_ex
+      x-enumNames:
+      - StrategySmartOrderRouting
+      - StrategyManual
+      - StrategyReport
+      - StrategyAutoEx
+    EventID:
+      description: A unique identifier for the event.
+      type: string
+      title: Event ID
+    RiskGroupID:
+      description: The risk group ID to use for this order. If not specified, the default risk group for the organization will be used. The risk group must belong to the organization specified by ib_id. Orders for which the risk group does not belong to the specified organization will be rejected with "invalid risk group id."
+      type: string
+    AccountAllocationRequest:
+      description: 'The account allocation request specifies the amount of the order to allocate to a specific account.
+
+        Note that requested_amount values must be a multiple of the par size of the bond.'
+      type: object
+      properties:
+        account_configuration:
+          $ref: '#/components/schemas/AccountConfiguration'
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        client_account_allocation_id:
+          description: Client-provided unique ID for the account allocation; for example, to cross-reference with an internal system. Values must be unique within the trading day.
+          type: string
+          example: allocacctID1
+        custodian_id:
+          description: The ID of the custodian for the account allocation.
+          type: string
+        requested_amount:
+          $ref: '#/components/schemas/OrderSize'
+      title: Account Allocation Request
+    FlaggedForReviewEventEventPayload:
+      type: object
+      properties:
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        event_type:
+          type: string
+          example: flagged_for_review
+          enum:
+          - flagged_for_review
+          x-enum-varnames:
+          - EventTypeFlaggedForReview
+        failed_controls:
+          type: array
+          items:
+            type: object
+            properties:
+              control_message:
+                description: The message of the control that failed.
+                type: string
+        order_id:
+          description: The ID of the order that was flagged.
+          type: string
+        time:
+          type: string
+          format: date-time
+    ExternalTradeReport:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        annotation:
+          description: Optional annotation for the trade.
+          type:
+          - string
+          - 'null'
+        bypass_street_side_leg:
+          description: Flag to bypass street side leg. If true, we will not send the street side to the custodian.
+          type: boolean
+          example: false
+          default: false
+          x-go-type-skip-optional-pointer: true
+        bypass_trade_booking:
+          description: Flag to bypass trade booking. If true, the trade will not be booked in the system.
+          type: boolean
+          example: true
+        client_external_trade_report_id:
+          description: The client-provided idempotency key.
+          type: string
+        counterparty_clearing_firm_id:
+          description: DTC ID of the counterparty's clearing firm.
+          type: string
+          example: '0123'
+          x-go-type-skip-optional-pointer: true
+        counterparty_id:
+          description: MPID of the counterparty involved in the street trade.
+          type: string
+          example: MMNT
+          x-go-type-skip-optional-pointer: true
+        execution_id:
+          description: Trade ID. Often times this will be the ID of the execution made at an external venue.
+          type: string
+          example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+        external_trade_report_id:
+          description: 'Optional external trade report ID. If provided, this ID will be used instead of auto-generating one.
+
+            Must start with ''etr_'' followed by a valid ULID.
+
+            If not provided, the system will generate a unique ID automatically.
+
+            '
+          type: string
+          example: etr_01JBFQZXMWZ08XDMTG08P2Z4XT
+        price:
+          description: The trade price. For mutual funds, if not provided, the backend will use the parent order's estimated price (NAV).
+          type:
+          - number
+          - 'null'
+          format: double
+        settle_date:
+          description: The settlement date for the trade.
+          type: string
+          format: date-time
+        snapshot_id:
+          description: Optional quote snapshot ID. If provided, this snapshot ID will be used instead of creating a new one.
+          type: string
+        trade_time:
+          description: The timestamp when the trade occurred.
+          type: string
+          format: date-time
+      required:
+      - client_external_trade_report_id
+      - amount
+      - trade_time
+      - settle_date
+      - bypass_trade_booking
+      title: External Trade Report
+    RFQCreateEventEventPayload:
+      type: object
+      properties:
+        event_type:
+          type: string
+          example: rfq_create
+          enum:
+          - rfq_create
+          x-enum-varnames:
+          - EventTypeRFQCreate
+        order_id:
+          $ref: '#/components/schemas/OrderID'
+        rfq_id:
+          description: The ID of the RFQ created on the order.
+          type: string
+        time:
+          type: string
+          format: date-time
+    ExecutionOrderRejectEventEventPayload:
+      description: Details of the rejection.
+      type: object
+      properties:
+        client_execution_order_id:
+          description: The client-provided execution order ID.
+          type: string
+        event_type:
+          type: string
+          example: execution_order_reject
+          enum:
+          - execution_order_reject
+          x-enum-varnames:
+          - EventTypeExecutionOrderReject
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        reason:
+          description: The reason for the rejection.
+          type: string
+        time:
+          description: The time when the failure occurred.
+          type: string
+          format: date-time
+    ExitCriteria:
+      type: object
+      title: Exit Criteria
+      required:
+      - timeout
+      properties:
+        timeout:
+          type: string
+          format: duration
+          description: Timeout for the execution order.
+    AllocationFailEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationFailEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Fail Event
+    CancelAllocationRequestEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        cancel_request_id:
+          type: string
+        event_type:
+          type: string
+          example: cancel_allocation_request
+          enum:
+          - cancel_allocation_request
+          x-enum-varnames:
+          - EventTypeCancelAllocationRequest
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        source:
+          type: string
+        time:
+          type: string
+          format: date-time
+    AllocationAccountRequest:
+      title: Allocation Account Request
+      type: object
+      description: 'The account allocation request specifies the amount of the order to allocate to a specific account.
+
+        Note that requested_amount values must be a multiple of the par size of the bond.'
+      required:
+      - client_account_allocation_id
+      - account_id
+      - requested_amount
+      properties:
+        client_account_allocation_id:
+          type: string
+          description: Client-provided unique ID for the account allocation; for example, to cross-reference with an internal system. Values must be unique within the trading day.
+          x-go-name: ClientAccountAllocationID
+        account_id:
+          type: string
+          description: Unique ID of user account
+          example: 5f7b9c9f-7b9c-9f7b-9c9f-7b9c9f7b9c9f
+          x-go-name: AccountID
+        requested_amount:
+          $ref: '#/components/schemas/OrderSize'
+        account_configuration:
+          $ref: '#/components/schemas/AccountConfiguration'
+        moment_sleeve_id:
+          type: string
+          description: The Moment internal ID of the sleeve to allocate the order to.
+          x-go-name: MomentSleeveID
+        order_received_at:
+          type: string
+          format: date-time
+          description: When the end client confirmed the order for this account.
+        order_received_by:
+          description: Who took that confirmation, by Moment user reference or by name.
+          allOf:
+          - $ref: '#/components/schemas/InvestmentAdvisorRepresentative'
+    ManualRejectFailureEventEventPayload:
+      type: object
+      properties:
+        event_type:
+          type: string
+          example: manual_reject_fail
+          enum:
+          - manual_reject_fail
+          x-enum-varnames:
+          - EventTypeManualRejectFail
+        manual_reject_id:
+          description: The ID of the manual reject request.
+          type: string
+        order_id:
+          description: The ID of the order.
+          type: string
+        reason:
+          description: The reason for the failure.
+          type: string
+        time:
+          type: string
+          format: date-time
+    Fee:
+      title: Fee
+      type: object
+      description: The fee to apply to the order.
+      properties:
+        fee_type:
+          $ref: '#/components/schemas/FeeType'
+        fee_amount_type:
+          $ref: '#/components/schemas/FeeAmountType'
+        recipient_id:
+          type: string
+          description: Unique ID of the recipient of the fee.
+          x-go-name: RecipientID
+          x-go-type-skip-optional-pointer: true
+        recipient_type:
+          $ref: '#/components/schemas/RecipientType'
+        fee_amount:
+          description: Fee amount to apply to the order.
+          $ref: '#/components/schemas/Decimal'
+        max_fee_amount:
+          description: Maximum fee amount to apply to the order.
+          $ref: '#/components/schemas/NullableDecimal'
+        max_fee_amount_type:
+          $ref: '#/components/schemas/FeeAmountType'
+        fee_name:
+          type: string
+          description: Optional name for the fee, for easier identification.
+      required:
+      - fee_type
+      - fee_amount_type
+      - fee_amount
+    ExecutionEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Execution Event
+    ExecutionOrderCancelRejectEvent:
+      description: 'Emitted when the system rejects a cancellation request (e.g. because the execution order
+
+        is not in a cancelable state).
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderCancelRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Cancel Execution Order Reject Event
+    AggressivenessLevel:
+      title: Aggressiveness Level
+      type: string
+      description: 'Execution aggressiveness for a custodian algo. Required by some custodians (e.g. Fidelity);
+
+        ignored by custodians without an equivalent concept (e.g. Schwab).'
+      enum:
+      - passive
+      - neutral
+      - aggressive
+      x-enumNames:
+      - AggressivenessLevelPassive
+      - AggressivenessLevelNeutral
+      - AggressivenessLevelAggressive
+    LotInstruction:
+      title: Lot Instruction
+      type: object
+      description: 'Identifies a specific tax lot so the booking gateway can emit lot-level
+
+        VSP instructions to custodians. Buy-side flows leave it unset; when set,
+
+        all three fields are populated from the same lot record.
+
+        '
+      properties:
+        custodian_tax_lot_id:
+          description: The tax lot ID assigned by the custodian.
+          type: string
+          x-go-type-skip-optional-pointer: true
+        lot_trade_date:
+          description: Trade date of the tax lot, YYYYMMDD.
+          type: integer
+          format: int32
+          x-go-type-skip-optional-pointer: true
+        lot_purchase_price:
+          description: Per-unit purchase price of the tax lot, decimal string.
+          type: string
+          x-go-type-skip-optional-pointer: true
+    CancelRejectEventEventPayload:
+      type: object
+      properties:
+        cancel_reject_code:
+          type: number
+        cancel_reject_reason:
+          type: string
+        cancel_request_id:
+          type: string
+        event_type:
+          type: string
+          example: cancel_reject
+          enum:
+          - cancel_reject
+          x-enum-varnames:
+          - EventTypeCancelReject
+        order_id:
+          type: string
+        risk_group_id:
+          type: string
+        time:
+          type: string
+          format: date-time
+    IsParameters:
+      title: IS Parameters
+      type: object
+      description: 'Parameters for an implementation-shortfall (arrival price) algo. The algo balances market
+
+        impact against timing risk to minimize slippage versus the arrival price, working more or
+
+        less aggressively based on the aggressiveness level. Order type and limit price are carried
+
+        on the order itself, not in these parameters.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    Annotation:
+      description: Client-provided custom metadata for the order.
+      type: string
+      maxLength: 1024
+      title: annotation
+    CancelEventEventPayload:
+      type: object
+      properties:
+        cancel_code:
+          type: number
+        cancel_reason:
+          type: string
+        client_order_id:
+          type: string
+        event_type:
+          type: string
+          example: cancel
+          enum:
+          - cancel
+          x-enum-varnames:
+          - EventTypeCancel
+        order_id:
+          type: string
+        time:
+          type: string
+          format: date-time
+    ManualRejectFailureEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ManualRejectFailureEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Manual Reject Failure Event
+    BookingType:
+      type: string
+      title: BookingType
+      description: The booking type for the account.
+      enum:
+      - cash
+      - margin
+      x-enumNames:
+      - BookingTypeCash
+      - BookingTypeMargin
+    IntroducingBrokerID:
+      description: The ID of the introducing broker placing the order. If not specified, the organization associated with the API key will be used.
+      type: string
+    AllocationSummary:
+      type: object
+      properties:
+        account_allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAllocationDetails'
+        account_requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAllocationRequest'
+        calculated_at:
+          description: The time at which the allocation was calculated.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        custodian_id:
+          $ref: '#/components/schemas/CustodianID'
+        ib_id:
+          $ref: '#/components/schemas/IntroducingBrokerID'
+        id:
+          $ref: '#/components/schemas/AllocationID'
+        order_id:
+          $ref: '#/components/schemas/OrderID'
+        risk_group_id:
+          description: The risk group ID used for this allocation.
+          type: string
+        status:
+          $ref: '#/components/schemas/AllocationStatus'
+        strategy:
+          $ref: '#/components/schemas/AllocationStrategy'
+        submitted_at:
+          description: The time at which the allocation was submitted to the custodian for booking.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        trades:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTrade'
+      title: Allocation Summary
+    AllocationRejectEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/AllocationRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: allocation_update
+          enum:
+          - allocation_update
+        summary:
+          $ref: '#/components/schemas/AllocationSummary'
+      title: Allocation Reject Event
+    ExecutionOrderCreateEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderCreateEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Execution Order Create Event
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    AllocationID:
+      description: Unique, Moment-generated ID for the allocation.
+      type: string
+      example: 01JBFQQB1Z00Q4KWR7MY4V6M4W
+      title: Allocation ID
+    ManualApproveRequestEventEventPayload:
+      type: object
+      properties:
+        annotation:
+          description: The annotation to be added to the order for the approval.
+          type: string
+        client_manual_approve_id:
+          description: The client-provided ID of the manual approval request.
+          type: string
+        event_type:
+          type: string
+          example: manual_approve_request
+          enum:
+          - manual_approve_request
+          x-enum-varnames:
+          - EventTypeManualApproveRequest
+        manual_approve_id:
+          description: The ID of the manual approval request.
+          type: string
+        order_id:
+          description: The ID of the order to be approved.
+          type: string
+        time:
+          type: string
+          format: date-time
+    Protocol:
+      title: Protocol
+      type: string
+      description: The protocol used for the execution order.
+      enum:
+      - limit_order_book
+      - request_for_quote
+      - external
+      - group
+      - custodian
+      x-enumNames:
+      - ProtocolLimitOrderBook
+      - ProtocolRequestForQuote
+      - ProtocolExternal
+      - ProtocolGroup
+      - ProtocolCustodian
+    CancelAllocationRequestEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/CancelAllocationRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Cancel Allocation Request Event
+    ManualRejectRequestEvent:
+      description: 'This event is sent when a request to reject an order is received.
+
+        It is used to acknowledge the request. If the request is rejected, the client
+
+        will receive a `ManualRejectFailureEvent` as a `system_update`. If the request
+
+        is accepted, the client will receive a `Reject` event as an `order_update`.'
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ManualRejectRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Manual Reject Request Event
+    annotation:
+      type: string
+      title: annotation
+      description: Client-provided custom metadata for the order.
+      maxLength: 10240
+    AllocationSubmitEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        custodian_id:
+          type: string
+        event_type:
+          type: string
+          example: allocation_submit
+          enum:
+          - allocation_submit
+          x-enum-varnames:
+          - EventTypeAllocationSubmit
+        time:
+          type: string
+          format: date-time
+    ExecutionOrderCancelEventEventPayload:
+      type: object
+      properties:
+        cancel_code:
+          type: number
+        cancel_reason:
+          type: string
+        client_execution_order_id:
+          type: string
+        event_type:
+          type: string
+          example: execution_order_cancel
+          enum:
+          - execution_order_cancel
+          x-enum-varnames:
+          - EventTypeExecutionOrderCancel
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        time:
+          type: string
+          format: date-time
+    TwapParameters:
+      title: TWAP Parameters
+      type: object
+      description: 'Parameters for a time-weighted average price (TWAP) algo. The algo slices the order into
+
+        smaller pieces and works them evenly over the specified time window, aiming to match the
+
+        time-weighted average price of the instrument over that window.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    VwapParameters:
+      title: VWAP Parameters
+      type: object
+      description: 'Parameters for a volume-weighted average price (VWAP) algo. The algo works the order in
+
+        proportion to the expected market volume profile over the specified time window, aiming to
+
+        match the volume-weighted average price of the instrument over that window.'
+      properties:
+        start_time:
+          type: string
+          format: date-time
+          description: Start of the absolute window to work the order.
+        end_time:
+          type: string
+          format: date-time
+          description: End of the absolute window to work the order.
+        would:
+          $ref: '#/components/schemas/WouldParameters'
+        participate_opening_auction:
+          type: boolean
+          description: Whether the algo should participate in the opening auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        participate_closing_auction:
+          type: boolean
+          description: Whether the algo should participate in the closing auction.
+          default: false
+          x-go-type-skip-optional-pointer: true
+        aggressiveness:
+          $ref: '#/components/schemas/AggressivenessLevel'
+        max_participation_percent:
+          type:
+          - integer
+          - 'null'
+          format: int64
+          description: Hard ceiling on participation of market volume, as a percent (e.g. 20 = 20%).
+    ExecutionOrderCancelRejectEventEventPayload:
+      description: Details of the rejection.
+      type: object
+      properties:
+        event_type:
+          type: string
+          example: execution_order_cancel_reject
+          enum:
+          - execution_order_cancel_reject
+          x-enum-varnames:
+          - EventTypeExecutionOrderCancelReject
+        execution_order_cancel_request_id:
+          description: The ID of the cancel request.
+          type: string
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        reason:
+          description: The reason for the rejection.
+          type: string
+        time:
+          description: The time when the failure occurred.
+          type: string
+          format: date-time
+    ExecutionOrderCancelEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderCancelEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Execution Order Cancel Event
+    InvestmentAdvisorRepresentative:
+      title: Investment Advisor Representative
+      type: object
+      description: 'The representative credited with this account''s participation in the
+
+        order. Accounts in one block order can name different representatives.
+
+        A Moment user is sent as moment_user_id; name and email resolve from
+
+        the user directory when read. A person with no Moment login is sent
+
+        by name, with email when known. When both are set, moment_user_id is
+
+        always preferred.
+
+        '
+      properties:
+        moment_user_id:
+          description: The Moment user who is the representative.
+          type: string
+          x-go-type-skip-optional-pointer: true
+          x-go-name: MomentUserID
+        name:
+          description: The representative's display name.
+          type: string
+          x-go-type-skip-optional-pointer: true
+        email:
+          description: The representative's email.
+          type: string
+          x-go-type-skip-optional-pointer: true
+    AllocationApproveEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        event_type:
+          type: string
+          example: allocation_approve
+          enum:
+          - allocation_approve
+          x-enum-varnames:
+          - EventTypeAllocationApprove
+        time:
+          type: string
+          format: date-time
+    EventType:
+      description: Event type for filtering events
+      type: string
+      enum:
+      - request
+      - approve
+      - reject
+      - flagged_for_review
+      - manual_approve_request
+      - manual_approve_fail
+      - manual_reject_request
+      - manual_reject_fail
+      - cancel
+      - execution
+      - cancel_request
+      - cancel_reject
+      - execution_order_request
+      - execution_order_reject
+      - execution_order_create
+      - execution_order_cancel_request
+      - execution_order_cancel_reject
+      - execution_order_cancel
+      - cancel_allocation_request
+      - cancel_allocation_reject
+      - external_trade_report_request
+      - external_trade_report_reject
+      - rfq_create
+      - allocation_create
+      - allocation_reject
+      - allocation_approve
+      - allocation_cancel
+      - allocation_calculate
+      - allocation_submit
+      - allocation_fail
+      x-enumNames:
+      - EventTypeRequest
+      - EventTypeApprove
+      - EventTypeReject
+      - EventTypeFlaggedForReview
+      - EventTypeManualApproveRequest
+      - EventTypeManualApproveFail
+      - EventTypeManualRejectRequest
+      - EventTypeManualRejectFail
+      - EventTypeCancel
+      - EventTypeExecution
+      - EventTypeCancelRequest
+      - EventTypeCancelReject
+      - EventTypeExecutionOrderRequest
+      - EventTypeExecutionOrderReject
+      - EventTypeExecutionOrderCreate
+      - EventTypeExecutionOrderCancelRequest
+      - EventTypeExecutionOrderCancelReject
+      - EventTypeExecutionOrderCancel
+      - EventTypeCancelAllocationRequest
+      - EventTypeCancelAllocationReject
+      - EventTypeExternalTradeReportRequest
+      - EventTypeExternalTradeReportReject
+      - EventTypeRFQCreate
+      - EventTypeAllocationCreate
+      - EventTypeAllocationReject
+      - EventTypeAllocationApprove
+      - EventTypeAllocationCancel
+      - EventTypeAllocationCalculate
+      - EventTypeAllocationSubmit
+      - EventTypeAllocationFail
+    ExecutionCriteria:
+      type: object
+      title: Execution Criteria
+      required:
+      - min_wait_time
+      - min_number_quotes
+      properties:
+        min_wait_time:
+          type: string
+          format: duration
+          description: Minimum wait time for the execution order.
+        min_number_quotes:
+          type: integer
+          description: Minimum number of quotes required on the side of the order, before execution can proceed. If the protocol is `request_for_quote`, this is the minimum number of RFQ quotes required. If the protocol is `limit_order_book`, this is the minimum number of LOB quotes required.
+        max_transaction_cost_dollar:
+          type: string
+          description: Maximum transaction cost in dollars. Max buy price = estimated price * par value + maxDollar, Min sell price = estimated price * par value - maxDollar. Ex. a value of `5` would mean the transaction cost must be within $5 of the instrument's estimated price in dollars, meaning when buying a bond with a estimated price of $100 and a par value of $1000, the transaction cost must be below $1005.
+          example: '5'
+        max_transaction_cost_percent:
+          type: string
+          description: Maximum transaction cost in percent. Max buy price = estimated price * (1 + maxPct / 100), Min sell price = estimated price * (1 - maxPct / 100). Ex. a value of `5` would mean the transaction cost must be within 5% of the instrument's estimated price in percent, meaning when buying a bond with a estimated price of $100, the transaction cost must be below $105.
+          example: '5'
+        max_transaction_cost_yield:
+          type: string
+          description: Maximum transaction cost in yield. Max buy yield = estimated ytw - maxYTW, Max sell yield = estimated ytw + maxYTW. Ex. a value of `0.5` would mean the transaction cost must be within 50 bps of the instrument's estimated yield, meaning when buying a bond with an estimated yield to worst of 1.5%, the transaction cost must be above 1.0%.
+          example: '0.5'
+    AllocationRejectEventEventPayload:
+      type: object
+      properties:
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        code:
+          type: number
+        event_type:
+          type: string
+          example: allocation_reject
+          enum:
+          - allocation_reject
+          x-enum-varnames:
+          - EventTypeAllocationReject
+        reason:
+          type: string
+        time:
+          type: string
+          format: date-time
+    OrderType:
+      type: string
+      enum:
+      - limit
+      - rfq_response
+      - market
+      - advisor_bw
+      - quote_wanted
+      - ioi
+      x-enumNames:
+      - OrderTypeLimit
+      - OrderTypeRFQResponse
+      - OrderTypeMarket
+      - OrderTypeAdvisorBW
+      - OrderTypeQuoteWanted
+      - OrderTypeIOI
+      default: limit
+      example: limit
+      description: 'Represents the types of orders Moment currently supports.
+
+
+        - limit
+
+        - rfq_response
+
+        - market
+
+        - advisor_bw
+
+        - quote_wanted
+
+        - ioi'
+      title: OrderType
+    RFQCreateEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/RFQCreateEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: RFQ Create Event
+    ExecutionEventEventPayload:
+      type: object
+      properties:
+        accrued_interest:
+          type: number
+          example: 0
+        amount:
+          $ref: '#/components/schemas/OrderSize'
+        client_order_id:
+          type: string
+        counterparty:
+          description: The market participant identifier (MPID)
+          type: string
+        counterparty_clearing_firm:
+          description: The National Securities Clearing Corporation (NSCC) id
+          type: string
+        event_type:
+          type: string
+          example: execution
+          enum:
+          - execution
+          x-enum-varnames:
+          - EventTypeExecution
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        net_money:
+          type: number
+          example: 332.13
+        order_id:
+          type: string
+        pre_fee_net_money:
+          type: number
+          example: 330.32
+        pre_fee_price:
+          $ref: '#/components/schemas/LimitPrice'
+        price:
+          $ref: '#/components/schemas/LimitPrice'
+        settlement_date:
+          type: string
+          format: date
+        time:
+          type: string
+          format: date-time
+        trade_date:
+          type: string
+          format: date
+        venue:
+          type: string
+        venue_execution_id:
+          type: string
+        ytm:
+          type:
+          - number
+          - 'null'
+        ytw:
+          type:
+          - number
+          - 'null'
+    AccountConfiguration:
+      title: Account Configuration
+      type: object
+      description: Account configuration for the allocation
+      properties:
+        prime_brokerage_enabled:
+          type: boolean
+          description: Whether the prime brokerage is enabled for the account.
+          x-go-type-skip-optional-pointer: true
+        household_id:
+          type: string
+          description: The ID of the household for the account.
+          x-go-type-skip-optional-pointer: true
+          x-go-name: HouseholdID
+        manager_id:
+          type: string
+          description: 'The accounts-service platform advisor for the account: an
+
+            account group, not a person. The person credited with the trade
+
+            is iar.
+
+            '
+          x-go-type-skip-optional-pointer: true
+          x-go-name: ManagerID
+        custodian_advisor_id:
+          description: 'The custodian''s own identifier for the manager_id account group at
+
+            this custodian: the rep code. Stored as sent.
+
+            '
+          type: string
+          x-go-type-skip-optional-pointer: true
+          x-go-name: CustodianAdvisorID
+        custodian_id:
+          $ref: '#/components/schemas/CustodianID'
+        booking_type:
+          allOf:
+          - $ref: '#/components/schemas/BookingType'
+          x-go-type-skip-optional-pointer: true
+        custodian_tax_lot_id:
+          description: The tax lot ID assigned by the custodian. Deprecated, use lot_instruction.custodian_tax_lot_id instead.
+          type: string
+          deprecated: true
+        is_discretionary:
+          description: Whether the introducing broker exercised discretion on behalf of the end client on this particular order.
+          type: boolean
+        is_solicited:
+          description: Whether the order was solicited. Must be unset if the order is discretionary.
+          type: boolean
+        is_natural_person:
+          description: 'Whether the account is held by a natural person rather than a
+
+            legal entity. Omit when the holder cannot be classified, as a
+
+            trust or an estate may not be. An attestation control can be
+
+            limited to the accounts this is true of.
+
+            '
+          type: boolean
+        lot_instruction:
+          $ref: '#/components/schemas/LotInstruction'
+        iar:
+          allOf:
+          - $ref: '#/components/schemas/InvestmentAdvisorRepresentative'
+          x-go-name: IAR
+    CustodianID:
+      type: string
+      description: The Moment-provided ID of the custodian for the order. Custodians must be enabled per risk group.
+      example: 01JBFPWZQV2D0D7M2P851G6AGM
+      title: Custodian ID
+      x-go-type-skip-optional-pointer: true
+      x-go-name: CustodianID
+    SuppressPMPCheck:
+      description: If set to true, any potential PMP violations will be suppressed.
+      type: boolean
+      default: false
+      title: Suppress PMP Check
+    CancelRequestEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/CancelRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Cancel Request Event
+    ExecutionOrderRequestEvent:
+      description: 'Sent when a request to create an execution order is received. This system update
+
+        acknowledges the request. If the request is accepted, an order_update event
+
+        (ExecutionOrderCreate) will follow; if rejected, a failure event
+
+        (ExecutionOrderRejectEvent) is sent.
+
+        '
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/ExecutionOrderRequestEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: system_update
+          enum:
+          - system_update
+      title: Execution Order Request Event
+    AllocationCalculateEventEventPayload:
+      type: object
+      properties:
+        account_allocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAllocationDetails'
+        allocation_id:
+          $ref: '#/components/schemas/AllocationID'
+        allocation_strategy:
+          $ref: '#/components/schemas/AllocationStrategy'
+        client_allocation_id:
+          $ref: '#/components/schemas/ClientAllocationID'
+        client_order_id:
+          type: string
+        custodian_id:
+          type: string
+        event_type:
+          type: string
+          example: allocation_calculate
+          enum:
+          - allocation_calculate
+          x-enum-varnames:
+          - EventTypeAllocationCalculate
+        ib_id:
+          type: string
+        order_id:
+          type: string
+        risk_group_id:
+          type: string
+        time:
+          type: string
+          format: date-time
+        trades:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTrade'
+    CancelAllocationRejectEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/CancelAllocationRejectEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          enum:
+          - system_update
+      title: Cancel Allocation Reject Event
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    ExternalTradeReportID:
+      description: The ID of the external trade report generated by Moment.
+      type: string
+      example: etr_01JBFQZXMWZ08XDMTG08P2Z4XT
+    AllocationStatus:
+      type: string
+      enum:
+      - created
+      - approved
+      - rejected
+      - calculated
+      - submitted
+      - failed
+      - canceled
+      title: Allocation Status
+      x-enum-varnames:
+      - AllocationStatusCreated
+      - AllocationStatusApproved
+      - AllocationStatusRejected
+      - AllocationStatusCalculated
+      - AllocationStatusSubmitted
+      - AllocationStatusFailed
+      - AllocationStatusCanceled
+    ExecutionOrderCancelRequestEventEventPayload:
+      description: Details of the cancel execution order request.
+      type: object
+      properties:
+        event_type:
+          type: string
+          example: execution_order_cancel_request
+          enum:
+          - execution_order_cancel_request
+          x-enum-varnames:
+          - EventTypeExecutionOrderCancelRequest
+        execution_order_cancel_request_id:
+          description: The ID of the cancel request.
+          type: string
+        execution_order_id:
+          $ref: '#/components/schemas/ExecutionOrderID'
+        order_id:
+          description: The ID of the parent order.
+          type: string
+        time:
+          description: The time when the cancellation request was received.
+          type: string
+          format: date-time
+    ClientAllocationID:
+      type: string
+      title: Client Allocation ID
+      description: Client-provided unique ID for the allocation; for example, to cross-reference with an internal system. Values must be unique within the trading day.
+      example: allocID1
+    QuotesSnapshot:
+      type: object
+      required:
+      - isin
+      - bids
+      - asks
+      - organization_id
+      properties:
+        isin:
+          type: string
+        organization_id:
+          type: string
+        bids:
+          type: array
+          items:
+            $ref: '#/components/schemas/SnapshotQuote'
+        asks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SnapshotQuote'
+    CancelRequestEventEventPayload:
+      type: object
+      properties:
+        cancel_request_id:
+          type: string
+        event_type:
+          type: string
+          example: cancel_request
+          enum:
+          - cancel_request
+          x-enum-varnames:
+          - EventTypeCancelRequest
+        order_id:
+          type: string
+        risk_group_id:
+          type: string
+        source:
+          type: string
+        time:
+          type: string
+          format: date-time
+    CancelEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/CancelEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Cancel Event
+    FlaggedForReviewEvent:
+      description: This event is sent when an order is flagged for review. It is used to notify the client that the order has been flagged and is pending review.
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/FlaggedForReviewEventEventPayload'
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          $ref: '#/components/schemas/MsgNumber'
+        msg_type:
+          type: string
+          example: order_update
+          enum:
+          - order_update
+        order:
+          $ref: '#/components/schemas/Order'
+      title: Flagged For Review Event
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/allocateorderbyorderid.md
+  - https://docs.moment.com/reference/approveorderbyorderid-1.md
+  - https://docs.moment.com/reference/bulkordersubmission.md
+  - https://docs.moment.com/reference/cancelexecutionorder-1.md
+  - https://docs.moment.com/reference/createbatchlistrfqwithautoex.md
+  - https://docs.moment.com/reference/createexecutionorderautoexrfq.md
+  - https://docs.moment.com/reference/createexecutionordercustodianmanual.md
+  - https://docs.moment.com/reference/createexecutionorderexternaltrade-1.md
+  - https://docs.moment.com/reference/createexecutionorderlobmanual.md
+  - https://docs.moment.com/reference/createexecutionorderlobsor-1.md
+  - https://docs.moment.com/reference/createexecutionordermanualrfq-1.md
+  - https://docs.moment.com/reference/createrfq-1.md
+  - https://docs.moment.com/reference/deleteallocation-2.md
+  - https://docs.moment.com/reference/deletebookingconfigurationbyid.md
+  - https://docs.moment.com/reference/deleteorderbyorderid-1.md
+  - https://docs.moment.com/reference/deleterfq-1.md
+  - https://docs.moment.com/reference/getallorders-1.md
+  - https://docs.moment.com/reference/getevents-1.md
+  - https://docs.moment.com/reference/getorderbyorderid-1.md
+  - https://docs.moment.com/reference/postorder-1.md
+  - https://docs.moment.com/reference/rejectorderbyorderid-1.md
+  - https://docs.moment.com/reference/reportexternaltrade-1.md
+  merge:
+    pages: 22
+    deduped: 363
+    conflicts_kept_first: 0

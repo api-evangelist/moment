@@ -1,0 +1,2624 @@
+openapi: 3.2.0
+info:
+  title: Moment Reference Data API
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+  description: 'Operations tagged Reference Data across 2 of this provider''s published API definitions: moment-data-api-openapi.yml, moment-live-inventory-api-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Reference Data
+paths:
+  /v1/data/instrument/:
+    get:
+      tags:
+      - Reference Data
+      summary: All Securities
+      parameters:
+      - $ref: '#/components/parameters/status'
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/page_size'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstrumentsResponse'
+      operationId: listInstruments
+      description: List and filter reference data for all instruments.
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/instrument/bulk-download/:
+    get:
+      tags:
+      - Reference Data
+      summary: Bulk Download
+      parameters:
+      - $ref: '#/components/parameters/status'
+      - $ref: '#/components/parameters/bond_type'
+      description: The bulk download endpoint can be used to download all reference data for all securities in Moment's system at once as a zipped csv file. This endpoint is intended to be called once per day as a way to download and cache information on all existing securities. The schema matches that of the reference data list and retrieve endpoints.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+              example: 'isin,cusip,figi,type,treasury_subtype,country_issue,country_domicile,currency,ticker,seniority,issuer,sector,naics_sector,naics_subsector,treasury_benchmark,description,description_short,purpose,maturity_date,coupon,perpetual,coupon_frequency,coupon_type,coupon_subtype,first_coupon_date,next_coupon_date,last_coupon_date,daycount,settlement_convention,dated_date,issue_size,issue_price,issue_date,issue_minimum_denomination,par_value,principal_factor,accrued_interest,callable,call_type,next_call_date,next_call_price,puttable,convertible,contingent_convertible,trigger_event_type,trigger_type,trigger_action,trigger_level_type,trigger_level_value,sinking_fund,insured,bond_warrant,is_structured_product,private_placement,144a,reg_s,trace_eligible,municipal_state,municipal_type,municipal_taxable_federal,bank_qualified,is_amt_applicable,pre_refunded,original_maturity_date,sp_rating,sp_rating_date,sp_creditwatch,sp_creditwatch_date,sp_outlook,sp_outlook_date,moodys_rating,moodys_rating_date,duration,convexity,liquidity_micro_buy,liquidity_micro_sell,liquidity_micro_aggregate,liquidity_retail_buy,liquidity_retail_sell,liquidity_retail_aggregate,liquidity_institutional_buy,liquidity_institutional_sell,liquidity_institutional_aggregate,close_price,close_ytw,close_ytm,close_price_asof,status,updated_at
+
+                US91282CCX74,91282CCX7,,treasury,,US,,USD,,,"UNITED STATES TREASURY",SOVEREIGN,,,,"United States Treasury 0.375%, 09/15/2024",UST 0.375% 09/15/2024,,2024-09-15,0.375,,semi_annual,fixed,,,,,,,,64176071300,99.78,2021-09-15,,1000,,,false,,,,false,false,,,,,,,false,,,,,,,true,,,,,,,,,,positive,2023-11-29,positive,2024-03-28,A1,2024-03-23,0.49,0.32,,,,,,,,,,,,,,outstanding,2023-07-21T16:35:36.28329Z
+
+                '
+      operationId: bulkDownloadReference
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/instrument/bulk-download/info/:
+    get:
+      tags:
+      - Reference Data
+      summary: Latest Update
+      description: The bulk download info endpoint can be used to get the timestamp of the last reference data update. This can be used to infer when there is new information available to download.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  last_updated:
+                    type: string
+                    description: The timestamp at which reference data was updated in Moment's system in UTC using the RFC-3339 format with nanosecond precision.
+                    format: date-time
+      operationId: bulkDownloadInfo
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/instrument/{instrument_id}/:
+    get:
+      tags:
+      - Reference Data
+      summary: Single Security
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstrumentInfoDetail'
+      operationId: retrieveInstrument
+      description: Retrieve reference data for a single instrument.
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/inventory/:
+    post:
+      tags:
+      - Reference Data
+      summary: Inventory Filtering
+      description: 'The inventory filtering endpoint filters for bonds that are available
+
+        for trading at the time of the request. Multiple fields can be filtered
+
+        for, including reference data fields (such as S&P rating, bond type) as
+
+        well as the bid / ask price and yields. These filters should be
+
+        specified in the `filters` field. We''re also able to filter for ISINs
+
+        that fulfill a specific trade size.
+
+
+        Two types of filtering are supported:
+
+
+        - Reference data filtering: specify filters for reference data fields,
+
+        such as S&P rating, bond type, and more.
+
+        - Live inventory filtering: specify filters for price, yield to
+
+        maturity, and yield to worst, filter for quotes that match a trade
+
+        size, and get `bids` and `asks` from the `returns` field.
+
+
+        In addition, specific fields can be requested in the response. These
+
+        fields should be specified in the `returns` field.'
+      operationId: postLiveInventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LiveInventoryRequest'
+            examples:
+              us_taxable:
+                summary: US taxable investor (federal + state rates)
+                description: 'The `us_taxable` profile drives post-tax yield from the
+
+                  `federal_tax_rate`, `state_tax_rate`, and `residing_state`
+
+                  fields. The `custom_*` fields are ignored.'
+                value:
+                  risk_group_id: rg_123
+                  tax_profile: us_taxable
+                  federal_tax_rate: 0.37
+                  state_tax_rate: 0.0882
+                  residing_state: NY
+              custom_taxable:
+                summary: Custom flat income + capital-gains rates
+                description: 'The `custom_taxable` profile uses `custom_income_tax` and
+
+                  `custom_capital_gains_tax`; the federal/state/residing-state
+
+                  fields are ignored.'
+                value:
+                  risk_group_id: rg_123
+                  tax_profile: custom_taxable
+                  custom_income_tax: 0.45
+                  custom_capital_gains_tax: 0.2
+              uk_taxable:
+                summary: UK investor (Gilt/QCB capital-gains exemption)
+                description: 'The `uk_taxable` profile uses the same `custom_income_tax`
+
+                  and `custom_capital_gains_tax` fields as `custom_taxable`,
+
+                  but the capital-gains rate is forced to 0 for Gilts and QCBs.
+
+                  The federal/state/residing-state fields are ignored.'
+                value:
+                  risk_group_id: rg_123
+                  tax_profile: uk_taxable
+                  custom_income_tax: 0.45
+                  custom_capital_gains_tax: 0.2
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveInventoryResponsePOST'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+    get:
+      tags:
+      - Reference Data
+      summary: Inventory Filtering
+      description: 'The inventory filtering endpoint filters for bonds that are available
+
+        for trading at the time of the request. Multiple parameters can be
+
+        filtered for, including reference data fields (such as S&P rating, bond
+
+        type) as well as the bid / ask price and yields. These filters should
+
+        be specified in the `filters` query parameter. We''re also able to
+
+        filter for ISINs that fulfil a specific trade size.
+
+
+        Two types of filtering are supported:
+
+
+        - Reference data filtering: specify filters for reference data fields,
+
+        such as S&P rating, bond type, and more.
+
+        - Live inventory filtering: specify filters for price, yield to
+
+        maturity, and yield to worst, filter for quotes that match a trade
+
+        size, and get `bids` and `asks` from the `returns` query parameter.
+
+
+        In addition, specific fields can be requested in the response. These
+
+        fields should be specified in the `returns` query parameter.'
+      operationId: getLiveInventory
+      parameters:
+      - $ref: '#/components/parameters/inventory_filters'
+      - $ref: '#/components/parameters/inventory_returns'
+      - $ref: '#/components/parameters/inventory_sort_by'
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/page_size'
+      - $ref: '#/components/parameters/trade_size'
+      - $ref: '#/components/parameters/objective_function'
+      - name: side
+        in: query
+        description: "Specify a side for inventory filters. Possible values:\n\n- 'buy' will limit the results to bonds that have quotes to buy\n  the instrument.\n- 'sell' will limit the results to bonds that have quotes to sell\n  the instrument.\n- 'both' will limit the results to bonds that have quotes on both\n  sides of the market, i.e. at least one quote to buy and one to sell.\n\nImportant note: If you are building a UI that leverages this API, you should be\nespecially cognizant that this value represents inventory side, not trade side.\n\nA client who wants to purchase a bond will look for asks/offers where the\ncounterparty wants to sell. Hence, they should pass 'sell' to the API.\n\nA client who wants to sell a bond will look for bids where the counterparty\nwants to buy. Hence, they should pass 'buy' to the API.\n\nWhen `objective_function` references `order_*` fields and `objective_side` is\nabsent, `side` also selects which side of the book those fields score ('both'\nor no side is rejected with a 400). Use `objective_side` to choose the scoring\nside independently of this filter."
+        schema:
+          type: string
+          enum:
+          - buy
+          - sell
+          - both
+      - name: objective_side
+        in: query
+        description: 'Which side of the book `objective_function`''s order fields score: ''sell'' the
+
+          asks, ''buy'' the bids (''both'' is not accepted). Scoring-only — unlike `side` it
+
+          never filters the results, and it takes precedence over `side` for scoring.
+
+          Scoring order fields reads the live order book, so risk group headers are
+
+          still required.'
+        schema:
+          type: string
+          enum:
+          - buy
+          - sell
+      - name: risk_group_id
+        in: query
+        description: 'The risk group ID to filter for tradable inventory. If left null,
+
+          and a single risk group exists for the organization, it will be
+
+          used as the default risk group. If left null, and more than one
+
+          risk group exists, the request will fail.'
+        schema:
+          type: string
+      - name: use_close_data_after_hours
+        in: query
+        description: 'Whether to use close data after market hours. When false (default),
+
+          only reference data is returned when market is closed. When true,
+
+          orders are shown as available even after market close (9:30 AM - 4:00 PM EST/EDT, Monday-Friday).'
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LiveInventoryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Standard error response format returned by all API endpoints.
+                properties:
+                  error:
+                    type: string
+                    description: Human-readable error message describing what went wrong.
+                  error_details:
+                    description: Additional structured information about the error.
+                    x-go-type: any
+                    x-go-type-skip-optional-pointer: true
+                    x-oapi-codegen-extra-tags:
+                      exhaustruct: optional
+                  error_type:
+                    type: string
+                    description: High-level error category for programmatic error handling.
+                    enum:
+                    - invalid_request
+                    - not_found
+                    - server_error
+                    - unauthorized
+                    - rate_limited
+                    - forbidden
+                    - closed
+                    - not_implemented
+                    - resource_conflict
+                    x-enum-varnames:
+                    - ErrorTypeInvalidRequest
+                    - ErrorTypeNotFound
+                    - ErrorTypeServerError
+                    - ErrorTypeUnauthorized
+                    - ErrorTypeRateLimited
+                    - ErrorTypeForbidden
+                    - ErrorTypeNeedsMarketState
+                    - ErrorTypeNotImplemented
+                    - ErrorTypeResourceConflict
+                required:
+                - error
+                - error_type
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+components:
+  schemas:
+    UpdatedAt:
+      type: string
+      description: The timestamp at which the bond was last updated in Moment's system in RFC-3339 format with nanosecond precision.
+      example: '2023-12-06T18:09:07.441248Z'
+      format: date-time
+    LiquidityInstitutionalSell:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell (no minimum trading sizes). A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 3
+    Puttable:
+      type:
+      - boolean
+      - 'null'
+      description: Whether the bond is puttable, meaning the bondholder has the right, but not the obligation, to sell the security back to the issuer at a predetermined price and date.
+      example: false
+    SpCreditwatch:
+      type:
+      - string
+      - 'null'
+      description: 'S&P''s CreditWatch highlights S&P''s opinion regarding the potential direction of a short-term or long-term rating. Null if no information is provided by the agency. Note: available to S&P licensed users only.'
+      example: positive
+      enum:
+      - positive
+      - negative
+      - developing
+      - not_meaningful
+    PreRefunded:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the bond is pre-refunded or escrowed to maturity (ETM), meaning the issuer has set aside funds in an escrow account to redeem the bond. For fully pre-refunded bonds, maturity_date holds the refund (redemption) date rather than the original stated maturity (see original_maturity_date). Only specified for municipal bonds.
+      example: false
+    CouponFrequency:
+      type:
+      - string
+      - 'null'
+      description: 'The frequency, or how often, the coupon is paid to the bondholder. There are a few standard coupon frequencies:
+
+        * annual: Paid out once per year.
+
+        * semi_annual: Paid out twice per year.
+
+        * quarterly: Paid out four times per year, every quarter.
+
+        * monthly: Paid out twelve times per year, every month.
+
+        * zero: No coupon payments.
+
+        * at_maturity: Coupon paid out once, at maturity. Interest accrues over the life of the bond, and is repaid with the principal. Note: this typically only applies for bonds with a total life of less than 1 year.'
+      example: annual
+      enum:
+      - annual
+      - semi_annual
+      - quarterly
+      - monthly
+      - zero
+      - at_maturity
+    Perpetual:
+      type:
+      - boolean
+      - 'null'
+      description: A flag representing whether a bond is perpetual, meaning it does not have a maturity date, and pays interest indefinitely. If this is set, the bond's maturity date will be null.
+      example: true
+    SpRating:
+      type:
+      - string
+      - 'null'
+      description: 'Standard & Poor''s rating for the bond in the standard AAA - D format. NR if marked as not rated by the agency. Null if there is no rating (AAA - D or NR) provided by the agency. Note: available to S&P licensed users only. This data includes Standard & Poor''s (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor''s Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor''s or its affiliates.'
+      example: AAA
+    NextCallDate:
+      type:
+      - string
+      - 'null'
+      description: The date of the next possible call on the bond. Null if the bond is not callable.
+      format: date
+      example: '2027-05-01'
+    NaicsSubsector:
+      type:
+      - string
+      - 'null'
+      description: North American Industry Classification System (NAICS) standard sub-classification of the bond
+      example: Securities, Commodity Contracts, And Other Financial Investments And Related Activities
+    InstrumentsResponse:
+      title: InstrumentsResponse
+      type: object
+      description: 'A model representing the result of hitting the Instruments api.
+
+
+        Provides refdata for each bond in Moment''s current and historical universes.'
+      properties:
+        count:
+          type: integer
+          description: The total number of instruments found that match the query
+        next:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the next page of results (if any exist). Null if no more pages.
+        prev:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the previous page of results (if any exist). Null if no earlier pages.
+        data:
+          type: array
+          description: Array of instruments
+          items:
+            $ref: '#/components/schemas/InstrumentInfo'
+      required:
+      - updated_at
+      - instruments
+    ClosePriceAsOf:
+      type:
+      - string
+      - 'null'
+      description: 'The timestamp on which the close price and yield were recorded in RFC-3339 format. Note: available to users licensed for end-of-day prices only.'
+      example: '2023-12-06T18:09:07.441247Z'
+      format: date-time
+    OriginalIssuePrice:
+      type:
+      - number
+      - 'null'
+      description: The price at which the bond was originally issued as a percentage of par value. This is populated for treasury bonds that were reissued.
+      example: 99.68
+    TriggerEventType:
+      type:
+      - string
+      - 'null'
+      description: The type of event that would cause conversion or write-down. Null if the bond has no trigger event.
+      example: Capital Adequacy
+    IssuePrice:
+      type:
+      - number
+      - 'null'
+      description: The price at which the bond was originally issued as a percentage of par value. In case of a reissue, this will be the latest issuance price.
+      example: 113.68
+    BondType:
+      type: string
+      description: The type of fixed income security.
+      example: agency
+      enum:
+      - agency
+      - cd
+      - corporate
+      - government
+      - municipal
+      - treasury
+    LastCouponDate:
+      type:
+      - string
+      - 'null'
+      description: The date of the last coupon payment on the bond. Null for zero-coupon bonds.
+      example: '2033-11-03'
+      format: date
+    Convertible:
+      type:
+      - boolean
+      - 'null'
+      description: A flag indicating whether the bond is convertible. If a bond is convertible, the investor has the right or the obligation to exchange the bond for a predetermined number of shares in the issuing company at certain times throughout a bond's lifetime. Only specified for corporate bonds issued by publicly traded companies.
+      example: false
+    OriginalMaturityDate:
+      type:
+      - string
+      - 'null'
+      description: The stated maturity date of the bond, for bonds whose maturity_date has been overridden with the refund (redemption) date (see pre_refunded). Null when maturity_date already holds the stated maturity.
+      format: date
+      example: '2038-04-01'
+    IssueDate:
+      type: string
+      description: The date on which the bond was issued. In case of a reissue, this will be the latest issuance date.
+      format: date
+      example: '2017-02-18'
+    TriggerAction:
+      type:
+      - string
+      - 'null'
+      description: The action taken when the trigger event occurs, such as conversion to equity or a principal write-down. Null if the bond has no trigger event.
+    IssueMinimumDenomination:
+      type:
+      - number
+      - 'null'
+      description: The smallest unit of the bond that can be purchased at its initial offering.
+      example: 5000
+    SpCreditwatchDate:
+      type:
+      - string
+      - 'null'
+      description: 'The date of the most recent Standard & Poor''s CreditWatch for the bond in YYYY-MM-DD format. This field will be null if no information about outlook is available or CreditWatch date not available. Note: available to S&P licensed users only.'
+      format: date
+      example: '2020-07-22'
+    ClosePrice:
+      type:
+      - number
+      - 'null'
+      description: 'The close price, or “end of day price” is the price of the last transaction of a security before the market closes for normal trading, shown as a percentage of par value. Note: available to users licensed for end-of-day prices only.'
+      example: 100.2
+    WorkoutDate:
+      type: string
+      description: 'Workout date, also know as the "call adjusted maturity date", is the terminal date of the bond implied by its yield to worst.
+
+
+        If a bond''s yield to worst is equal to its yield to maturity, that means the market believes that it will not be redeemed until maturity. Hence, the workout date is the maturity date.
+
+
+        If a bond''s yield to worst is less than the yield to maturity, that means that the market believes it will get called, and are evaluating the bond''s yield according to that predicted call date. Hence, the workout date is the date the market believes the bond will be called.'
+    Insured:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the bond is insured, meaning a third-party insurance company will guarantee the payment of principal and interest in case the issuer defaults.
+      example: true
+    TreasuryBenchmark:
+      type:
+      - string
+      - 'null'
+      description: ISIN that represents the reference U.S. Treasury security used as a benchmark for pricing and evaluating the fixed income instrument. Typically, this is the closest-maturity Treasury bond or note that serves as a basis for determining relative yield and spread.
+    Description:
+      type: string
+      description: 'Full text description of the bond following the format: [issuer] [coupon]%, [maturity_date: MM/DD/YYYY]'
+      example: AAA UNITED STATES GOVERNMENT MONEY MARKET ACCOUNT INC 2.6%, 11/30/2022
+    LiquidityRetailBuy:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $10,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 1
+    TriggerLevelValue:
+      type:
+      - number
+      - 'null'
+      description: For a trigger event, the threshold value at which conversion or write-down is activated, expressed in the units implied by trigger_level_type (for example, a percentage for a capital ratio). Null if the bond has no conversion trigger.
+    MunicipalState:
+      type:
+      - string
+      - 'null'
+      description: The state or territory of the issuing municipality formatted as a two-letter USPS state abbreviation. Only specified for municipal bonds.
+      example: AZ
+    MoodysRatingDate:
+      type:
+      - string
+      - 'null'
+      description: 'The date in the timezone of the issuing country of the most recent Moody''s rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to Moody''s licensed users only.'
+      format: date
+      example: '2018-07-24'
+    PrincipalFactor:
+      type:
+      - number
+      - 'null'
+      description: The principal factor represents the remaining principal balance as a percentage of the original principal amount. Used primarily for mortgage-backed securities and other amortizing bonds.
+      example: 0.956234
+    AccruedInterest:
+      type:
+      - number
+      - 'null'
+      description: The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.
+      example: 56.25
+    CloseYTM:
+      type:
+      - number
+      - 'null'
+      description: 'The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+      example: 5.486
+    InstrumentInfo:
+      title: InstrumentInfo
+      type: object
+      description: Reference data base for bulk download and list
+      properties:
+        isin:
+          $ref: '#/components/schemas/isin'
+        cusip:
+          $ref: '#/components/schemas/cusip'
+        figi:
+          $ref: '#/components/schemas/Figi'
+        type:
+          $ref: '#/components/schemas/BondType'
+        treasury_subtype:
+          $ref: '#/components/schemas/TreasurySubtype'
+        country_issue:
+          $ref: '#/components/schemas/CountryIssue'
+        country_domicile:
+          $ref: '#/components/schemas/CountryDomicile'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        ticker:
+          $ref: '#/components/schemas/Ticker'
+        seniority:
+          $ref: '#/components/schemas/Seniority'
+        issuer:
+          $ref: '#/components/schemas/Issuer'
+        sector:
+          $ref: '#/components/schemas/Sector'
+        naics_sector:
+          $ref: '#/components/schemas/NaicsSector'
+        naics_subsector:
+          $ref: '#/components/schemas/NaicsSubsector'
+        treasury_benchmark:
+          $ref: '#/components/schemas/TreasuryBenchmark'
+        description:
+          $ref: '#/components/schemas/Description'
+        description_short:
+          $ref: '#/components/schemas/DescriptionShort'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        maturity_date:
+          $ref: '#/components/schemas/MaturityDate'
+        workout_date:
+          $ref: '#/components/schemas/WorkoutDate'
+        coupon:
+          $ref: '#/components/schemas/Coupon'
+        coupon_frequency:
+          $ref: '#/components/schemas/CouponFrequency'
+        coupon_type:
+          $ref: '#/components/schemas/CouponType'
+        coupon_subtype:
+          $ref: '#/components/schemas/CouponSubtype'
+        first_coupon_date:
+          $ref: '#/components/schemas/FirstCouponDate'
+        next_coupon_date:
+          $ref: '#/components/schemas/NextCouponDate'
+        last_coupon_date:
+          $ref: '#/components/schemas/LastCouponDate'
+        issue_size:
+          $ref: '#/components/schemas/IssueSize'
+        issue_date:
+          $ref: '#/components/schemas/IssueDate'
+        original_issue_date:
+          $ref: '#/components/schemas/OriginalIssueDate'
+        original_issue_price:
+          $ref: '#/components/schemas/OriginalIssuePrice'
+        original_issue_size:
+          $ref: '#/components/schemas/OriginalIssueSize'
+        issue_price:
+          $ref: '#/components/schemas/IssuePrice'
+        issue_minimum_denomination:
+          $ref: '#/components/schemas/IssueMinimumDenomination'
+        par_value:
+          $ref: '#/components/schemas/ParValue'
+        principal_factor:
+          $ref: '#/components/schemas/PrincipalFactor'
+        accrued_interest:
+          $ref: '#/components/schemas/AccruedInterest'
+        callable:
+          $ref: '#/components/schemas/Callable'
+        call_type:
+          $ref: '#/components/schemas/CallType'
+        next_call_date:
+          $ref: '#/components/schemas/NextCallDate'
+        next_call_price:
+          $ref: '#/components/schemas/NextCallPrice'
+        puttable:
+          $ref: '#/components/schemas/Puttable'
+        convertible:
+          $ref: '#/components/schemas/Convertible'
+        contingent_convertible:
+          $ref: '#/components/schemas/ContingentConvertible'
+        trigger_event_type:
+          $ref: '#/components/schemas/TriggerEventType'
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_action:
+          $ref: '#/components/schemas/TriggerAction'
+        trigger_level_type:
+          $ref: '#/components/schemas/TriggerLevelType'
+        trigger_level_value:
+          $ref: '#/components/schemas/TriggerLevelValue'
+        bond_warrant:
+          $ref: '#/components/schemas/BondWarrant'
+        is_structured_product:
+          $ref: '#/components/schemas/IsStructuredProduct'
+        sinking_fund:
+          $ref: '#/components/schemas/SinkingFund'
+        perpetual:
+          $ref: '#/components/schemas/Perpetual'
+        insured:
+          $ref: '#/components/schemas/Insured'
+        private_placement:
+          $ref: '#/components/schemas/PrivatePlacement'
+        144a:
+          $ref: '#/components/schemas/144A'
+        reg_s:
+          $ref: '#/components/schemas/RegS'
+        trace_eligible:
+          $ref: '#/components/schemas/TraceEligible'
+        daycount:
+          $ref: '#/components/schemas/DayCount'
+        settlement_convention:
+          $ref: '#/components/schemas/SettlementConvention'
+        dated_date:
+          $ref: '#/components/schemas/DatedDate'
+        municipal_state:
+          $ref: '#/components/schemas/MunicipalState'
+        municipal_type:
+          $ref: '#/components/schemas/MunicipalType'
+        municipal_taxable_federal:
+          $ref: '#/components/schemas/MunicipalTaxableFederal'
+        bank_qualified:
+          $ref: '#/components/schemas/BankQualified'
+        is_amt_applicable:
+          $ref: '#/components/schemas/IsAMTApplicable'
+        pre_refunded:
+          $ref: '#/components/schemas/PreRefunded'
+        original_maturity_date:
+          $ref: '#/components/schemas/OriginalMaturityDate'
+        sp_rating:
+          $ref: '#/components/schemas/SpRating'
+        sp_rating_date:
+          $ref: '#/components/schemas/SpRatingDate'
+        sp_creditwatch:
+          $ref: '#/components/schemas/SpCreditwatch'
+        sp_creditwatch_date:
+          $ref: '#/components/schemas/SpCreditwatchDate'
+        sp_outlook:
+          $ref: '#/components/schemas/SpOutlook'
+        sp_outlook_date:
+          $ref: '#/components/schemas/SpOutlookDate'
+        moodys_rating:
+          $ref: '#/components/schemas/MoodysRating'
+        moodys_rating_date:
+          $ref: '#/components/schemas/MoodysRatingDate'
+        duration:
+          $ref: '#/components/schemas/Duration'
+        convexity:
+          $ref: '#/components/schemas/Convexity'
+        liquidity_micro_buy:
+          $ref: '#/components/schemas/LiquidityMicroBuy'
+        liquidity_micro_sell:
+          $ref: '#/components/schemas/LiquidityMicroSell'
+        liquidity_micro_aggregate:
+          $ref: '#/components/schemas/LiquidityMicroAggregate'
+        liquidity_retail_buy:
+          $ref: '#/components/schemas/LiquidityRetailBuy'
+        liquidity_retail_sell:
+          $ref: '#/components/schemas/LiquidityRetailSell'
+        liquidity_retail_aggregate:
+          $ref: '#/components/schemas/LiquidityRetailAggregate'
+        liquidity_institutional_buy:
+          $ref: '#/components/schemas/LiquidityInstitutionalBuy'
+        liquidity_institutional_sell:
+          $ref: '#/components/schemas/LiquidityInstitutionalSell'
+        liquidity_institutional_aggregate:
+          $ref: '#/components/schemas/LiquidityInstitutionalAggregate'
+        close_price:
+          $ref: '#/components/schemas/ClosePrice'
+        close_ytw:
+          $ref: '#/components/schemas/CloseYTW'
+        close_ytm:
+          $ref: '#/components/schemas/CloseYTM'
+        close_price_asof:
+          $ref: '#/components/schemas/ClosePriceAsOf'
+        status:
+          $ref: '#/components/schemas/BondStatus'
+        updated_at:
+          $ref: '#/components/schemas/UpdatedAt'
+    BankQualified:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the bond is bank qualified, which is a type of municipal bond specifically designated for purchase by commercial banks. Bank qualified bonds can offer specific tax benefits because they allow banks to deduct interest costs of carrying the bond. For example, they must be issued by a small issuer who expects to issue no more than $10 million in bonds during a calendar year. Banks can also deduct 80% of the interest expense they incur to buy and carry these bonds.
+      example: true
+    IssueSize:
+      type:
+      - number
+      - 'null'
+      description: The total size amount of the bond issue in the issuing currency.
+      example: 1625000
+    CouponType:
+      type:
+      - string
+      - 'null'
+      description: 'The type of coupon rate.
+
+        * fixed: The coupon payment is a fixed percentage of the bond''s par value.
+
+        * floating: The coupon payment is pegged to some benchmark rate that frequently changes based off a benchmark, such as SOFR. Typically, the coupon payment is the benchmark rate plus a spread.
+
+        * variable: The coupon payment changes over the life of the bond. Similar to a floating rate, but typically updates less frequently, such as once every coupon payment.
+
+        * zero: Zero-coupon bonds do not pay a coupon over their lifetime.
+
+        * complex: A coupon rate that does not belong in any of the above categories.
+
+
+        Several distinct coupon structures share a single coupon_type — stepped-coupon bonds, for example, are reported as variable. See coupon_subtype for the finer-grained description.'
+      example: fixed
+      enum:
+      - fixed
+      - floating
+      - variable
+      - zero
+      - complex
+    TreasurySubtype:
+      type:
+      - string
+      - 'null'
+      description: 'The subtype of a treasury. Possible values include:
+
+        * bond: long term i.e. 20, 30 years
+
+        * note: intermediate term i.e. 2, 3, 5, 7, and 10 years
+
+        * bill: short term i.e. 4, 8, 13, 17, 26, 52 weeks (<= 1 year)
+
+        * tips: treasury inflation-protected securities
+
+        * strips: separate trading of registered interest and principal of securities
+
+        * floating: floating rate notes'
+      example: bill
+      enum:
+      - bond
+      - bill
+      - note
+      - strips
+      - tips
+      - floating
+    CouponSubtype:
+      type:
+      - string
+      - 'null'
+      description: 'A more specific description of the coupon structure, refining coupon_type. Unlike coupon_type this is not a fixed set of values: it is a free-form descriptive string passed through from the data provider, so treat it as display text rather than matching against an enum. Null when the coupon data does not come with a subtype.'
+      example: Stepped Coupon
+    LiquidityRetailSell:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 2
+    IsStructuredProduct:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the bond is a structured product, which is a security derived from or linked to a pool of underlying assets, such as indices or derivatives.
+      example: false
+    SpOutlookDate:
+      type:
+      - string
+      - 'null'
+      description: 'The date of the most recent Standard & Poor''s outlook for the bond in YYYY-MM-DD format. Null if no information about outlook is available or outlook date not available. Note: available to S&P licensed users only.'
+      format: date
+      example: '2022-06-15'
+    CallType:
+      type:
+      - string
+      - 'null'
+      description: 'The type of call on the bond refers to one of a variety of circumstances under which a callable bond may be called. Null if the bond is not callable.
+
+        * ordinary: The most common call type, which grants the issuer the ability to redeem the bond before its maturity date.
+
+        * make_whole: A make whole call provision allows an issuer to redeem the bond before maturity at a price that is usually calculated based on the present value of future coupon payments and the redemption value, discounted at a specified rate.
+
+        * regulatory: A regulatory call type gives the issuer the right to redeem the bond before its maturity due to changes in regulatory or tax laws that adversely affect the bond or its issuer.
+
+        * special: A special call allows the issuer to call the bond before its maturity under specific circumstances, conditions, or events that are outside the typical operations of the issuer, as outlined in the bond''s indenture.'
+      example: ordinary
+      enum:
+      - ordinary
+      - make_whole
+      - regulatory
+      - special
+    LiquidityMicroSell:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 5
+    Ticker:
+      type:
+      - string
+      - 'null'
+      description: The stock ticker for publicly traded companies, or a similar styled abbreviation for securities issued by a company that is not publicly traded. This field is only populated for corporate bonds.
+      example: AAPL
+    SpOutlook:
+      type:
+      - string
+      - 'null'
+      description: 'A Standard & Poor''s rating outlook indicates S&P''s view regarding the potential direction of a long-term credit rating over the intermediate term (2 years for investment grade, 1 year for speculative grade). Null if no information is provided by the agency. Note: available to S&P licensed users only.'
+      example: negative
+      enum:
+      - positive
+      - negative
+      - developing
+      - stable
+      - not_rated
+      - not_meaningful
+    ParValue:
+      type: number
+      description: The amount that the issuer of the bond will pay back to the bondholder upon maturity. Also known as face value or nominal value.
+      example: 5000
+    cusip:
+      type:
+      - string
+      - 'null'
+      title: CUSIP
+      description: 'The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.
+
+
+        Note: Available to licensed users only.
+
+        The Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.
+
+        CUSIPs are unique security identifiers managed by The CUSIP Service Bureau.'
+      example: H00402625
+      minLength: 9
+      maxLength: 9
+    MoodysRating:
+      type:
+      - string
+      - 'null'
+      description: 'Moody''s rating for the bond in the standard Aaa - C format. NR if marked as not rated by the agency. Null if there is no rating (Aaa - C or NR) provided by the agency. Note: available to Moody''s licensed users only. This data includes Moody''s ratings and related financial information. Moody''s ratings and data are proprietary to Moody''s Investors Service, Inc. The information is used under license and is subject to copyright and other intellectual property rights held by Moody''s or its affiliates.'
+      example: Baa1
+    Convexity:
+      type:
+      - number
+      - 'null'
+      description: 'The convexity of a bond measures the degree to which the duration of a bond changes as interest rates change. While duration estimates a bond''s price sensitivity to small interest rate movements, convexity accounts for the fact that this relationship is not linear—especially for larger rate changes. A bond with higher convexity will exhibit more price gain when interest rates fall and less price loss when rates rise, compared to a bond with lower convexity. Moment provides effective convexity, which approximates this curvature by comparing the bond''s price change under small upward and downward shifts in yield. Note: this field is available to users licensed for pricing analytics only.'
+      example: 0.41
+    SinkingFund:
+      type:
+      - boolean
+      - 'null'
+      description: A sinking fund is a pool of money a bond issuer sets aside to repay the bond, typically through periodic buybacks, offering added security to bondholders. For bonds with a sinking fund provision, the bond issuer is obligated to retire or pay down a portion of the principal at specified intervals throughout the bond's lifetime. This means bondholders receive both periodic coupon payments and portions of the principal before maturity, rather than receiving the entire principal amount solely at maturity.
+      example: false
+    IsAMTApplicable:
+      type:
+      - boolean
+      - 'null'
+      description: A flag representing whether a bond is AMT (Alternative Minimum Tax) applicable, which means that the bond's interest may be subject to the alternative minimum tax. Only specified for municipal bonds.
+      example: false
+    Figi:
+      type:
+      - string
+      - 'null'
+      title: FIGI
+      description: 'The Financial Instrument Global Identifier (FIGI) is a 12-character alphanumeric open-standard identifier assigned at the instrument level.
+
+
+        Sourced from the Bloomberg Global Id in ICE reference data.'
+      example: BBG00KTQXF60
+      minLength: 12
+      maxLength: 12
+    BondStatus:
+      type: string
+      description: 'The status of the bond reflects many possible states a bond can be in.
+
+
+        * called: The bond has been called by the issuer.
+
+        * converted: The bond has been converted into another type of security. Usually this is from the issue being converted into common stock.
+
+        * defaulted: The bond issuer has failed to make timely payments on the bond and has entered default.
+
+        * funged: The bond has been funged (replaced/exchanged) for another. This sometimes happens when an issuer combines two classes of bond into one parent bond.
+
+        * liquidated: The issuer has been liquidated.
+
+        * matured: The bond has reached its maturity date and the bondholders have been repaid their principal.
+
+        * outstanding: The bond is still active and has not reached its maturity date.
+
+        * pre_issuance: There is reference data for this bond but it has not yet been issued and is unavailable for trading.
+
+        * put: The bond has been put (sold back) to the issuer.
+
+        * repaid: The bond has been repaid before its maturity date using a covenant other than an option such as a put or call. For example, through prepayment.
+
+        * tendered: The bond has been tendered (offered for repurchase) by the issuer.
+
+        * repurchased: The bond has been repurchased by the issuer.
+
+        * restructured: The security has been restructured into a new security or into a security with materially different terms.
+
+        * unknown: The status of the bond is unknown.'
+      example: called
+      enum:
+      - called
+      - converted
+      - defaulted
+      - funged
+      - liquidated
+      - matured
+      - outstanding
+      - pre_issuance
+      - put
+      - repaid
+      - tendered
+      - repurchased
+      - restructured
+      - unknown
+    CloseYTW:
+      type:
+      - number
+      - 'null'
+      description: 'The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+      example: 5.486
+    SettlementConvention:
+      type:
+      - string
+      - 'null'
+      description: The standard process through which the legal transfer of bonds from the seller to the buyer is completed, and payment is made by the buyer, including details like the timing and the specific procedures involved in the settlement of a trade.
+      example: T+1
+    MaturityDate:
+      type:
+      - string
+      - 'null'
+      description: 'The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds. For fully pre-refunded municipal bonds (see pre_refunded), this holds the refund (redemption) date rather than the original stated maturity, since the bond is redeemed from escrowed funds on that date; the stated maturity is available in original_maturity_date.'
+      format: date
+      example: '2023-01-15'
+    LiquidityRetailAggregate:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to 10,000. A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 4
+    Currency:
+      type:
+      - string
+      - 'null'
+      description: The 3-alpha currency code of the currency the bond is denominated in (e.g., USD, CAD).
+      example: USD
+    Duration:
+      type:
+      - number
+      - 'null'
+      description: 'The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond''s price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.'
+      example: 0.71
+    Callable:
+      type:
+      - boolean
+      - 'null'
+      description: Whether the bond is callable, meaning the issuer has the right but not the obligation to redeem the bond before its maturity date at a set price (the call price). This field only reflects regular call provisions; make-whole or other special call features are not captured.
+      example: true
+    Coupon:
+      type:
+      - number
+      - 'null'
+      description: The coupon is the annual interest rate paid on the bond as a percentage of par value. This field is set to zero for zero-coupon bonds.
+      example: 5
+    OriginalIssueSize:
+      type:
+      - number
+      - 'null'
+      description: The size of the bond when it was originally issued. This is populated for treasury bonds that were reissued.
+      example: 1000000
+    CountryIssue:
+      type:
+      - string
+      - 'null'
+      description: The country where the bond is issued in the 2-alpha country code format (e.g., US, CA).
+      example: US
+    CallSchedule:
+      title: CallSchedule
+      type: object
+      description: 'The call schedule of the bond specifies the dates and prices at which the issuer can choose to redeem the bond before its maturity. Note: this data is subject to availability.'
+      properties:
+        call_date:
+          type: string
+          description: The date of the call.
+          format: date
+        call_price:
+          type: number
+          description: The price at which the bond can be called as a percentage of par.
+    CountryDomicile:
+      type:
+      - string
+      - 'null'
+      description: The country where the bond is domiciled (where it legally resides) in the 2-alpha country code format (e.g., US, CA). An example of where this differs from country_issue is if a Brazilian bond is issued in the US (country of issue) for a corporation in Brazil (country of domicile).
+      example: US
+    MunicipalTaxableFederal:
+      type:
+      - boolean
+      - 'null'
+      description: Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.
+      example: false
+    DatedDate:
+      type:
+      - string
+      - 'null'
+      description: The dated date marks the beginning of the period for which interest starts accruing on the bond.
+      format: date
+      example: '2024-04-01'
+    ContingentConvertible:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the bond has loss-absorbing contingent convertible (CoCo) features, meaning it can be converted to equity or have its principal written down if a trigger event occurs. Most commonly applies to bank regulatory-capital instruments. False if the bond has no such features.
+      example: true
+    PrivatePlacement:
+      type:
+      - boolean
+      - 'null'
+      description: 'Indicates whether the security was part of private placement, or issued directly to a limited pool of investors rather than through a public offering. These bonds are unregistered with the SEC and are not part of the open market. Note: retail investors may not be eligible to participate in bonds offered via private placement — please consult an attorney for more information.'
+      example: false
+    InstrumentInfoDetail:
+      allOf:
+      - $ref: '#/components/schemas/InstrumentInfo'
+      - title: InstrumentInfo
+      - type: object
+      - description: Reference data (detail)
+      - properties:
+          call_schedule:
+            type: array
+            description: The call schedule of the bond.
+            items:
+              $ref: '#/components/schemas/CallSchedule'
+    Issuer:
+      type: string
+      description: Name of the bond issuer
+      example: AAA United States Government Money Market Account Inc.
+    RegS:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the security falls under Regulation S, a rule that provides an exemption from the registration requirements for securities offerings made outside the United States. This regulation allows U.S. and foreign issuers to sell securities in non-U.S. markets without the need to register these securities with SEC.
+      example: false
+    LiquidityMicroBuy:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 if the bond is priced, or null if the bond is not tradable) reflecting the historical depth of executable liquidity to buy with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have  offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 3
+    144A:
+      type:
+      - boolean
+      - 'null'
+      description: 'Indicates whether the security was part of Rule 144A, an SEC rule that provides a safe harbor exemption from the registration requirements for certain private resales of restricted securities to qualified institutional buyers. 144A applies to securities that are not registered with the SEC and are typically sold through private placements. Note: only qualified institutional buyers, such as those with with at least $100 million in investable assets, are eligible to purchase 144A securities.'
+      example: false
+    NextCallPrice:
+      type:
+      - number
+      - 'null'
+      description: The price at which a callable bond can be redeemed by the issuer on the next call date, as a percentage of par. Null if the bond is not callable.
+      example: 100
+    SpRatingDate:
+      type:
+      - string
+      - 'null'
+      description: 'The date in the timezone of the issuing country of the most recent Standard & Poor''s rating for the bond in YYYY-MM-DD format. Null if no rating is available or rating date not available. Note: available to S&P licensed users only.'
+      format: date
+      example: '2018-07-24'
+    TriggerType:
+      type:
+      - string
+      - 'null'
+      description: The type of trigger for a conversion or write-down event. Null if the bond has no trigger event.
+      example: Mechanical
+    NextCouponDate:
+      type:
+      - string
+      - 'null'
+      description: The date of the next upcoming coupon payment. Null for zero-coupon bonds. Please note that this date may not be when the actual coupon is paid; most coupons will be paid on the following business day if the coupon date falls on a holiday or a weekend.
+      format: date
+      example: '2024-05-01'
+    OriginalIssueDate:
+      type:
+      - string
+      - 'null'
+      description: The initial date of issuance for treasury bonds, used to differentiate between original and re-issued bonds.
+      format: date
+      example: '2015-02-18'
+    LiquidityInstitutionalAggregate:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell (no minimum trading sizes). A higher score means that an order to buy or sell will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 2
+    Sector:
+      type:
+      - string
+      - 'null'
+      description: Sector classification of issuer (e.x. Financial Services, Healthcare Facilities, Industrials, Professional Services, Energy, etc.)
+      example: Financial Services
+    NaicsSector:
+      type:
+      - string
+      - 'null'
+      description: North American Industry Classification System (NAICS) standard classification of the bond
+      example: Finance And Insurance
+    TraceEligible:
+      type:
+      - boolean
+      - 'null'
+      description: Indicates whether the security is TRACE eligible, meaning it is subject to the Trade Reporting and Compliance Engine (TRACE) reporting requirements. Trades on these instruments must be reported to FINRA within 15 minutes of execution.
+      example: true
+    BondWarrant:
+      type:
+      - boolean
+      - 'null'
+      description: A financial instrument that gives holder the right, but not the obligation, to purchase a certain number of shares of the issuer's stock at a specified price (the strike price) before the warrant expires.
+      example: false
+    LiquidityMicroAggregate:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy or sell with minimum trading sizes less than or equal to $1,000.00. A higher score means that the bond is more likely to have bids and offers at the minimum trading size. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 5
+    isin:
+      type: string
+      title: ISIN
+      description: The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.
+      example: US594918AD66
+      minLength: 12
+      maxLength: 12
+    TriggerLevelType:
+      type:
+      - string
+      - 'null'
+      description: The type of threshold used to define the trigger level (for example, a regulatory capital ratio). Null if the bond has no trigger event.
+    DescriptionShort:
+      type:
+      - string
+      - 'null'
+      description: 'Short text description of the bond following the format: [abbreviated issuer] [coupon]% [maturity_date: MM/DD/YYYY]'
+      example: MI 5.0% 05/01/2034
+    MunicipalType:
+      type:
+      - string
+      - 'null'
+      description: The type of revenue backing. General obligation bonds are not tied to any particular revenue-generating project. Revenue bonds, in contrast are repaid from the income generated by specific projects, enterprises, or sources, rather than from general taxation. Only specified for municipal bonds.
+      example: revenue
+      enum:
+      - general_obligation
+      - revenue
+    Purpose:
+      type:
+      - string
+      - 'null'
+      description: The purpose of a bond refers to the specific reason or the objective for which the bond is issued. It defines how the issuer intends to use the funds raised from the bond sale. May be null for bonds where the purpose is not captured in the prospectus.
+      example: Water & Sewer
+    FirstCouponDate:
+      type:
+      - string
+      - 'null'
+      description: The date of the first coupon payment on the bond. Null for zero-coupon bonds.
+      example: '2017-11-01'
+      format: date
+    LiquidityInstitutionalBuy:
+      type:
+      - integer
+      - 'null'
+      description: 'Score (from 1-5 or null if the bond is not priced/tradable) reflecting the historical depth of executable liquidity to buy (no minimum trading sizes). A higher score means that an order to buy will generally have faster execution. Note: available to users licensed for pricing analytics only. See reference data glossary for breakdown of how this proprietary analytic is calculated by Moment.'
+      example: 4
+    Seniority:
+      type:
+      - string
+      - 'null'
+      description: The order of priority in which bondholders are repaid in the event of a default by the issuing corporation such as bankruptcy or liquidation. This field is only populated for corporate bonds.
+      example: senior_secured
+    DayCount:
+      type:
+      - string
+      - 'null'
+      description: 'The day count convention used to calculate accrued interest.
+
+        * A/360: calculates the daily interest using a 360-day year and then multiplies that by the actual number of days in each time period.
+
+        * A/365: calculates the daily interest using a 365-day year and then multiplies that by the actual number of days in each time period.
+
+        * 30/360: calculates the daily interest using a 360-day year and then multiplies that by 30 (standardized month).
+
+        * 30/365: calculates the daily interest using a 365-day year and then multiplies that by 30 (standardized month).
+
+        * A/A: calculates the daily interest using the actual number of days in the year and then multiplies that by the actual number of days in each time period.
+
+        * 30E/360: number of days equals to the actual number of days (for February). If the start date or the end date of the period is the 31st of a month, that date is set to the 30th. The number of days in a year is 360.
+
+        * B/252: calculates the daily interest using a 252-business-day year and then multiplies that by the actual number of days in each time period.
+
+        * A/364: calculates the daily interest using a 364-day year and then multiplies that by the actual number of days in each time period.'
+      example: 30/360
+      enum:
+      - A/360
+      - A/365
+      - 30/360
+      - 30/365
+      - A/A
+      - 30E/360
+      - B/252
+      - A/364
+    LiveInventoryRequest:
+      type: object
+      properties:
+        custom_capital_gains_tax:
+          description: 'Capital gains tax rate as a decimal between 0 and 1. Meaningful
+
+            when `tax_profile` is `custom_taxable` or `uk_taxable`; under
+
+            `uk_taxable` it is overridden to 0 for Gilts and QCBs. The
+
+            `us_taxable` profile does not apply a capital-gains adjustment —
+
+            post-tax yield under `us_taxable` is computed multiplicatively from
+
+            the effective income tax rate alone, deferring real capgain
+
+            handling until a dedicated US capital-gains field is added.'
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+        custom_income_tax:
+          description: 'Marginal income tax rate as a decimal between 0 and 1. Meaningful
+
+            when `tax_profile` is `custom_taxable` or `uk_taxable`; ignored
+
+            under `us_taxable`, which uses `federal_tax_rate` + `state_tax_rate`
+
+            + `residing_state` per-bond rules instead.'
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+        federal_tax_rate:
+          description: 'Investor''s marginal federal income tax rate, as a decimal 0-1.
+
+            Used only under the `us_taxable` profile (alongside
+
+            `state_tax_rate` + `residing_state`); ignored under
+
+            `custom_taxable`/`uk_taxable`, which use `custom_income_tax`.
+
+            Default 0.37.'
+          type: number
+          format: double
+          default: 0.37
+          maximum: 1
+          minimum: 0
+        filters:
+          description: 'The filters to apply, as a JSON object whose keys are fields to filter on or
+
+            operators. Send the object itself: this field is a nested object in the request
+
+            body, not a JSON-encoded string (`objective_function` is the only field on this
+
+            body that takes a JSON-encoded string).
+
+            Example: {"cusip": {"in": ["035240AQ3"]}, "maturity_date": {"less_than": "2030-01-01"}}'
+          $ref: '#/components/schemas/InventoryFilter'
+        objective_function:
+          description: 'JSON-encoded objective function that defines the scoring formula for ranking bonds.
+
+            Contains a list of weighted terms, each referencing a field or an arithmetic expression.
+
+            Unlike `filters`, this field is a string: serialize the objective to JSON and send
+
+            the resulting string.
+
+            Example: {"terms": [{"term": {"type": "field", "field": "duration", "factor": 0.01}, "factor": 1.0}]}
+
+
+            `order_price`, `order_ytw` and `order_ytm` score the top of the book on the
+
+            scoring side (`objective_side`, or `side` when absent), falling back to price
+
+            estimates; an objective referencing them requires a scoring side (400 otherwise)
+
+            and risk group headers. `spread_to_benchmark` is an accepted optimizer alias for
+
+            `mid_ytw_spread_bps`, valid only inside the objective.'
+          type: string
+        objective_side:
+          description: 'Which side of the book `objective_function`''s order fields score: ''sell'' the
+
+            asks, ''buy'' the bids (''both'' is not accepted). Scoring-only — unlike `side` it
+
+            never filters the results, and it takes precedence over `side` for scoring.
+
+            Scoring order fields reads the live order book, so risk group headers are
+
+            still required.'
+          type: string
+          enum:
+          - buy
+          - sell
+        page:
+          description: The page number of the results to return. If not provided, the default is page 1.
+          type: integer
+        page_size:
+          description: The number of results to return per page. If not provided, the default is 100.
+          type: integer
+        residing_state:
+          description: 'Two-letter state code of the investor''s state of residence.
+
+            Example: "CA", "NY", "TX". Used only under the `us_taxable`
+
+            profile (drives per-bond state-tax exemptions); ignored under
+
+            `custom_taxable`/`uk_taxable`.'
+          type: string
+          maxLength: 2
+          minLength: 2
+        returns:
+          description: The fields to return in the response.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryReturnField'
+          example:
+          - isin
+          - cusip
+          - description
+          - bids
+          - asks
+        risk_group_id:
+          description: 'The risk group ID to filter for tradable inventory. If left null,
+
+            and a single risk group exists for the organization, it will be
+
+            used as the default risk group. If left null, and more than one
+
+            risk group exists, the request will fail.'
+          type: string
+        side:
+          description: "Specify a side for inventory filters. Possible values:\n\n- 'buy' will limit the results to bonds that have quotes to buy\n  the instrument.\n- 'sell' will limit the results to bonds that have quotes to sell\n  the instrument.\n- 'both' will limit the results to bonds that have quotes on both\n  sides of the market, i.e. at least one quote to buy and one to sell.\n\nImportant note: If you are building a UI that leverages this API, you should be\nespecially cognizant that this value represents inventory side, not trade side.\n\nA client who wants to purchase a bond will look for asks/offers where the\ncounterparty wants to sell. Hence, they should pass 'sell' to the API.\n\nA client who wants to sell a bond will look for bids where the counterparty\nwants to buy. Hence, they should pass 'buy' to the API.\n\nWhen `objective_function` references `order_*` fields and `objective_side` is\nabsent, `side` also selects which side of the book those fields score ('both'\nor no side is rejected with a 400). Use `objective_side` to choose the scoring\nside independently of this filter."
+          type: string
+          enum:
+          - buy
+          - sell
+          - both
+        sort_by:
+          description: 'The fields to sort the results by. Each field can optionally specify a direction
+
+            by appending ''.asc'' or ''.desc''. If no direction is specified, defaults to ascending order.'
+          type: array
+          items:
+            type: string
+          example:
+          - isin.asc
+          - cusip.desc
+          - par_value.asc
+          - maturity_date
+          - issuer
+        state_tax_rate:
+          description: 'Investor''s marginal state income tax rate, as a decimal 0-1.
+
+            Used only under the `us_taxable` profile; ignored under
+
+            `custom_taxable`/`uk_taxable`.'
+          type: number
+          format: double
+          default: 0
+          maximum: 1
+          minimum: 0
+        tax_profile:
+          description: "Tax profile classification controlling how post-tax yield fields\nand the post-tax objective term are computed.\n\n- `us_taxable` (default): post-tax yield is the pre-tax yield\n  multiplied by `(1 - effective_tax_rate)`, where\n  `effective_tax_rate` is the per-bond combination of\n  `federal_tax_rate` + `state_tax_rate` + `residing_state` with\n  treasury, US-territory, state-exempt-agency, and muni\n  federal/state exemption carve-outs applied per bond. Capital\n  gains is not applied under this profile (deferred until a real\n  US capgain field is defined).\n- `custom_taxable`: post-tax yield is the bivariate Taylor\n  expansion of after-tax YTW evaluated at constants\n  (`s = custom_income_tax`, `g = custom_capital_gains_tax`).\n  Federal/state/residing-state are ignored.\n- `uk_taxable`: same Taylor expansion as `custom_taxable`\n  (using `custom_income_tax` and `custom_capital_gains_tax`), but\n  the capital-gains rate is forced to 0 for instruments exempt from\n  UK capital gains tax — Gilts (`ice_sector_1 = Sovereign` and\n  `currency = GBP`) and QCBs (`qcb_indicator = true`). Income tax\n  still applies to exempt instruments.\n- `non_taxable`: no tax is applied to any instrument. Post-tax yield\n  equals the pre-tax yield and tax-equivalent yield receives no\n  gross-up. All rate fields are ignored."
+          type: string
+          default: us_taxable
+          enum:
+          - us_taxable
+          - custom_taxable
+          - uk_taxable
+          - non_taxable
+        trade_size:
+          description: 'Filtering by trade_size will only return `asks` and `bids` that
+
+            would completely fill an order of the specified quantity. More
+
+            specifically, it will return quotes where the minimum quantity is
+
+            less than or equal to the specified trade_size and the total
+
+            quantity is greater than or equal to the specified trade_size.
+
+            Optionally, set value to "lowest" to get all the quotes sorted from
+
+            least to greatest `min_quantity`.'
+          type: string
+        use_close_data_after_hours:
+          description: 'Whether to use close data after market hours. When false (default),
+
+            only reference data is returned when market is closed. When true,
+
+            orders are shown as available even after market close (9:30 AM - 4:00 PM EST/EDT, Monday-Friday).'
+          type: boolean
+          default: false
+      required:
+      - returns
+    InventoryFilterCondition:
+      type: object
+      properties:
+        ends_with:
+          description: String to end with in the filter.
+          type: string
+        equal_to:
+          description: Exact value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        greater_than:
+          description: Greater than value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        greater_than_or_equal_to:
+          description: Greater than or equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        in:
+          description: Array of values for the filter.
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: number
+        in_filter_list:
+          description: Filter by values from a named filter list. The value is the filter list ID (e.g., "list_01ABC123").
+          type: string
+        includes:
+          description: String to include in the filter.
+          type: string
+        is_null:
+          description: Boolean to filter for null / not-null values.
+          type: boolean
+        less_than:
+          description: Less than value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        less_than_or_equal_to:
+          description: Less than or equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        not_equal_to:
+          description: Not equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        not_in:
+          description: Array of values not to include in the filter.
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: number
+        not_in_filter_list:
+          description: Exclude values that are in a named filter list. The value is the filter list ID (e.g., "list_01ABC123").
+          type: string
+        not_includes:
+          description: String not to include in the filter.
+          type: string
+        starts_with:
+          description: String to start with in the filter.
+          type: string
+    LiveInventoryResponse:
+      type: object
+      properties:
+        count:
+          description: The total number of instruments found that match the query.
+          type: integer
+        data:
+          description: The array of live inventory data, with only the fields that the user requests.
+          type: array
+          items:
+            $ref: '#/components/schemas/LiveInventoryItem'
+        next:
+          description: The URL to the next page of results (if any exist). Null if no more pages.
+          type:
+          - string
+          - 'null'
+          format: URL
+        prev:
+          description: The URL to the previous page of results (if any exist). Null if no earlier pages.
+          type:
+          - string
+          - 'null'
+          format: URL
+        warnings:
+          description: Warning messages about requested fields that don't exist or other non-fatal issues.
+          type: array
+          items:
+            type: string
+          example:
+          - Unknown field 'invalid_field' requested in returns parameter
+          x-omitzero: true
+      title: LiveInventoryResponse
+    AccruedInterest_2:
+      description: The interest that has accumulated on a bond in dollars per bond bewteen the last interest payment and the present date that has not yet been paid to the bondholder.
+      type:
+      - number
+      - 'null'
+      format: double
+      example: 56.25
+    CloseYTM_2:
+      description: 'The close Yield to Maturity refers to the YTM of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+      type:
+      - number
+      - 'null'
+      format: double
+      example: 5.486
+    InstrumentInfo_2:
+      description: Reference data base for bulk download and list
+      type: object
+      properties:
+        144a:
+          $ref: '#/components/schemas/144A'
+        accrued_interest:
+          $ref: '#/components/schemas/AccruedInterest_2'
+        bank_qualified:
+          $ref: '#/components/schemas/BankQualified_2'
+        bond_warrant:
+          $ref: '#/components/schemas/BondWarrant'
+        call_type:
+          $ref: '#/components/schemas/CallType'
+        callable:
+          $ref: '#/components/schemas/Callable_2'
+        close_price:
+          $ref: '#/components/schemas/ClosePrice'
+        close_price_asof:
+          $ref: '#/components/schemas/ClosePriceAsOf'
+        close_ytm:
+          $ref: '#/components/schemas/CloseYTM_2'
+        close_ytw:
+          $ref: '#/components/schemas/CloseYTW_2'
+        convertible:
+          $ref: '#/components/schemas/Convertible'
+        convexity:
+          $ref: '#/components/schemas/Convexity_2'
+        country_domicile:
+          $ref: '#/components/schemas/CountryDomicile_2'
+        country_issue:
+          $ref: '#/components/schemas/CountryIssue_2'
+        country_of_risk:
+          $ref: '#/components/schemas/CountryOfRisk'
+        coupon:
+          $ref: '#/components/schemas/Coupon'
+        coupon_frequency:
+          $ref: '#/components/schemas/CouponFrequency'
+        coupon_type:
+          $ref: '#/components/schemas/CouponType_2'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        cusip:
+          $ref: '#/components/schemas/cusip'
+        dated_date:
+          $ref: '#/components/schemas/DatedDate'
+        daycount:
+          $ref: '#/components/schemas/DayCount_2'
+        description:
+          $ref: '#/components/schemas/Description'
+        description_short:
+          $ref: '#/components/schemas/DescriptionShort'
+        duration:
+          $ref: '#/components/schemas/Duration_2'
+        emerging_status:
+          $ref: '#/components/schemas/EmergingStatus'
+        first_coupon_date:
+          $ref: '#/components/schemas/FirstCouponDate'
+        insured:
+          $ref: '#/components/schemas/Insured'
+        is_amt_applicable:
+          $ref: '#/components/schemas/IsAMTApplicable'
+        is_structured_product:
+          $ref: '#/components/schemas/IsStructuredProduct'
+        isin:
+          $ref: '#/components/schemas/isin'
+        issue_date:
+          $ref: '#/components/schemas/IssueDate'
+        issue_minimum_denomination:
+          $ref: '#/components/schemas/IssueMinimumDenomination'
+        issue_price:
+          $ref: '#/components/schemas/IssuePrice'
+        issue_size:
+          $ref: '#/components/schemas/IssueSize'
+        issuer:
+          $ref: '#/components/schemas/Issuer'
+        last_coupon_date:
+          $ref: '#/components/schemas/LastCouponDate'
+        liquidity_institutional_aggregate:
+          $ref: '#/components/schemas/LiquidityInstitutionalAggregate'
+        liquidity_institutional_buy:
+          $ref: '#/components/schemas/LiquidityInstitutionalBuy'
+        liquidity_institutional_sell:
+          $ref: '#/components/schemas/LiquidityInstitutionalSell'
+        liquidity_micro_aggregate:
+          $ref: '#/components/schemas/LiquidityMicroAggregate'
+        liquidity_micro_buy:
+          $ref: '#/components/schemas/LiquidityMicroBuy'
+        liquidity_micro_sell:
+          $ref: '#/components/schemas/LiquidityMicroSell'
+        liquidity_retail_aggregate:
+          $ref: '#/components/schemas/LiquidityRetailAggregate'
+        liquidity_retail_buy:
+          $ref: '#/components/schemas/LiquidityRetailBuy'
+        liquidity_retail_sell:
+          $ref: '#/components/schemas/LiquidityRetailSell'
+        lowest_rating:
+          $ref: '#/components/schemas/LowestRating'
+        lowest_rating_rank:
+          $ref: '#/components/schemas/LowestRatingRank'
+        maturity_date:
+          $ref: '#/components/schemas/MaturityDate_2'
+        municipal_state:
+          $ref: '#/components/schemas/MunicipalState'
+        municipal_taxable_federal:
+          $ref: '#/components/schemas/MunicipalTaxableFederal_2'
+        municipal_type:
+          $ref: '#/components/schemas/MunicipalType'
+        naics_sector:
+          $ref: '#/components/schemas/NaicsSector'
+        naics_subsector:
+          $ref: '#/components/schemas/NaicsSubsector'
+        next_call_date:
+          $ref: '#/components/schemas/NextCallDate'
+        next_call_price:
+          $ref: '#/components/schemas/NextCallPrice'
+        next_coupon_date:
+          $ref: '#/components/schemas/NextCouponDate'
+        original_issue_date:
+          $ref: '#/components/schemas/OriginalIssueDate'
+        original_issue_price:
+          $ref: '#/components/schemas/OriginalIssuePrice'
+        original_issue_size:
+          $ref: '#/components/schemas/OriginalIssueSize'
+        par_value:
+          $ref: '#/components/schemas/ParValue'
+        perpetual:
+          $ref: '#/components/schemas/Perpetual'
+        private_placement:
+          $ref: '#/components/schemas/PrivatePlacement'
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        puttable:
+          $ref: '#/components/schemas/Puttable'
+        reg_s:
+          $ref: '#/components/schemas/RegS'
+        sector:
+          $ref: '#/components/schemas/Sector'
+        seniority:
+          $ref: '#/components/schemas/Seniority'
+        settlement_convention:
+          $ref: '#/components/schemas/SettlementConvention_2'
+        sinking_fund:
+          $ref: '#/components/schemas/SinkingFund'
+        sp_creditwatch:
+          $ref: '#/components/schemas/SpCreditwatch'
+        sp_creditwatch_date:
+          $ref: '#/components/schemas/SpCreditwatchDate'
+        sp_outlook:
+          $ref: '#/components/schemas/SpOutlook'
+        sp_outlook_date:
+          $ref: '#/components/schemas/SpOutlookDate'
+        sp_rating:
+          $ref: '#/components/schemas/SpRating'
+        sp_rating_date:
+          $ref: '#/components/schemas/SpRatingDate'
+        status:
+          $ref: '#/components/schemas/BondStatus'
+        ticker:
+          $ref: '#/components/schemas/Ticker'
+        trace_eligible:
+          $ref: '#/components/schemas/TraceEligible'
+        treasury_benchmark:
+          $ref: '#/components/schemas/TreasuryBenchmark'
+        treasury_subtype:
+          $ref: '#/components/schemas/TreasurySubtype'
+        type:
+          $ref: '#/components/schemas/BondType'
+        updated_at:
+          $ref: '#/components/schemas/UpdatedAt'
+        workout_date:
+          $ref: '#/components/schemas/WorkoutDate'
+      title: InstrumentInfo
+    BankQualified_2:
+      description: Indicates whether the bond is bank qualified, which is a type of municipal bond specifically designated for purchase by commercial banks. Bank qualified bonds can offer specific tax benefits because they allow banks to deduct interest costs of carrying the bond. For example, they must be issued by a small issuer who expects to issue no more than $10 million in bonds during a calendar year. Banks can also deduct 80% of the interest expense they incur to buy and carry these bonds.
+      type: boolean
+      example: true
+    CouponType_2:
+      description: 'The type of coupon rate.
+
+        * fixed: The coupon payment is a fixed percentage of the bond''s par value.
+
+        * floating: The coupon payment is pegged to some benchmark rate that frequently changes based off a benchmark, such as SOFR. Typically, the coupon payment is the benchmark rate plus a spread.
+
+        * variable: The coupon payment changes over the life of the bond. Similar to a floating rate, but typically updates less frequently, such as once every coupon payment.
+
+        * zero: Zero-coupon bonds do not pay a coupon over their lifetime.
+
+        * complex: A coupon rate that does not belong in any of the above categories.'
+      type:
+      - string
+      - 'null'
+      example: fixed
+      enum:
+      - fixed
+      - floating
+      - variable
+      - zero
+      - complex
+    Convexity_2:
+      description: 'The convexity of a bond measures the degree to which the duration of a bond changes as interest rates change. While duration estimates a bond''s price sensitivity to small interest rate movements, convexity accounts for the fact that this relationship is not linear—especially for larger rate changes. A bond with higher convexity will exhibit more price gain when interest rates fall and less price loss when rates rise, compared to a bond with lower convexity. Moment provides effective convexity, which approximates this curvature by comparing the bond''s price change under small upward and downward shifts in yield. Note: this field is available to users licensed for pricing analytics only.'
+      type:
+      - number
+      - 'null'
+      format: double
+      example: 0.41
+    LowestRatingRank:
+      description: 'Integer rank of the bond''s lowest credit rating across the rating agencies, mapped onto a numeric scale of 2 (D, lowest) to 27 (AAA, highest) — a higher rank means better credit. 0 means not rated / unrated / unknown: no rating is available from any agency, or the rating is NR or NULL. This is a computed field derived from the underlying agency rating strings, not raw vendor reference data, and is always present as an integer (it is never null; unrated bonds are 0, not null). Caveat for objective_function arithmetic: an unrated bond''s rank evaluates to 0, i.e. it is treated as *worse* than D (rank 2) rather than excluded. If you want to exclude unrated bonds instead of ranking them below D, filter on the rating string fields (e.g. sp_rating). Bucket AVG() aggregations exclude the 0 (unrated) values rather than averaging them in.'
+      type: integer
+      example: 19
+      maximum: 27
+      minimum: 0
+    CloseYTW_2:
+      description: 'The close Yield to Worst refers to the YTW of the last transaction of a security before the market officially closes for normal trading. Note: available to users licensed for end-of-day prices only.'
+      type:
+      - number
+      - 'null'
+      format: double
+      example: 5.486
+    SettlementConvention_2:
+      description: The standard process through which the legal transfer of bonds from the seller to the buyer is completed, and payment is made by the buyer, including details like the timing and the specific procedures involved in the settlement of a trade.
+      type:
+      - string
+      - 'null'
+      example: T+2
+    MaturityDate_2:
+      description: 'The date on which the bond matures and the principal amount is paid back to the bondholder by the issuer. Note: not all bonds have a maturity date, such as perpetual bonds.'
+      type:
+      - string
+      - 'null'
+      format: date
+      example: '2023-01-15'
+    EmergingStatus:
+      description: The emerging-vs-developed-market classification of the bond, sourced from ICE. This is the field to use to answer "is this bond EM?" — use `emerging_status = Emerging` to include emerging markets and `emerging_status = Developed` to exclude them. May be null when ICE has not classified the instrument.
+      type:
+      - string
+      - 'null'
+      example: Developed
+      enum:
+      - Developed
+      - Emerging
+    Duration_2:
+      description: 'The duration of a bond represents how long it will take, on average, to receive the returns of investment, including the regular interest payments on the bond as well as the final lump sum payment. Moment provides modified duration, a modification of Macaulay duration (which measures the weighted average time it takes to receive all cash flows, both interest and principal, from a bond). Modified duration provides a more direct measure of a bond''s price sensitivity to interest rates, as it provides an estimate for how much the price of a bond will change in response to a 1% change in interest rates. Note: this field is available to users licensed for pricing analytics only.'
+      type:
+      - number
+      - 'null'
+      format: double
+      example: 0.71
+    LiveInventoryItem:
+      allOf:
+      - $ref: '#/components/schemas/InstrumentInfo_2'
+      - title: InstrumentInfo
+      - type: object
+      - description: Live inventory data
+      - additionalProperties: true
+      - properties:
+          asks:
+            description: The asks
+            type:
+            - array
+            - 'null'
+            items:
+              type: object
+              properties:
+                effective_markup:
+                  description: The effective markup of the ask
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                min_balance_remaining:
+                  description: Minimum balance remaining after a partial fill.
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                min_increment:
+                  description: Minimum increment for order sizing.
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                min_quantity:
+                  description: The minimum quantity of the ask
+                  type: number
+                pre_fee_price:
+                  description: The pre-fee price of the ask.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                pre_fee_yield_to_maturity:
+                  description: The pre-fee yield to maturity of the ask.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                pre_fee_yield_to_worst:
+                  description: The pre-fee yield to worst of the ask.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                price:
+                  description: The price of the ask
+                  type: number
+                quantity:
+                  description: The quantity of the ask
+                  type: number
+                yield_to_maturity:
+                  description: The yield to maturity of the ask
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                yield_to_worst:
+                  description: The yield to worst of the ask
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+          bids:
+            description: The bids
+            type:
+            - array
+            - 'null'
+            items:
+              type: object
+              properties:
+                effective_markup:
+                  description: The effective markup of the bid
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                min_balance_remaining:
+                  description: Minimum balance remaining after a partial fill.
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                min_increment:
+                  description: Minimum increment for order sizing.
+                  type:
+                  - integer
+                  - 'null'
+                  format: int64
+                min_quantity:
+                  description: The minimum quantity of the bid
+                  type: number
+                pre_fee_price:
+                  description: The pre-fee price of the bid.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                pre_fee_yield_to_maturity:
+                  description: The pre-fee yield to maturity of the bid.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                pre_fee_yield_to_worst:
+                  description: The pre-fee yield to worst of the bid.
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                price:
+                  description: The price of the bid
+                  type: number
+                quantity:
+                  description: The quantity of the bid
+                  type: number
+                yield_to_maturity:
+                  description: The yield to maturity of the bid
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+                yield_to_worst:
+                  description: The yield to worst of the bid
+                  type:
+                  - number
+                  - 'null'
+                  format: double
+    Callable_2:
+      description: Whether the bond is callable, meaning the issuer has the right, but not the obligation to redeem the bond — in other words, pay out the bondholder — before its maturity date at a set price (the call price).
+      type:
+      - boolean
+      - 'null'
+      example: true
+    CountryIssue_2:
+      description: 'The country where the security is issued/registered, in the 2-alpha country code format (e.g., US, CA). This is the registration country, NOT the risk country: an SEC-registered Yankee bond is `US` here even when its issuer and economic risk sit elsewhere. For risk-geography decisions use `country_of_risk` (and `emerging_status` for EM/DM), not this field.'
+      type:
+      - string
+      - 'null'
+      example: US
+    InventoryFilter:
+      description: 'In a filter object, each key is either a field to filter on or an operator.
+
+        Each value is either a filter condition object or, in the case of certain
+
+        operators, an array of filter objects.
+
+
+        Some of the fields which can be filtered on are explicitly defined on this schema.
+
+        Any of the other fields in the reference data model can be used as an
+
+        InventoryFilter key.'
+      type: object
+      properties:
+        and:
+          description: Filter operator key with array value of filter objects to be combined with AND.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryFilter'
+        country_issue:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        country_of_risk:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        coupon:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        currency:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        cusip:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        description:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        emerging_status:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        isin:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        issue_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        issuer:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        lowest_rating:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        maturity_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        min_trade_market_value:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        naics_sector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        naics_subsector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        not:
+          description: Filter operator key with a filter object to be negated.
+          $ref: '#/components/schemas/InventoryFilter'
+        objective_score:
+          description: 'Filter on the computed objective score. Requires an
+
+            `objective_function` in the request — the score is computed from
+
+            it per bond. Supports only the numeric comparison operators
+
+            (equal_to, not_equal_to, greater_than, greater_than_or_equal_to,
+
+            less_than, less_than_or_equal_to) and is_null, with numeric
+
+            values. Combine with `sort_by: ["objective_score.desc"]` to rank
+
+            and threshold in one query.'
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        or:
+          description: Filter operator key with array value of filter objects to be combined with OR.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryFilter'
+        pre_fee_price:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        pre_fee_yield_to_maturity:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        pre_fee_yield_to_worst:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        price:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        sector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        sp_rating:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        treasury_benchmark:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        type:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        workout_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        yield_to_maturity:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        yield_to_worst:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+      example:
+        best_bid_yield:
+          greater_than: 6.5
+        maturity_date:
+          less_than: '2030-01-01'
+          greater_than: '2026-01-01'
+        sp_rating:
+          greater_than: BBB
+        issuer:
+          includes: Apple
+        liquidity_institutional_buy:
+          in:
+          - 3
+          - 4
+          - 5
+        or:
+        - description:
+            starts_with: app
+        - description:
+            starts_with: united
+      additionalProperties:
+        $ref: '#/components/schemas/InventoryFilterCondition'
+    CountryDomicile_2:
+      description: The country where the bond/issuer legally resides, in the 2-alpha country code format (e.g., US, CA). Differs from `country_issue` when a security is registered in one country for an issuer that resides in another — e.g. a Brazilian corporation issuing an SEC-registered bond in the US is `country_issue` = US but `country_domicile` = BR. For risk-geography decisions prefer `country_of_risk`.
+      type:
+      - string
+      - 'null'
+      example: US
+    LowestRating:
+      description: 'The bond''s lowest (worst) credit rating across S&P, Moody''s, and Fitch, expressed as a string on the S&P scale in the standard AAA - D format. Moody''s ratings are converted to their S&P equivalent before comparison, so the returned value is always S&P notation regardless of which agency supplied the worst rating. Agencies reporting NR/WR/WD are skipped, so a single agency''s not-rated or withdrawn marker does not outweigh a real rating from another agency; NR is returned only when no agency provides a real rating. Null if no agency reports any value. See lowest_rating_rank for the numeric form used in sorting and objective_function arithmetic. Note: this is a computed field derived from the underlying agency rating strings, not raw vendor reference data. Because it may be sourced from Standard & Poor''s, it is available to S&P licensed users only. This data includes Standard & Poor''s (S&P) ratings and related financial information. S&P ratings and data are proprietary to Standard & Poor''s Financial Services LLC. The information is used under license and is subject to copyright and other intellectual property rights held by Standard & Poor''s or its affiliates.'
+      type:
+      - string
+      - 'null'
+      example: BBB+
+    MunicipalTaxableFederal_2:
+      description: Whether a municipal bond is subject to US federal taxes. Only specified for municipal bonds.
+      type: boolean
+      example: false
+    LiveInventoryResponsePOST:
+      type: object
+      properties:
+        count:
+          description: The total number of instruments found that match the query.
+          type: integer
+        data:
+          description: The array of live inventory data, with only the fields that the user requests.
+          type: array
+          items:
+            $ref: '#/components/schemas/LiveInventoryItem'
+        next_page:
+          description: The next page number of results (if any exist). Null if no more pages.
+          type:
+          - integer
+          - 'null'
+        prev_page:
+          description: The previous page number of results (if any exist). Null if no earlier pages.
+          type:
+          - integer
+          - 'null'
+        warnings:
+          description: Warning messages about requested fields that don't exist or other non-fatal issues.
+          type: array
+          items:
+            type: string
+          example:
+          - Unknown field 'invalid_field' requested in returns parameter
+          x-omitzero: true
+      title: LiveInventoryResponsePOST
+    CountryOfRisk:
+      description: The country whose economy/credit the bond is exposed to — the risk country, in the 2-alpha country code format (e.g., US, ID, CN). This is the field to use for risk-geography decisions; it can differ from both `country_issue` (registration) and `country_domicile` (legal residence). For example, an emerging-market sovereign or corporate issuing an SEC-registered USD bond is `country_issue` = US but `country_of_risk` = the EM country.
+      type:
+      - string
+      - 'null'
+      example: US
+    InventoryReturnField:
+      description: "A field that can be requested in the `returns` array. Fields come from\nthree distinct sources — choose based on whether you want the live\nmarket or an evaluated model price:\n\n1. LIVE ORDER BOOK (real, executable quotes from dealers):\n   - `bids` / `asks`: full depth — every individual quote with its own\n     price, quantity, min_quantity, and yield_to_worst.\n   - `best_ask_ytw`: the live top-of-book ask yield — the YTW of the\n     best offer (lowest price, i.e. highest yield). Use this (or read\n     `asks`) for \"what's the yield on this bond / the best offer to buy\n     at\".\n   - `best_bid_ytw`: the live top-of-book bid yield — the YTW of the\n     best bid (highest price, i.e. lowest yield). Use this (or read\n     `bids`) for \"what could I sell this at\".\n   - `best_ask_price` / `best_bid_price`: the live top-of-book ask/bid\n     PRICE — the price of the same best offer/bid as `best_ask_ytw` /\n     `best_bid_ytw`. Use these (or read `asks` / `bids`) for \"what's the\n     price of the best offer / what could I sell this at\"; do NOT use the\n     deprecated `ask_price` / `bid_price`, which are evaluated-model\n     values, not live quotes.\n   - `best_ask_post_tax_ytw` / `best_bid_post_tax_ytw`,\n     `best_ask_tax_equivalent_yield` / `best_bid_tax_equivalent_yield`,\n     `market_spread_*`: derived from the live order book.\n\n2. EVALUATED MODEL (price-estimates feed — a modeled valuation, NOT a\n   live tradable quote):\n   - `eval_price` / `eval_ytw` / `eval_ytm`: the mid evaluated value.\n   - `eval_bid_*` / `eval_ask_*` / `eval_mid_*` (price, ytw, ytm, ytc,\n     spreads, oas): the evaluated curve's bid/ask/mid values. These are\n     model outputs, not order-book quotes.\n   - `ask_eval_ytw_diff` / `bid_eval_ytw_diff` (and the `_price_diff`\n     variants): live best book yield/price MINUS the evaluated value.\n\n3. REFERENCE / STATIC DATA: identifiers, descriptive, ratings, dates,\n   call schedule, etc. (`isin`, `cusip`, `issuer`, `coupon`, ...).\n\nDEPRECATED — a non-deprecated alternative always exists, so always find\nit and use it instead: the bare `bid_*` / `ask_*` / `mid_*` families\n(`ask_ytw`, `bid_ytw`, `mid_ytw`, `ask_price`, `bid_price`, `ask_oas`,\n`ask_ytw_spread_bps`, ...) are EVALUATED-MODEL values, NOT live\norder-book quotes despite the bid/ask naming. Each is an exact alias of\nits `eval_`-prefixed counterpart (e.g. `ask_ytw` == `eval_ask_ytw`,\n`ask_price` == `eval_ask_price`). They are retained only for backward\ncompatibility and will be removed. For the evaluated value use the\nexplicit `eval_*` name (`eval_ask_price`, `eval_ask_ytw`, ...); for the\nlive top-of-book use `best_ask_price` / `best_bid_price` /\n`best_ask_ytw` / `best_bid_ytw` or the `asks` / `bids` arrays.\n"
+      type: string
+      enum:
+      - bids
+      - asks
+      - isin
+      - cusip
+      - issuer
+      - sector
+      - naics_sector
+      - naics_subsector
+      - treasury_benchmark
+      - description
+      - type
+      - issue_size
+      - issue_price
+      - issue_date
+      - maturity_date
+      - workout_date
+      - sp_rating
+      - duration
+      - convexity
+      - coupon
+      - coupon_frequency
+      - next_coupon_date
+      - callable
+      - call_type
+      - next_call_date
+      - next_call_price
+      - convertible
+      - par_value
+      - principal_factor
+      - insured
+      - accrued_interest
+      - municipal_state
+      - municipal_type
+      - purpose
+      - municipal_taxable_federal
+      - bank_qualified
+      - is_amt_applicable
+      - treasury_subtype
+      - ticker
+      - coupon_type
+      - description_short
+      - sp_rating_date
+      - sinking_fund
+      - is_144a
+      - reg_s
+      - private_placement
+      - daycount
+      - first_coupon_date
+      - last_coupon_date
+      - perpetual
+      - fdic_insured
+      - country_issue
+      - country_domicile
+      - country_of_risk
+      - emerging_status
+      - currency
+      - sp_creditwatch
+      - sp_creditwatch_date
+      - sp_outlook
+      - sp_outlook_date
+      - lowest_rating
+      - close_price
+      - close_ytw
+      - close_ytm
+      - liquidity_micro_buy
+      - liquidity_micro_sell
+      - liquidity_micro_aggregate
+      - liquidity_retail_buy
+      - liquidity_retail_sell
+      - liquidity_retail_aggregate
+      - liquidity_institutional_buy
+      - liquidity_institutional_sell
+      - liquidity_institutional_aggregate
+      - issue_minimum
+      - seniority
+      - bond_warrant
+      - is_structured_product
+      - puttable
+      - dated_date
+      - settlement_convention
+      - trace_eligible
+      - market_spread_price
+      - market_spread_ytw
+      - market_spread_ytm
+      - eval_price
+      - eval_ytw
+      - eval_ytm
+      - ask_eval_price_diff
+      - bid_eval_price_diff
+      - ask_eval_ytw_diff
+      - bid_eval_ytw_diff
+      - min_trade_market_value
+      - best_ask_tax_equivalent_yield
+      - best_bid_tax_equivalent_yield
+      - best_ask_post_tax_ytw
+      - best_bid_post_tax_ytw
+      - best_ask_ytw
+      - best_bid_ytw
+      - best_ask_price
+      - best_bid_price
+      - bid_price
+      - ask_price
+      - mid_price
+      - bid_ytm
+      - ask_ytm
+      - mid_ytm
+      - bid_ytw
+      - ask_ytw
+      - mid_ytw
+      - bid_ytc
+      - ask_ytc
+      - mid_ytc
+      - eval_bid_price
+      - eval_ask_price
+      - eval_mid_price
+      - eval_bid_ytm
+      - eval_ask_ytm
+      - eval_mid_ytm
+      - eval_bid_ytw
+      - eval_ask_ytw
+      - eval_mid_ytw
+      - eval_bid_ytc
+      - eval_ask_ytc
+      - eval_mid_ytc
+      - eval_bid_ytw_spread_bps
+      - eval_ask_ytw_spread_bps
+      - eval_mid_ytw_spread_bps
+      - eval_bid_g_spread
+      - eval_ask_g_spread
+      - eval_mid_g_spread
+      - eval_bid_z_spread
+      - eval_ask_z_spread
+      - eval_mid_z_spread
+      - eval_bid_oas
+      - eval_ask_oas
+      - eval_mid_oas
+      - eval_bid_i_spread
+      - eval_ask_i_spread
+      - eval_mid_i_spread
+      - benchmark_isin
+      - benchmark_yield
+      - bid_ytw_spread_bps
+      - ask_ytw_spread_bps
+      - mid_ytw_spread_bps
+      - bid_g_spread
+      - ask_g_spread
+      - mid_g_spread
+      - bid_z_spread
+      - ask_z_spread
+      - mid_z_spread
+      - bid_oas
+      - ask_oas
+      - mid_oas
+      - bid_i_spread
+      - ask_i_spread
+      - mid_i_spread
+      - effective_duration
+      - duration_times_spread
+      - objective_score
+      - objective_score_decomposition
+      - filter_lists
+    DayCount_2:
+      description: 'The day count convention used to calculate accrued interest.
+
+        * A/360: calculates the daily interest using a 360-day year and then multiplies that by the actual number of days in each time period.
+
+        * A/365: calculates the daily interest using a 365-day year and then multiplies that by the actual number of days in each time period.
+
+        * 30/360: calculates the daily interest using a 360-day year and then multiplies that by 30 (standardized month).
+
+        * A/A: calculates the daily interest using the actual number of days in the year and then multiplies that by the actual number of days in each time period.
+
+        * 30E/360: number of days equals to the actual number of days (for February). If the start date or the end date of the period is the 31st of a month, that date is set to the 30th. The number of days in a year is 360.
+
+        * B/252: calculates the daily interest using a 252-business-day year and then multiplies that by the actual number of days in each time period.
+
+        * A/364: calculates the daily interest using a 364-day year and then multiplies that by the actual number of days in each time period.'
+      type:
+      - string
+      - 'null'
+      example: 30/360
+      enum:
+      - A/360
+      - A/365
+      - 30/360
+      - 30/365
+      - A/A
+      - 30E/360
+      - B/252
+      - A/364
+  parameters:
+    page_size:
+      name: page_size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+      description: Number of items to return. Must be in range 1-1000, defaults to 100.
+    instrument_id:
+      name: instrument_id
+      in: path
+      required: true
+      description: Instrument CUSIP or ISIN
+      schema:
+        type: string
+        example: US91915WAB81
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: Page number of results to return. Defaults to 1.
+    bond_type:
+      name: type
+      description: Filter by a specific bond type.
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - agency
+        - cd
+        - corporate
+        - government
+        - municipal
+        - treasury
+        example: corporate
+    status:
+      name: status
+      description: Filter by a specific bond status.
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - called
+        - converted
+        - defaulted
+        - funged
+        - liquidated
+        - matured
+        - outstanding
+        - pre_issuance
+        - put
+        - repaid
+        - tendered
+        - repurchased
+        - restructured
+        - unknown
+        example: outstanding
+    objective_function:
+      name: objective_function
+      description: 'JSON-encoded objective function that defines the scoring formula for ranking bonds.
+
+        When provided alongside objective_score in returns, the server computes a score for each bond.
+
+
+        `order_price`, `order_ytw` and `order_ytm` score the top of the book on the scoring
+
+        side (`objective_side`, or `side` when absent), falling back to price estimates; an
+
+        objective referencing them requires a scoring side (400 otherwise) and risk group
+
+        headers. `spread_to_benchmark` is an accepted optimizer alias for
+
+        `mid_ytw_spread_bps`, valid only inside the objective.'
+      in: query
+      required: false
+      schema:
+        type: string
+    trade_size:
+      name: trade_size
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 'Filtering by trade_size will only return `asks` and `bids` that would
+
+        completely fill an order of the specified quantity. More specifically,
+
+        it will return quotes where the minimum quantity is less than or equal
+
+        to the specified trade_size and the total quantity is greater than or
+
+        equal to the specified trade_size. Optionally, set value to "lowest" to
+
+        get all the quotes sorted from least to greatest `min_quantity`.'
+    inventory_filters:
+      name: filters
+      description: "The filters for live inventory are in the format of a JSON object. In a\nfilter object, each key is either a field to filter on or an operator.\nEach value is either a filter condition object or, in the case of\ncertain operators, an array of filter objects.\n\nA filter condition object can contain the following fields:\n\n* equal_to: Exact value for the filter.\n* not_equal_to: Not equal to value for the filter.\n* greater_than: Greater than value for the filter.\n* greater_than_or_equal_to: Greater than or equal to value for the filter.\n* less_than: Less than value for the filter.\n* less_than_or_equal_to: Less than or equal to value for the filter.\n* in: Array of values for the filter.\n* not_in: Array of values not to include in the filter.\n* is_null: Boolean to filter for null / not-null values.\n* includes: String to include in the filter.\n* not_includes: String not to include in the filter.\n* starts_with: String to start with in the filter.\n* ends_with: String to end with in the filter.\n\nThe fields that can be filtered on are:\n\n* price\n* yield_to_maturity\n* yield_to_worst\n* isin\n* cusip\n* issuer\n* sector\n* description\n* type\n* issue_date\n* maturity_date\n* workout_date\n* treasury_benchmark\n* sp_rating\n* lowest_rating\n* lowest_rating_rank\n* coupon\n* currency\n* country_issue\n* country_of_risk\n* emerging_status\n* liquidity_micro_buy\n* liquidity_micro_sell\n* liquidity_micro_aggregate\n* liquidity_retail_buy\n* liquidity_retail_sell\n* liquidity_retail_aggregate\n* liquidity_institutional_buy\n* liquidity_institutional_sell\n* liquidity_institutional_aggregate\n* Any of the other fields in the reference data model.\n\nThe operators that can be used are:\n* and: Array of filter objects to be combined with an AND operator.\n* not: Filter object to be negated.\n* or: Array of filter objects to be combined with an OR operator.\n\nFor example, a sample filter object might look like this:\n\n```json\n{\n  \"yield_to_worst\": {\n    \"greater_than\": 6.5\n  },\n  \"price\": {\n    \"less_than\": 100\n  },\n  \"maturity_date\": {\n    \"less_than\": \"2030-01-01\",\n    \"greater_than\": \"2026-01-01\"\n  },\n  \"sp_rating\": {\n    \"greater_than\": \"BBB\"\n  },\n  \"issuer\": {\n    \"includes\": \"Apple\"\n  },\n  \"liquidity_institutional_buy\": {\n    \"in\": [3, 4, 5]\n  },\n  \"or\": [\n    {\n      \"description\": {\n        \"starts_with\": \"app\"\n      }\n    },\n    {\n      \"description\": {\n        \"starts_with\": \"united\"\n      }\n    }\n  ]\n}\n```\n\nThis must be encoded as a JSON string in the query parameter."
+      in: query
+      required: true
+      schema:
+        type: string
+      example: "{\n  \"yield_to_worst\": {\n    \"greater_than\": 6.5\n  },\n  \"price\": {\n    \"less_than\": 100\n  },\n  \"maturity_date\": {\n    \"less_than\": \"2030-01-01\",\n    \"greater_than\": \"2026-01-01\"\n  },\n  \"sp_rating\": {\n    \"greater_than\": \"BBB\"\n  },\n  \"issuer\": {\n    \"includes\": \"Apple\"\n  },\n  \"liquidity_institutional_buy\": {\n    \"in\": [3, 4, 5]\n  }\n}\n"
+    inventory_returns:
+      name: returns
+      description: 'Fields returned for inventory filtering. In order to get live inventory
+
+        information, you must add `bids` and `asks` -- each of these fields
+
+        will be an array of existing inventory for a given instrument,
+
+        including information about its price, minimum quantity, total
+
+        quantity, and yield to worst (if available). Note that the inventory is
+
+        not inclusive of mark-ups.'
+      in: query
+      required: true
+      explode: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/InventoryReturnField'
+    inventory_sort_by:
+      name: sort_by
+      description: 'The fields to sort the results by. Each field can optionally specify a direction
+
+        by appending ''.asc'' or ''.desc''. If no direction is specified, defaults to ascending order.
+
+
+        Examples:
+
+        - isin.asc
+
+        - cusip.desc
+
+        - par_value.asc
+
+        - maturity_date
+
+        - issuer'
+      in: query
+      required: false
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      example:
+      - isin.asc
+      - maturity_date.desc
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-refined-from:
+- moment-data-api-openapi.yml
+- moment-live-inventory-api-openapi.yml
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/addfixipallowlist.md
+  - https://docs.moment.com/reference/getfixipallowlist.md
+  - https://docs.moment.com/reference/removefixipallowlist.md
+  - https://docs.moment.com/reference/updateorganizationipallowlist.md
+  merge:
+    pages: 4
+    deduped: 7
+    conflicts_kept_first: 0

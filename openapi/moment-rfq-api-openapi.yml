@@ -1,22 +1,44 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: RFQ API
-  description: 'Moment''s RFQ API is a modern platform for algorithmic fixed income trading, for placing, retrieving, and updating Requests For Quote (RFQ).
-
-
-    For complete documentation on the RFQ API and to obtain your keys head to https://withmoment.com/docs/api-documentation/api-v1/. Once you have your keys, head to the environments tab to quickly get started.'
+  title: Moment RFQ API
   version: 1.0.0
   contact:
     name: Moment Support
     email: support@withmoment.com
     url: https://withmoment.com/support
+  description: 'Operations tagged RFQ across 2 of this provider''s published API definitions: moment-orders-api-openapi.yml, moment-rfq-api-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://live.moment-api.com
 - url: https://paper.moment-api.com
-security:
-- bearerAuth: []
+tags:
+- name: RFQ
 paths:
   /v1/trading/rfq/:
+    post:
+      tags:
+      - RFQ
+      summary: Create RFQ
+      description: Creates a new RFQ.
+      operationId: createRFQ
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRFQ'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRFQResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
     get:
       tags:
       - RFQ
@@ -113,25 +135,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-    post:
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/trading/rfq/{id}/:
+    delete:
       tags:
       - RFQ
-      summary: Create RFQ
-      description: Creates a new RFQ.
-      operationId: createRFQ
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateRFQ'
+      summary: Cancel RFQ
+      description: Attempts to cancel an open RFQ. If the RFQ is no longer cancelable, a subsequent cancel reject event will be sent to the client via the Real-Time RFQ API.
+      operationId: deleteRfq
+      parameters:
+      - name: id
+        in: path
+        description: The id of the RFQ you wish to cancel.
         required: true
+        schema:
+          type: string
       responses:
-        '201':
+        '204':
+          description: Successful response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    get:
+      tags:
+      - RFQ
+      summary: Get RFQ
+      description: Retrieves an RFQ by its id.
+      operationId: getRFQ
+      parameters:
+      - name: id
+        in: path
+        description: The id of the RFQ you wish to retrieve.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateRFQResponse'
+                $ref: '#/components/schemas/GetRFQResponse'
         '400':
           description: Bad Request
           content:
@@ -144,6 +193,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
   /v1/trading/rfq/event/:
     get:
       tags:
@@ -202,6 +260,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
   /v1/trading/rfq/list/:
     post:
       tags:
@@ -234,470 +297,223 @@ paths:
             application/json:
               schema:
                 $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-  /v1/trading/rfq/{id}/:
-    delete:
-      tags:
-      - RFQ
-      summary: Cancel RFQ
-      description: Attempts to cancel an open RFQ. If the RFQ is no longer cancelable, a subsequent cancel reject event will be sent to the client via the Real-Time RFQ API.
-      operationId: deleteRfq
-      parameters:
-      - name: id
-        in: path
-        description: The id of the RFQ you wish to cancel.
-        required: true
-        schema:
-          type: string
-      responses:
-        '204':
-          description: Successful response
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-    get:
-      tags:
-      - RFQ
-      summary: Get RFQ
-      description: Retrieves an RFQ by its id.
-      operationId: getRFQ
-      parameters:
-      - name: id
-        in: path
-        description: The id of the RFQ you wish to retrieve.
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetRFQResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/paths/~1v1~1trading~1rfq~1/get/responses/400/content/application~1json/schema'
-tags:
-- name: RFQ
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
 components:
   schemas:
-    RFQ:
+    OrderSize:
+      type: object
+      title: Amount
+      description: 'The Amount of an order with a specified `type` indicating how the amount is represented.
+
+        - **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).
+
+        - **Notional:** Represents the order size in notional dollar value.
+
+        - **Shares:** Represents the order size in number of shares (for equities).'
+      properties:
+        value:
+          type: number
+          example: 10000
+          x-go-type: float64
+        type:
+          type: string
+          enum:
+          - par
+          - notional
+          - shares
+          default: par
+          x-enumNames:
+          - SizeTypePar
+          - SizeTypeNotional
+          - SizeTypeShares
+      required:
+      - value
+      - type
+    IntroducingBrokerID:
+      description: The ID of the introducing broker placing the order. If not specified, the organization associated with the API key will be used.
+      type: string
+    OrderSide:
+      type: string
+      enum:
+      - buy
+      - sell
+      example: buy
+      title: OrderSide
+      description: 'Represents which side this order is on:
+
+
+        - buy
+
+        - sell'
+    DisclosureType:
+      description: Disclosure types
+      type: string
+      enum:
+      - disclosed
+      - anonymous
+      - unspecified
+    CreateRFQ:
+      description: Request body for creating a standalone RFQ.
       type: object
       properties:
         amount:
-          $ref: '#/components/schemas/Size'
+          $ref: '#/components/schemas/OrderSize'
         client_rfq_id:
-          $ref: '#/components/schemas/ClientRFQID'
-        contra_quote_id:
-          $ref: '#/components/schemas/ContraQuoteIDNullable'
-        created_at:
-          $ref: '#/components/schemas/CreatedAtNullable'
+          description: The ID of the RFQ as provided by the client.
+          type: string
+          title: Client RFQ ID
+        custodian_id:
+          description: The ID of the custodian for the RFQ. This field is required when venue is TMC.
+          type: string
         disclosure:
-          $ref: '#/components/schemas/Disclosure'
+          $ref: '#/components/schemas/DisclosureType'
         due_time:
-          $ref: '#/components/schemas/DueTimeNullable'
+          description: The time at which quotes for this RFQ are due.
+          type: string
+          format: date-time
         expire_time:
-          $ref: '#/components/schemas/ExpireTimeNullable'
+          description: The time at which the RFQ will expire.
+          type: string
+          format: date-time
         firm_until_time:
-          $ref: '#/components/schemas/FirmUntilTimeNullable'
+          description: The time until which the quotes for this RFQ are firm.
+          type: string
+          format: date-time
         ib_id:
           $ref: '#/components/schemas/IntroducingBrokerID'
-        id:
-          $ref: '#/components/schemas/RFQID'
-        isin:
-          $ref: '#/components/schemas/ISIN'
-        list_id:
-          description: The ID of the list this RFQ belongs to, if any.
+        instrument_id:
+          description: The ISIN of the instrument being traded.
           type: string
-          title: List id
-        list_name:
-          description: The name of the list this RFQ belongs to, if any.
+        moment_order_id:
+          description: When creating an RFQ to trade against an existing order, the identifier of the corresponding order.
           type: string
-          title: List name
-        quote_responses:
-          type: array
-          items:
-            $ref: '#/components/schemas/RFQQuoteResponse'
-        quotes:
-          type: array
-          items:
-            $ref: '#/components/schemas/RFQQuote'
+          example: 01FJ4B9B2D3H5Y8N0R0X3FQ1Z5
+          title: Moment Order ID
+          x-go-name: MomentOrderID
         risk_group_id:
           $ref: '#/components/schemas/RiskGroupID'
         settlement_date:
           description: The date on which the trade for this RFQ is to be settled.
-          type: string
+          type:
+          - string
+          - 'null'
           format: date
-          nullable: true
-          x-go-type: date.Date
-          x-go-type-import:
-            path: github.com/moment-technology/core-api/pkg/date
         side:
-          $ref: '#/components/schemas/Side'
+          $ref: '#/components/schemas/OrderSide'
         skip_fees:
           description: Whether to skip fees for this RFQ. If true, the quotes will not include fees.
           type: boolean
-        status:
-          $ref: '#/components/schemas/Status'
         type:
-          $ref: '#/components/schemas/Type'
+          $ref: '#/components/schemas/RFQType'
         venue_mpid:
-          $ref: '#/components/schemas/VenueMPID'
+          description: The Market Participant Identifier (MPID) of the venue.
+          type: string
         venue_trader_info:
           $ref: '#/components/schemas/VenueTraderInfo'
       required:
-      - id
-      - client_rfq_id
-      - contra_quote_id
       - ib_id
       - risk_group_id
-      - isin
+      - instrument_id
       - type
       - side
       - amount
       - venue_mpid
       - disclosure
-      - expire_time
-      - due_time
-      - firm_until_time
-      - settlement_date
-      - created_at
-      - status
-      - quotes
-      - quote_responses
-      - skip_fees
-    GetRFQResponse:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQ'
-      - type: object
-        required:
-        - latest_msg_num
-        properties:
-          latest_msg_num:
-            description: The `msg_number` for the most recent RFQ event corresponding to this RFQ. This is a string representation of a 64-bit unsigned integer `YYYYMMDDxxxxxxxxxx`.
-            type: string
-    RFQQuote:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/Size'
-        counter_history:
-          description: History of counter offers for this quote.
-          type: array
-          items:
-            $ref: '#/components/schemas/CounterHistory'
-          nullable: true
-        counterable:
-          description: Whether the quote is counterable.
-          type: boolean
-          nullable: true
-        counterparty:
-          description: The Market Participant Identifier (MPID) of the counterparty providing the quote.
-          type: string
-          nullable: true
-        created_at:
-          description: The time at which the quote was created in RFC-3339 format.
-          type: string
-          format: date-time
-          nullable: true
-        expire_time:
-          $ref: '#/components/schemas/ExpireTimeNullable'
-        firm_until_time:
-          $ref: '#/components/schemas/FirmUntilTimeNullable'
-        is_subject:
-          description: Whether the quote is subject rather than firm.
-          type: boolean
-        price:
-          $ref: '#/components/schemas/Price'
-        side:
-          $ref: '#/components/schemas/Side'
-        spread_price:
-          $ref: '#/components/schemas/SpreadPrice'
-        updated_at:
-          description: The time at which the quote was last updated in RFC-3339 format.
-          type: string
-          format: date-time
-          nullable: true
-        venue_mpid:
-          $ref: '#/components/schemas/VenueMPID'
-        venue_price_type:
-          $ref: '#/components/schemas/PriceValueType'
-        venue_quote_id:
-          description: The quote ID as provided by the venue.
-          type: string
-        ytm:
-          description: The yield to maturity of the quote.
-          type: number
-          nullable: true
-          x-go-type: decimal.Decimal
-          x-go-type-import:
-            path: github.com/shopspring/decimal
-        ytw:
-          description: The yield to worst of the quote.
-          type: number
-          nullable: true
-          x-go-type: decimal.Decimal
-          x-go-type-import:
-            path: github.com/shopspring/decimal
-      required:
-      - venue_quote_id
-      - side
-      - amount
-      - price
-      - ytw
-      - ytm
-      - firm_until_time
-      - expire_time
-      - counterparty
-      - is_subject
-      - venue_mpid
-      - created_at
-      - updated_at
-    RFQQuoteResponse:
-      type: object
-      properties:
-        client_order_id:
-          $ref: '#/components/schemas/ClientOrderID'
-        contra_quote_id:
-          $ref: '#/components/schemas/ContraQuoteID'
-        created_at:
-          description: The time at which the quote response was created in RFC-3339 format.
-          type: string
-          format: date-time
-          nullable: true
-        id:
-          $ref: '#/components/schemas/OrderID'
-        status:
-          $ref: '#/components/schemas/RFQQuoteResponseStatus'
-      required:
-      - id
-      - client_order_id
-      - contra_quote_id
-      - status
-      - created_at
-    ClientRFQID:
-      description: The ID of the RFQ as provided by the client.
-      type: string
-      title: Client RFQ ID
-    ClientOrderID:
-      description: Client-provided unique ID for the order.
-      type: string
-      title: Client Order ID
-    ContraQuoteID:
-      description: The ID of the quote that is being traded against.
-      type: string
-      title: Contra Quote ID
-    ContraQuoteIDNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ContraQuoteID'
-      nullable: true
-    CreatedAt:
-      description: The time the RFQ was created in RFC-3339 format.
-      type: string
-      format: date-time
-      title: Created At
-    CreatedAtNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/CreatedAt'
-      nullable: true
-    Disclosure:
-      description: The disclosure for the RFQ. Currently, only `disclosed` is supported.
-      type: string
-      enum:
-      - disclosed
-      - anonymous
-      x-go-type: rfq.Disclosure
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/rfq
-    DueTime:
-      description: The time at which quotes for this RFQ are due.
-      type: string
-      format: date-time
-    DueTimeNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/DueTime'
-      nullable: true
-    ExpireTime:
-      description: The time at which the RFQ will expire.
-      type: string
-      format: date-time
-    ExpireTimeNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ExpireTime'
-      nullable: true
-    FirmUntilTime:
-      description: The time until which the quotes for this RFQ are firm.
-      type: string
-      format: date-time
-    FirmUntilTimeNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/FirmUntilTime'
-      nullable: true
-    IntroducingBrokerID:
-      description: The ID of the introducing broker placing the RFQ.
-      type: string
-      title: Introducing Broker ID
-      x-go-type: ulid.ULID
-      x-go-type-import:
-        path: github.com/moment-technology/go-shiny/pkg/ulid
-    RiskGroupID:
-      description: The ID of the risk group placing the RFQ.
-      type: string
-      title: Risk Group ID
-      x-go-type: ulid.ULID
-      x-go-type-import:
-        path: github.com/moment-technology/go-shiny/pkg/ulid
-    ISIN:
-      description: The ISIN of the instrument being traded.
-      type: string
-    OrderID:
-      description: Unique, Moment-generated ID for the order.
-      type: string
-      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
-      title: Order ID
-      x-go-type: ulid.ULID
-      x-go-type-import:
-        path: github.com/moment-technology/go-shiny/pkg/ulid
-    RFQID:
-      description: Unique, Moment-generated identifier for the RFQ.
-      type: string
-      example: 01JGEVEGS2X0EGYP1JK2X16AHV
-      x-go-type: ulid.ULID
-      x-go-type-import:
-        path: github.com/moment-technology/go-shiny/pkg/ulid
-    RFQQuoteResponseStatus:
-      description: The status of the quote response.
-      type: string
-      enum:
-      - open
-      - filled
-      - canceled
-      - rejected
-      - approved
-      x-go-type: rfq.QuoteResponseStatus
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/rfq
-    Price:
-      description: The price of the RFQ represented as a percentage of par.
-      type: number
-      x-go-type: decimal.Decimal
-      x-go-type-import:
-        path: github.com/shopspring/decimal
-    SpreadPrice:
-      description: The spread price of the RFQ represented as a percentage of par.
-      type: object
-      x-go-type: prices.SpreadPrice
-      x-go-type-import:
-        path: github.com/moment-technology/warren-protobuffett/types/go/prices
-    Size:
-      type: object
-      properties:
-        type:
-          description: The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.
-          type: string
-          default: par
-          enum:
-          - par
-          - notional
-        value:
-          description: The size of the RFQ.
-          type: integer
-      required:
-      - value
-      - type
-      x-go-type: parentorder.Size
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/parentorder
-    Side:
-      description: 'Represents which side this RFQ is on:
-
-        - buy (offers wanted)
-
-        - sell (bids wanted)'
-      type: string
-      enum:
-      - buy
-      - sell
-      x-go-type: parentorder.Side
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/parentorder
-    Status:
-      type: string
-      enum:
-      - open
-      - validating
-      - order_placed
-      - rejected
-      - expired
-      - canceled
-      - filled
-      x-go-type: rfq.Status
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/rfq
-    Type:
-      description: The type of the RFQ.
+    RFQType:
+      description: RFQ types
       type: string
       enum:
       - bin
       - asap
-      x-go-type: rfq.Type
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/rfq
-    VenueMPID:
-      description: The Market Participant Identifier (MPID) of the venue.
-      type: string
+      - unspecified
     VenueTraderInfo:
-      description: Trader information for a venue.
-      x-go-type: parentorder.VenueTraderInfo
-      x-go-type-import:
-        path: github.com/moment-technology/core-api/pkg/parentorder
-    CounterType:
-      description: 'The current status of the counter.
-
-        quoted: original quoted price
-
-        initiated: counter offer initiated by the client
-
-        negotiated: counter offer negotiated by dealer to client'
+      title: Venue Trader Info
+      type: object
+      required:
+      - venue_mpid
+      - custodian_id
+      - venue_trader_id
+      - custodian_account_at_venue
+      properties:
+        venue_mpid:
+          type: string
+          description: The MPID of the venue.
+          x-go-name: VenueMPID
+        custodian_id:
+          type: string
+          description: The ID of the custodian for the venue trader info.
+          x-go-name: CustodianID
+        venue_trader_id:
+          type: string
+          description: The ID of the venue trader.
+          x-go-name: VenueTraderID
+        custodian_account_at_venue:
+          type: string
+          description: The ID of the custodian account for the venue trader.
+    ErrorType:
       type: string
+      description: High-level error category for programmatic error handling.
       enum:
-      - quoted
-      - initiated
-      - negotiated
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
       x-enum-varnames:
-      - CounterTypeQuoted
-      - CounterTypeInitiated
-      - CounterTypeNegotiated
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    CreateRFQResponse:
+      type: object
+      properties:
+        rfq_id:
+          description: Unique, Moment-generated identifier for the RFQ.
+          type: string
+          example: 01JGEVEGS2X0EGYP1JK2X16AHV
+          x-go-name: RfqID
+      required:
+      - rfq_id
+    RiskGroupID:
+      description: The risk group ID to use for this order. If not specified, the default risk group for the organization will be used. The risk group must belong to the organization specified by ib_id. Orders for which the risk group does not belong to the specified organization will be rejected with "invalid risk group id."
+      type: string
+    ExpireTimeNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/ExpireTime'
     CounterHistory:
       description: History of counter offers for an RFQ quote response.
       type: object
@@ -706,14 +522,16 @@ components:
           $ref: '#/components/schemas/CounterType'
         created_at:
           description: The time at which the counter was created in RFC-3339 format.
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
-          nullable: true
         expires_at:
           description: The time at which the counter expires in RFC-3339 format.
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
-          nullable: true
         price:
           description: The price of the counter offer represented as a percentage of par.
           type: number
@@ -733,199 +551,30 @@ components:
           type: string
         settlement_date:
           description: The settlement date of the counter quote as a Unix timestamp.
-          type: integer
+          type:
+          - integer
+          - 'null'
           format: int64
-          nullable: true
         venue_price_type:
           description: The type of price used by the venue for this quote.
           $ref: '#/components/schemas/PriceValueType'
-    PriceValueType:
-      description: The method used to represent the price value.
-      type: string
-      default: percent
-      enum:
-      - percent
-      - discount_yield
-      - spread
-      - money_market_yield
-      title: Price Value Type
-      x-enumNames:
-      - PriceValueTypePercent
-      - PriceValueTypeDiscountYield
-      - PriceValueTypeSpread
-      - PriceValueTypeMMYield
-    ListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetRFQResponse'
-      required:
-      - data
-    CreateRFQ:
-      type: object
-      properties:
-        amount:
-          $ref: '#/components/schemas/Size'
-        client_rfq_id:
-          $ref: '#/components/schemas/ClientRFQID'
-        disclosure:
-          $ref: '#/components/schemas/Disclosure'
-        due_time:
-          $ref: '#/components/schemas/DueTime'
-        expire_time:
-          $ref: '#/components/schemas/ExpireTime'
-        firm_until_time:
-          $ref: '#/components/schemas/FirmUntilTime'
-        ib_id:
-          description: The ID of the introducing broker placing the RFQ.
-          type: string
-          title: Introducing Broker ID
-        instrument_id:
-          $ref: '#/components/schemas/ISIN'
-        moment_order_id:
-          description: When creating an RFQ to trade against an existing order, the identifier of the corresponding order.
-          type: string
-          example: 01FJ4B9B2D3H5Y8N0R0X3FQ1Z5
-          title: Moment Order ID
-          x-go-type: ulid.ULID
-          x-go-type-import:
-            path: github.com/moment-technology/go-shiny/pkg/ulid
-        risk_group_id:
-          description: The ID of the risk group placing the RFQ.
-          type: string
-          title: Risk Group ID
-        settlement_date:
-          description: The date on which the trade for this RFQ is to be settled.
-          type: string
-          format: date
-          nullable: true
-          x-go-type: date.Date
-          x-go-type-import:
-            path: github.com/moment-technology/core-api/pkg/date
-        side:
-          $ref: '#/components/schemas/Side'
-        skip_fees:
-          description: Whether to skip fees for this RFQ. If true, the quotes will not include fees.
-          type: boolean
-        type:
-          $ref: '#/components/schemas/Type'
-        venue_mpid:
-          $ref: '#/components/schemas/VenueMPID'
-        venue_trader_info:
-          $ref: '#/components/schemas/VenueTraderInfo'
-      required:
-      - ib_id
-      - risk_group_id
-      - instrument_id
-      - type
-      - side
-      - amount
-      - venue_mpid
-      - disclosure
-    CreateRFQResponse:
-      type: object
-      properties:
-        rfq_id:
-          $ref: '#/components/schemas/RFQID'
-      required:
-      - rfq_id
-    EventsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/EventResponse'
-      required:
-      - data
-    EventResponse:
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/RFQAck'
-      - $ref: '#/components/schemas/RFQApprove'
-      - $ref: '#/components/schemas/RFQReject'
-      - $ref: '#/components/schemas/RFQCancel'
-      - $ref: '#/components/schemas/RFQCancelReject'
-      - $ref: '#/components/schemas/RFQQuoteUpdate'
-      - $ref: '#/components/schemas/RFQExpire'
-      - $ref: '#/components/schemas/RFQFill'
-      - $ref: '#/components/schemas/RFQQuoteResponseReceive'
-      - $ref: '#/components/schemas/RFQQuoteResponseApprove'
-      - $ref: '#/components/schemas/RFQQuoteResponseReject'
-      - $ref: '#/components/schemas/RFQQuoteResponseCancel'
-      - $ref: '#/components/schemas/RFQDueTime'
-      - $ref: '#/components/schemas/RFQFirmUntilTime'
-    RFQEvent:
-      type: object
-      properties:
-        event_id:
-          $ref: '#/components/schemas/EventID'
-        msg_number:
-          description: The msg_number for the event. This is a string representation of a 64-bit unsigned integer YYYYMMDDxxxxxxxxxx where the x's are an incrementing index starting at 0000000000.
-          type: string
-      required:
-      - event_id
-      - msg_number
-    RFQEventSummary:
-      type: object
-      properties:
-        summary:
-          $ref: '#/components/schemas/RFQ'
-      required:
-      - summary
-    RFQAck:
+    DueTimeNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/DueTime'
+    GetRFQResponse:
       type: object
       allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
+      - $ref: '#/components/schemas/RFQ'
       - type: object
         required:
-        - msg_type
-        - event
+        - latest_msg_num
         properties:
-          event:
-            $ref: '#/components/schemas/RFQAckEvent'
-          msg_type:
+          latest_msg_num:
+            description: The `msg_number` for the most recent RFQ event corresponding to this RFQ. This is a string representation of a 64-bit unsigned integer `YYYYMMDDxxxxxxxxxx`.
             type: string
-            enum:
-            - rfq_update
-      title: RFQ Ack Event
-    RFQApprove:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQApproveEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Approve Event
-    RFQReject:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQRejectEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Reject Event
     RFQCancel:
       type: object
       allOf:
@@ -943,495 +592,18 @@ components:
             enum:
             - rfq_update
       title: RFQ Cancel Event
-    RFQCancelReject:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQCancelRejectEvent'
-          msg_type:
-            type: string
-            enum:
-            - system_update
-      title: RFQ Cancel Reject Event
-    RFQQuoteUpdate:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQQuoteUpdateEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Quote Update Event
-    RFQExpire:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQExpireEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Expire Event
-    RFQFill:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQFillEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Fill Event
-    RFQQuoteResponseReceive:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQQuoteResponseReceiveEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Quote Response Receive Event
-    RFQQuoteResponseApprove:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQQuoteResponseApproveEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Quote Response Approve Event
-    RFQQuoteResponseReject:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQQuoteResponseRejectEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Quote Response Reject Event
-    RFQQuoteResponseCancel:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQQuoteResponseCancelEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Quote Response Cancel Event
-    RFQDueTime:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQDueTimeEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Due Time Event
-    RFQFirmUntilTime:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQEvent'
-      - $ref: '#/components/schemas/RFQEventSummary'
-      - type: object
-        required:
-        - msg_type
-        - event
-        properties:
-          event:
-            $ref: '#/components/schemas/RFQFirmUntilTimeEvent'
-          msg_type:
-            type: string
-            enum:
-            - rfq_update
-      title: RFQ Firm Until Time Event
-    RFQQuoteResponseNullable:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/RFQQuoteResponse'
-      nullable: true
-    EventID:
-      description: A unique identifier for the event.
+    ContraQuoteID:
+      description: The ID of the quote that is being traded against.
       type: string
-    BaseRFQEvent:
-      type: object
-      properties:
-        client_rfq_id:
-          $ref: '#/components/schemas/ClientRFQID'
-        rfq_id:
-          $ref: '#/components/schemas/RFQID'
-        time:
-          description: The time at which the event occurred in RFC-3339 format.
-          type: string
-          format: date-time
-      required:
-      - time
-      - rfq_id
-      - client_rfq_id
-    RFQAckEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        properties:
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - ack
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-    RFQApproveEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        properties:
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - approve
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-    RFQRejectEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        - reason
-        properties:
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - reject
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-          reason:
-            description: The reason for the rejection.
-            type: string
-    RFQCancelEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        - reason
-        - cancel_request_id
-        properties:
-          cancel_request_id:
-            $ref: '#/components/schemas/CancelRequestID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - cancel
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-          reason:
-            description: The reason for the cancellation.
-            type: string
-    RFQCancelRejectEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - reason
-        - cancel_request_id
-        properties:
-          cancel_request_id:
-            $ref: '#/components/schemas/CancelRequestID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - cancel_reject
-          reason:
-            description: The reason for the rejection.
-            type: string
-    RFQQuoteUpdateEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        properties:
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - quote_update
-          quotes:
-            type: array
-            items:
-              $ref: '#/components/schemas/RFQQuote'
-          venue_update_id:
-            type: string
-    RFQExpireEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        - rfq_expired_at
-        properties:
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - expire
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-          rfq_expired_at:
-            description: The time at which the RFQ expired in RFC-3339 format.
-            type: string
-            format: date-time
-    RFQFillEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        - contra_quote_id
-        - order_id
-        - client_order_id
-        - filled_amount
-        - accrued_interest_cents
-        properties:
-          accrued_interest_cents:
-            description: The cumulative pro-rated coupon payment, including the pro-rated coupon payments of all partial fills, that will be either paid or received when the trade is settled.
-            type: integer
-          client_order_id:
-            $ref: '#/components/schemas/ClientOrderID'
-          contra_quote_id:
-            $ref: '#/components/schemas/ContraQuoteID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - fill
-          filled_amount:
-            $ref: '#/components/schemas/Size'
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-          order_id:
-            $ref: '#/components/schemas/OrderID'
-    RFQQuoteResponseReceiveEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - order_id
-        - client_order_id
-        - isin
-        - price
-        - amount
-        - side
-        - is_counter
-        properties:
-          amount:
-            $ref: '#/components/schemas/Size'
-          client_order_id:
-            $ref: '#/components/schemas/ClientOrderID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - quote_response_receive
-          is_counter:
-            description: Indicates whether this is a counter quote response.
-            type: boolean
-          isin:
-            $ref: '#/components/schemas/ISIN'
-          order_id:
-            $ref: '#/components/schemas/OrderID'
-          price:
-            $ref: '#/components/schemas/Price'
-          side:
-            $ref: '#/components/schemas/Side'
-    RFQQuoteResponseApproveEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - order_id
-        - contra_quote_id
-        properties:
-          contra_quote_id:
-            $ref: '#/components/schemas/ContraQuoteID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - quote_response_approve
-          order_id:
-            $ref: '#/components/schemas/OrderID'
-    RFQQuoteResponseRejectEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - order_id
-        - contra_quote_id
-        - active_quotes
-        - reason
-        - active_order
-        properties:
-          active_order:
-            $ref: '#/components/schemas/RFQQuoteResponseNullable'
-          active_quotes:
-            type: array
-            items:
-              $ref: '#/components/schemas/RFQQuote'
-          contra_quote_id:
-            $ref: '#/components/schemas/ContraQuoteID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - quote_response_reject
-          order_id:
-            $ref: '#/components/schemas/OrderID'
-          reason:
-            description: The reason for the rejection.
-            type: string
-    RFQQuoteResponseCancelEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - order_id
-        - contra_quote_id
-        - client_order_id
-        - reason
-        properties:
-          client_order_id:
-            $ref: '#/components/schemas/ClientOrderID'
-          contra_quote_id:
-            $ref: '#/components/schemas/ContraQuoteID'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - quote_response_cancel
-          order_id:
-            $ref: '#/components/schemas/OrderID'
-          reason:
-            description: The reason for the cancellation.
-            type: string
-    RFQDueTimeEvent:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/BaseRFQEvent'
-      - type: object
-        required:
-        - event_type
-        - ib_id
-        - due_time
-        properties:
-          due_time:
-            $ref: '#/components/schemas/DueTime'
-          event_type:
-            allOf:
-            - $ref: '#/components/schemas/RFQEventTypeBase'
-            - enum:
-              - due_time
-          ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
+      title: Contra Quote ID
+    ClientOrderID:
+      description: Client-provided unique ID for the order.
+      type: string
+      title: Client Order ID
+    DueTime:
+      description: The time at which quotes for this RFQ are due.
+      type: string
+      format: date-time
     RFQFirmUntilTimeEvent:
       type: object
       allOf:
@@ -1450,32 +622,16 @@ components:
           firm_until_time:
             $ref: '#/components/schemas/FirmUntilTime'
           ib_id:
-            $ref: '#/components/schemas/IntroducingBrokerID'
-    RFQEventTypeBase:
-      description: The type of the RFQ event.
-      type: string
-    RFQEventType:
-      allOf:
-      - $ref: '#/components/schemas/RFQEventTypeBase'
-      - enum:
-        - ack
-        - approve
-        - reject
-        - cancel
-        - cancel_reject
-        - quote_update
-        - expire
-        - fill
-        - quote_response_receive
-        - quote_response_approve
-        - quote_response_reject
-        - quote_response_cancel
-        - due_time
-        - firm_until_time
-    CancelRequestID:
-      description: The ID of the cancel request.
-      type: string
-      title: Cancel Request ID
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+    ListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetRFQResponse'
+      required:
+      - data
     CreateRFQListItem:
       type: object
       properties:
@@ -1500,6 +656,60 @@ components:
       - instrument_id
       - side
       - amount
+    VenueTraderInfo_2:
+      description: Trader information for a venue.
+      x-go-type: parentorder.VenueTraderInfo
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/parentorder
+    RFQQuoteResponse:
+      type: object
+      properties:
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        contra_quote_id:
+          $ref: '#/components/schemas/ContraQuoteID'
+        created_at:
+          description: The time at which the quote response was created in RFC-3339 format.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        id:
+          $ref: '#/components/schemas/OrderID'
+        status:
+          $ref: '#/components/schemas/RFQQuoteResponseStatus'
+      required:
+      - id
+      - client_order_id
+      - contra_quote_id
+      - status
+      - created_at
+    VenueMPID:
+      description: The Market Participant Identifier (MPID) of the venue.
+      type: string
+    RFQReject:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQRejectEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Reject Event
+    SpreadPrice:
+      description: The spread price of the RFQ represented as a percentage of par.
+      type: object
+      x-go-type: prices.SpreadPrice
+      x-go-type-import:
+        path: github.com/moment-technology/warren-protobuffett/types/go/prices
     CreateRFQList:
       type: object
       properties:
@@ -1535,7 +745,7 @@ components:
         venue_mpid:
           $ref: '#/components/schemas/VenueMPID'
         venue_trader_info:
-          $ref: '#/components/schemas/VenueTraderInfo'
+          $ref: '#/components/schemas/VenueTraderInfo_2'
       required:
       - list_name
       - ib_id
@@ -1544,6 +754,860 @@ components:
       - type
       - disclosure
       - items
+    RFQExpireEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        - rfq_expired_at
+        properties:
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - expire
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+          rfq_expired_at:
+            description: The time at which the RFQ expired in RFC-3339 format.
+            type: string
+            format: date-time
+    OrderID:
+      description: Unique, Moment-generated ID for the order.
+      type: string
+      example: 01JBFQZXMWZ08XDMTG08P2Z4XT
+      title: Order ID
+      x-go-type: ulid.ULID
+      x-go-type-import:
+        path: github.com/moment-technology/go-shiny/pkg/ulid
+    RFQRejectEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        - reason
+        properties:
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - reject
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+          reason:
+            description: The reason for the rejection.
+            type: string
+    RFQAckEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        properties:
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - ack
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+    RFQAck:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQAckEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Ack Event
+    Type:
+      description: The type of the RFQ.
+      type: string
+      enum:
+      - bin
+      - asap
+      x-go-type: rfq.Type
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/rfq
+    RFQID:
+      description: Unique, Moment-generated identifier for the RFQ.
+      type: string
+      example: 01JGEVEGS2X0EGYP1JK2X16AHV
+      x-go-type: ulid.ULID
+      x-go-type-import:
+        path: github.com/moment-technology/go-shiny/pkg/ulid
+    Price:
+      description: The price of the RFQ represented as a percentage of par.
+      type: number
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+    RFQApprove:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQApproveEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Approve Event
+    RFQQuoteUpdateEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        properties:
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - quote_update
+          quotes:
+            type: array
+            items:
+              $ref: '#/components/schemas/RFQQuote'
+          venue_update_id:
+            type: string
+    RFQCancelEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        - reason
+        - cancel_request_id
+        properties:
+          cancel_request_id:
+            $ref: '#/components/schemas/CancelRequestID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - cancel
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+          reason:
+            description: The reason for the cancellation.
+            type: string
+    RFQFillEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        - contra_quote_id
+        - order_id
+        - client_order_id
+        - filled_amount
+        - accrued_interest_cents
+        properties:
+          accrued_interest_cents:
+            description: The cumulative pro-rated coupon payment, including the pro-rated coupon payments of all partial fills, that will be either paid or received when the trade is settled.
+            type: integer
+          client_order_id:
+            $ref: '#/components/schemas/ClientOrderID'
+          contra_quote_id:
+            $ref: '#/components/schemas/ContraQuoteID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - fill
+          filled_amount:
+            $ref: '#/components/schemas/Size'
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+          order_id:
+            $ref: '#/components/schemas/OrderID'
+    CreatedAtNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/CreatedAt'
+    RFQApproveEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        properties:
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - approve
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+    CreatedAt:
+      description: The time the RFQ was created in RFC-3339 format.
+      type: string
+      format: date-time
+      title: Created At
+    ISIN:
+      description: The ISIN of the instrument being traded.
+      type: string
+    CounterType:
+      description: 'The current status of the counter.
+
+        quoted: original quoted price
+
+        initiated: counter offer initiated by the client
+
+        negotiated: counter offer negotiated by dealer to client'
+      type: string
+      enum:
+      - quoted
+      - initiated
+      - negotiated
+      x-enum-varnames:
+      - CounterTypeQuoted
+      - CounterTypeInitiated
+      - CounterTypeNegotiated
+    EventsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventResponse'
+      required:
+      - data
+    RFQQuoteResponseReceive:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQQuoteResponseReceiveEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Quote Response Receive Event
+    RFQFirmUntilTime:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQFirmUntilTimeEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Firm Until Time Event
+    PriceValueType:
+      description: The method used to represent the price value.
+      type: string
+      default: percent
+      enum:
+      - percent
+      - discount_yield
+      - spread
+      - money_market_yield
+      title: Price Value Type
+      x-enumNames:
+      - PriceValueTypePercent
+      - PriceValueTypeDiscountYield
+      - PriceValueTypeSpread
+      - PriceValueTypeMMYield
+    RFQQuote:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/Size'
+        counter_history:
+          description: History of counter offers for this quote.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/CounterHistory'
+        counterable:
+          description: Whether the quote is counterable.
+          type:
+          - boolean
+          - 'null'
+        counterparty:
+          description: The Market Participant Identifier (MPID) of the counterparty providing the quote.
+          type:
+          - string
+          - 'null'
+        created_at:
+          description: The time at which the quote was created in RFC-3339 format.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        expire_time:
+          $ref: '#/components/schemas/ExpireTimeNullable'
+        firm_until_time:
+          $ref: '#/components/schemas/FirmUntilTimeNullable'
+        is_subject:
+          description: Whether the quote is subject rather than firm.
+          type: boolean
+        price:
+          $ref: '#/components/schemas/Price'
+        side:
+          $ref: '#/components/schemas/Side'
+        spread_price:
+          $ref: '#/components/schemas/SpreadPrice'
+        updated_at:
+          description: The time at which the quote was last updated in RFC-3339 format.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        venue_mpid:
+          $ref: '#/components/schemas/VenueMPID'
+        venue_price_type:
+          $ref: '#/components/schemas/PriceValueType'
+        venue_quote_id:
+          description: The quote ID as provided by the venue.
+          type: string
+        ytm:
+          description: The yield to maturity of the quote.
+          type:
+          - number
+          - 'null'
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+        ytw:
+          description: The yield to worst of the quote.
+          type:
+          - number
+          - 'null'
+          x-go-type: decimal.Decimal
+          x-go-type-import:
+            path: github.com/shopspring/decimal
+      required:
+      - venue_quote_id
+      - side
+      - amount
+      - price
+      - ytw
+      - ytm
+      - firm_until_time
+      - expire_time
+      - counterparty
+      - is_subject
+      - venue_mpid
+      - created_at
+      - updated_at
+    Size:
+      type: object
+      properties:
+        type:
+          description: The size of an RFQ, with a specified type indicating how the size is represented. Par sizes represent the size of the RFQ in face value; most corporate bonds have a face value of $1000, so an order with par $3000 would represent an order for 3 bonds. Notional sizes represent the size of the RFQ in current dollar value, so an RFQ with notional $3000 would represent an RFQ to buy or sell $3000 worth of the bond at the current market prices. Currently, only `par` sizes are supported.
+          type: string
+          default: par
+          enum:
+          - par
+          - notional
+        value:
+          description: The size of the RFQ.
+          type: integer
+      required:
+      - value
+      - type
+      x-go-type: parentorder.Size
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/parentorder
+    RFQQuoteUpdate:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQQuoteUpdateEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Quote Update Event
+    EventID:
+      description: A unique identifier for the event.
+      type: string
+    RiskGroupID_2:
+      description: The ID of the risk group placing the RFQ.
+      type: string
+      title: Risk Group ID
+      x-go-type: ulid.ULID
+      x-go-type-import:
+        path: github.com/moment-technology/go-shiny/pkg/ulid
+    RFQ:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/Size'
+        client_rfq_id:
+          $ref: '#/components/schemas/ClientRFQID'
+        contra_quote_id:
+          $ref: '#/components/schemas/ContraQuoteIDNullable'
+        created_at:
+          $ref: '#/components/schemas/CreatedAtNullable'
+        disclosure:
+          $ref: '#/components/schemas/Disclosure'
+        due_time:
+          $ref: '#/components/schemas/DueTimeNullable'
+        expire_time:
+          $ref: '#/components/schemas/ExpireTimeNullable'
+        firm_until_time:
+          $ref: '#/components/schemas/FirmUntilTimeNullable'
+        ib_id:
+          $ref: '#/components/schemas/IntroducingBrokerID_2'
+        id:
+          $ref: '#/components/schemas/RFQID'
+        isin:
+          $ref: '#/components/schemas/ISIN'
+        list_id:
+          description: The ID of the list this RFQ belongs to, if any.
+          type: string
+          title: List id
+        list_name:
+          description: The name of the list this RFQ belongs to, if any.
+          type: string
+          title: List name
+        quote_responses:
+          type: array
+          items:
+            $ref: '#/components/schemas/RFQQuoteResponse'
+        quotes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RFQQuote'
+        risk_group_id:
+          $ref: '#/components/schemas/RiskGroupID_2'
+        settlement_date:
+          description: The date on which the trade for this RFQ is to be settled.
+          type:
+          - string
+          - 'null'
+          format: date
+          x-go-type: date.Date
+          x-go-type-import:
+            path: github.com/moment-technology/core-api/pkg/date
+        side:
+          $ref: '#/components/schemas/Side'
+        skip_fees:
+          description: Whether to skip fees for this RFQ. If true, the quotes will not include fees.
+          type: boolean
+        status:
+          $ref: '#/components/schemas/Status'
+        type:
+          $ref: '#/components/schemas/Type'
+        venue_mpid:
+          $ref: '#/components/schemas/VenueMPID'
+        venue_trader_info:
+          $ref: '#/components/schemas/VenueTraderInfo_2'
+      required:
+      - id
+      - client_rfq_id
+      - contra_quote_id
+      - ib_id
+      - risk_group_id
+      - isin
+      - type
+      - side
+      - amount
+      - venue_mpid
+      - disclosure
+      - expire_time
+      - due_time
+      - firm_until_time
+      - settlement_date
+      - created_at
+      - status
+      - quotes
+      - quote_responses
+      - skip_fees
+    RFQQuoteResponseApprove:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQQuoteResponseApproveEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Quote Response Approve Event
+    RFQEventTypeBase:
+      description: The type of the RFQ event.
+      type: string
+    RFQCancelReject:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQCancelRejectEvent'
+          msg_type:
+            type: string
+            enum:
+            - system_update
+      title: RFQ Cancel Reject Event
+    Side:
+      description: 'Represents which side this RFQ is on:
+
+        - buy (offers wanted)
+
+        - sell (bids wanted)'
+      type: string
+      enum:
+      - buy
+      - sell
+      x-go-type: parentorder.Side
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/parentorder
+    RFQQuoteResponseRejectEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - order_id
+        - contra_quote_id
+        - active_quotes
+        - reason
+        - active_order
+        properties:
+          active_order:
+            $ref: '#/components/schemas/RFQQuoteResponseNullable'
+          active_quotes:
+            type: array
+            items:
+              $ref: '#/components/schemas/RFQQuote'
+          contra_quote_id:
+            $ref: '#/components/schemas/ContraQuoteID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - quote_response_reject
+          order_id:
+            $ref: '#/components/schemas/OrderID'
+          reason:
+            description: The reason for the rejection.
+            type: string
+    RFQFill:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQFillEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Fill Event
+    EventResponse:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/RFQAck'
+      - $ref: '#/components/schemas/RFQApprove'
+      - $ref: '#/components/schemas/RFQReject'
+      - $ref: '#/components/schemas/RFQCancel'
+      - $ref: '#/components/schemas/RFQCancelReject'
+      - $ref: '#/components/schemas/RFQQuoteUpdate'
+      - $ref: '#/components/schemas/RFQExpire'
+      - $ref: '#/components/schemas/RFQFill'
+      - $ref: '#/components/schemas/RFQQuoteResponseReceive'
+      - $ref: '#/components/schemas/RFQQuoteResponseApprove'
+      - $ref: '#/components/schemas/RFQQuoteResponseReject'
+      - $ref: '#/components/schemas/RFQQuoteResponseCancel'
+      - $ref: '#/components/schemas/RFQDueTime'
+      - $ref: '#/components/schemas/RFQFirmUntilTime'
+    RFQQuoteResponseReceiveEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - order_id
+        - client_order_id
+        - isin
+        - price
+        - amount
+        - side
+        - is_counter
+        properties:
+          amount:
+            $ref: '#/components/schemas/Size'
+          client_order_id:
+            $ref: '#/components/schemas/ClientOrderID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - quote_response_receive
+          is_counter:
+            description: Indicates whether this is a counter quote response.
+            type: boolean
+          isin:
+            $ref: '#/components/schemas/ISIN'
+          order_id:
+            $ref: '#/components/schemas/OrderID'
+          price:
+            $ref: '#/components/schemas/Price'
+          side:
+            $ref: '#/components/schemas/Side'
+    Disclosure:
+      description: The disclosure for the RFQ. Currently, only `disclosed` is supported.
+      type: string
+      enum:
+      - disclosed
+      - anonymous
+      x-go-type: rfq.Disclosure
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/rfq
+    IntroducingBrokerID_2:
+      description: The ID of the introducing broker placing the RFQ.
+      type: string
+      title: Introducing Broker ID
+      x-go-type: ulid.ULID
+      x-go-type-import:
+        path: github.com/moment-technology/go-shiny/pkg/ulid
+    CancelRequestID:
+      description: The ID of the cancel request.
+      type: string
+      title: Cancel Request ID
+    RFQQuoteResponseApproveEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - order_id
+        - contra_quote_id
+        properties:
+          contra_quote_id:
+            $ref: '#/components/schemas/ContraQuoteID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - quote_response_approve
+          order_id:
+            $ref: '#/components/schemas/OrderID'
+    RFQExpire:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQExpireEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Expire Event
+    RFQQuoteResponseStatus:
+      description: The status of the quote response.
+      type: string
+      enum:
+      - open
+      - filled
+      - canceled
+      - rejected
+      - approved
+      x-go-type: rfq.QuoteResponseStatus
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/rfq
+    ClientRFQID:
+      description: The ID of the RFQ as provided by the client.
+      type: string
+      title: Client RFQ ID
+    RFQEvent:
+      type: object
+      properties:
+        event_id:
+          $ref: '#/components/schemas/EventID'
+        msg_number:
+          description: The msg_number for the event. This is a string representation of a 64-bit unsigned integer YYYYMMDDxxxxxxxxxx where the x's are an incrementing index starting at 0000000000.
+          type: string
+      required:
+      - event_id
+      - msg_number
+    RFQQuoteResponseCancelEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - order_id
+        - contra_quote_id
+        - client_order_id
+        - reason
+        properties:
+          client_order_id:
+            $ref: '#/components/schemas/ClientOrderID'
+          contra_quote_id:
+            $ref: '#/components/schemas/ContraQuoteID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - quote_response_cancel
+          order_id:
+            $ref: '#/components/schemas/OrderID'
+          reason:
+            description: The reason for the cancellation.
+            type: string
+    RFQQuoteResponseCancel:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQQuoteResponseCancelEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Quote Response Cancel Event
+    Status:
+      type: string
+      enum:
+      - open
+      - validating
+      - order_placed
+      - rejected
+      - expired
+      - canceled
+      - filled
+      x-go-type: rfq.Status
+      x-go-type-import:
+        path: github.com/moment-technology/core-api/pkg/rfq
+    RFQEventSummary:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/RFQ'
+      required:
+      - summary
+    RFQDueTimeEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - ib_id
+        - due_time
+        properties:
+          due_time:
+            $ref: '#/components/schemas/DueTime'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - due_time
+          ib_id:
+            $ref: '#/components/schemas/IntroducingBrokerID_2'
+    FirmUntilTime:
+      description: The time until which the quotes for this RFQ are firm.
+      type: string
+      format: date-time
+    RFQCancelRejectEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/BaseRFQEvent'
+      - type: object
+        required:
+        - event_type
+        - reason
+        - cancel_request_id
+        properties:
+          cancel_request_id:
+            $ref: '#/components/schemas/CancelRequestID'
+          event_type:
+            allOf:
+            - $ref: '#/components/schemas/RFQEventTypeBase'
+            - enum:
+              - cancel_reject
+          reason:
+            description: The reason for the rejection.
+            type: string
     CreateRFQListResponse:
       type: object
       properties:
@@ -1558,6 +1622,98 @@ components:
       required:
       - list_id
       - list_name
+    RFQEventType:
+      allOf:
+      - $ref: '#/components/schemas/RFQEventTypeBase'
+      - enum:
+        - ack
+        - approve
+        - reject
+        - cancel
+        - cancel_reject
+        - quote_update
+        - expire
+        - fill
+        - quote_response_receive
+        - quote_response_approve
+        - quote_response_reject
+        - quote_response_cancel
+        - due_time
+        - firm_until_time
+    ContraQuoteIDNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/ContraQuoteID'
+    RFQQuoteResponseNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/RFQQuoteResponse'
+    FirmUntilTimeNullable:
+      type:
+      - object
+      - 'null'
+      allOf:
+      - $ref: '#/components/schemas/FirmUntilTime'
+    RFQDueTime:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQDueTimeEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Due Time Event
+    BaseRFQEvent:
+      type: object
+      properties:
+        client_rfq_id:
+          $ref: '#/components/schemas/ClientRFQID'
+        rfq_id:
+          $ref: '#/components/schemas/RFQID'
+        time:
+          description: The time at which the event occurred in RFC-3339 format.
+          type: string
+          format: date-time
+      required:
+      - time
+      - rfq_id
+      - client_rfq_id
+    RFQQuoteResponseReject:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/RFQEvent'
+      - $ref: '#/components/schemas/RFQEventSummary'
+      - type: object
+        required:
+        - msg_type
+        - event
+        properties:
+          event:
+            $ref: '#/components/schemas/RFQQuoteResponseRejectEvent'
+          msg_type:
+            type: string
+            enum:
+            - rfq_update
+      title: RFQ Quote Response Reject Event
+    ExpireTime:
+      description: The time at which the RFQ will expire.
+      type: string
+      format: date-time
+x-refined-from:
+- moment-orders-api-openapi.yml
+- moment-rfq-api-openapi.yml
 x-provenance:
   method: searched
   source: https://docs.moment.com/reference
@@ -1565,13 +1721,11 @@ x-provenance:
   tool: harvest-readme-openapi.py
   note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
   assembled_from:
-  - https://docs.moment.com/reference/createlistrfq.md
-  - https://docs.moment.com/reference/createrfq.md
-  - https://docs.moment.com/reference/deleterfq.md
-  - https://docs.moment.com/reference/getrfq.md
-  - https://docs.moment.com/reference/getrfqevents.md
-  - https://docs.moment.com/reference/listrfqs.md
+  - https://docs.moment.com/reference/addfixipallowlist.md
+  - https://docs.moment.com/reference/getfixipallowlist.md
+  - https://docs.moment.com/reference/removefixipallowlist.md
+  - https://docs.moment.com/reference/updateorganizationipallowlist.md
   merge:
-    pages: 6
-    deduped: 95
+    pages: 4
+    deduped: 7
     conflicts_kept_first: 0

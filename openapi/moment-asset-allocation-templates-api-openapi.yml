@@ -1,0 +1,1197 @@
+openapi: 3.2.0
+info:
+  title: Models Asset Allocation Templates API
+  description: Moment's Models API allows Clients to manage their portfolio models.
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Asset Allocation Templates
+paths:
+  /v1/allocation-template/:
+    get:
+      tags:
+      - Asset Allocation Templates
+      summary: List Asset Allocation Templates
+      operationId: ListAllocationTemplates
+      parameters:
+      - name: include_archived
+        in: query
+        description: Include archived templates in the listing.
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Create an Asset Allocation Template
+      description: Creates a template and publishes version 1 atomically. Standalone templates send a config; linked templates send base_template_id plus overrides (may be empty). A template only ever exists published.
+      operationId: CreateAllocationTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAllocationTemplateRequest'
+        required: true
+      responses:
+        '201':
+          description: Template created and version 1 published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateDetails'
+        '400':
+          description: Validation failed - the structured conflicts identify the failing nodes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Base template not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: Name already taken by a live template, or the base template is archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/allocation-template/{template_id}/:
+    get:
+      tags:
+      - Asset Allocation Templates
+      summary: Get an Asset Allocation Template
+      description: Details include the published materialized config, overrides, lineage in both directions, counts, and - when the template needs resolution - the conflict view recomputed against the base's current published version.
+      operationId: GetAllocationTemplate
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    patch:
+      tags:
+      - Asset Allocation Templates
+      summary: Update an Asset Allocation Template's metadata
+      description: 'Lightweight name/description edit: does not create a version, but is recorded in the audit history.'
+      operationId: UpdateAllocationTemplateMetadata
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAllocationTemplateMetadataRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateSummary'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: Name already taken by a live template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/allocation-template/{template_id}/archive/:
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Archive an Asset Allocation Template
+      description: Soft delete. Blocked while the template has live linked children (archive children first, leaf to root) or account assignments (unassign them first).
+      operationId: ArchiveAllocationTemplate
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      responses:
+        '200':
+          description: Archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: Blocked by live linked children or by account assignments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateArchiveBlockedError'
+  /v1/allocation-template/{template_id}/publish-preview/:
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Preview an Asset Allocation Template publish
+      description: 'Dry-run of the publish walk with zero writes: returns the blast radius (descendants that will auto-update, descendants that will be flagged needs-resolution, and assigned descendants that would be left incomplete) for the review-and-save modal. Any listed conflicts mean the publish itself would fail validation; any listed assigned descendants mean it would be refused.'
+      operationId: PreviewAllocationTemplatePublish
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishAllocationTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Preview computed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewAllocationTemplatePublishResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: Stale current_version_id, or the template is archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplatePublishBlockedError'
+  /v1/allocation-template/{template_id}/publish/:
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Publish an Asset Allocation Template
+      description: 'Validates and publishes a new version, then re-resolves each live descendant one hop at a time: valid children auto-publish propagated versions, conflicting children freeze with needs_resolution set. The request carries the current_version_id the builder session was seeded from; a mismatch returns 409 so a stale session re-seeds instead of silently overwriting.'
+      operationId: PublishAllocationTemplate
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishAllocationTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishAllocationTemplateResponse'
+        '400':
+          description: Validation failed and the structured conflicts identify the failing nodes. While the template is assigned to accounts, an unset weight is reported as a conflict.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: The publish was refused because the template changed since it was loaded, it is archived, or publishing would leave linked templates that are assigned to accounts with unset weights. The response says which, and names those linked templates.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplatePublishBlockedError'
+  /v1/allocation-template/{template_id}/restore/:
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Restore a previous Asset Allocation Template version
+      description: 'Re-publishes an old version''s overrides (standalone: its config) through the publish pipeline against the base''s current published version. When the restored configuration no longer validates, nothing is stored and the conflict view is returned to seed the builder.'
+      operationId: RestoreAllocationTemplate
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestoreAllocationTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Restore evaluated - published reports whether a new version was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestoreAllocationTemplateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Template or version not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: The template is archived, or the restore would leave linked templates that are assigned to accounts incomplete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplatePublishBlockedError'
+  /v1/allocation-template/{template_id}/unarchive/:
+    post:
+      tags:
+      - Asset Allocation Templates
+      summary: Unarchive an Asset Allocation Template
+      description: Restores an archived template. A linked template re-resolves against its base's current published version and may re-enter needs_resolution. Blocked while the base is archived or when a live template holds the same name.
+      operationId: UnarchiveAllocationTemplate
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      responses:
+        '200':
+          description: Unarchived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '409':
+          description: The base template is archived, or a live template holds the same name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/allocation-template/{template_id}/versions/:
+    get:
+      tags:
+      - Asset Allocation Templates
+      summary: List an Asset Allocation Template's versions
+      operationId: ListAllocationTemplateVersions
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      - name: limit
+        in: query
+        description: Max versions to return (newest first). Defaults to 20, capped at 100.
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: cursor
+        in: query
+        description: Opaque pagination cursor from a previous response's next_cursor. Omit for the first (newest) page.
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateVersionPage'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/allocation-template/{template_id}/versions/{version_id}/:
+    get:
+      tags:
+      - Asset Allocation Templates
+      summary: Get a single Asset Allocation Template version
+      operationId: GetAllocationTemplateVersion
+      parameters:
+      - $ref: '#/components/parameters/template_id'
+      - $ref: '#/components/parameters/version_id'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationTemplateVersionDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    AllocationTemplateStrategyEntry:
+      description: A reference from a leaf node's menu to an existing strategy, with a relative weight. A 0% weight means the strategy is approved for selection but not allocated by default.
+      type: object
+      properties:
+        strategy_id:
+          description: The ID of the referenced strategy
+          type: string
+        relative_weight:
+          description: The entry's share of its menu as a decimal string (never a number). Null means unset.
+          type:
+          - string
+          - 'null'
+        min_weight:
+          description: Optional lower range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        max_weight:
+          description: Optional upper range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+      required:
+      - strategy_id
+      title: AllocationTemplateStrategyEntry
+    RestoreAllocationTemplateConflictView:
+      description: The restored configuration re-resolved against today's base, with the failing nodes flagged
+      type: object
+      properties:
+        config:
+          $ref: '#/components/schemas/AllocationTemplateConfig'
+        overrides:
+          $ref: '#/components/schemas/AllocationTemplateOverrides'
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateConflict'
+      required:
+      - config
+      - overrides
+      - conflicts
+      title: RestoreAllocationTemplateConflictView
+    AllocationTemplateNode:
+      description: A node in the template tree. It holds either child nodes or a strategy menu, never both; cash holds neither. A model_category is a section defined by strategy tags — those tags filter which strategies show up in menus under it, and at least one is required. Ordinary sections and cash must not carry tags.
+      type: object
+      properties:
+        id:
+          description: 'Stable node id (''aatn_'' ULID). Minted server-side for new nodes: omit or send empty on creation, keep it verbatim on later publishes - child overrides are keyed by it.'
+          type: string
+        name:
+          description: Display name; the root node may have an empty name
+          type: string
+        kind:
+          description: What this node is. A node is a free-text section; a model_category is a section defined by strategy tags; cash is the funding buffer.
+          type: string
+          enum:
+          - node
+          - model_category
+          - cash
+        relative_weight:
+          description: The node's share of its parent as a decimal string (never a number). Null means unset; the root carries an implicit 100% and keeps this null.
+          type:
+          - string
+          - 'null'
+        min_weight:
+          description: Optional lower range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        max_weight:
+          description: Optional upper range bound in relative-weight terms, as a decimal string
+          type:
+          - string
+          - 'null'
+        tag_ids:
+          description: Strategy tag ids from the tags service. Required on a model_category (at least one). Must be omitted or empty on ordinary sections and cash. A nested model_category cannot reuse a tag already set by an ancestor.
+          type: array
+          items:
+            type: string
+        children:
+          description: Child nodes; mutually exclusive with strategies
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateNode'
+        strategies:
+          description: The leaf node's strategy menu; mutually exclusive with children
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateStrategyEntry'
+      required:
+      - kind
+      title: AllocationTemplateNode
+    AllocationTemplatePublishConflictReason:
+      description: Why a publish or restore was refused with 409
+      type: string
+      enum:
+      - stale_version
+      - archived
+      - assigned_descendants_incomplete
+      title: AllocationTemplatePublishConflictReason
+    AllocationTemplatePublishBlockedError:
+      description: A publish or restore refused because of the template's current state. The list of linked templates is filled only when the refusal is about assigned linked templates that would be left with unset weights.
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        reason:
+          $ref: '#/components/schemas/AllocationTemplatePublishConflictReason'
+        blocking_templates:
+          description: Linked templates assigned to accounts that the publish would leave incomplete; nothing was written
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+      required:
+      - error
+      - error_type
+      - reason
+      - blocking_templates
+      title: AllocationTemplatePublishBlockedError
+    AllocationTemplateSummary:
+      description: Summary representation used by list rows and lineage entries
+      type: object
+      properties:
+        id:
+          description: The ID of the template
+          type: string
+        name:
+          description: The name of the template
+          type: string
+        description:
+          description: The description of the template
+          type: string
+        template_type:
+          description: Whether the template owns its tree or inherits from a base
+          type: string
+          enum:
+          - standalone
+          - linked
+        base_template_id:
+          description: The base template a linked template inherits from
+          type:
+          - string
+          - 'null'
+        base_template_name:
+          description: The base template's name
+          type:
+          - string
+          - 'null'
+        status:
+          description: The template's lifecycle status
+          type: string
+          enum:
+          - published
+          - needs_resolution
+          - archived
+        needs_resolution:
+          description: True when the published overrides no longer validate against the base's current published version
+          type: boolean
+        is_incomplete:
+          description: True when at least one category or strategy in the template has no weight set. An incomplete template can still be the base for linked templates, but it cannot be assigned to accounts until every weight is filled in.
+          type: boolean
+        direct_descendant_count:
+          description: Number of live templates directly linked to this one
+          type: integer
+        current_version_id:
+          description: The ID of the currently published version
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          description: The user who created the template
+          allOf:
+          - $ref: '#/components/schemas/User'
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          description: The user who last updated the template
+          allOf:
+          - $ref: '#/components/schemas/User'
+      required:
+      - id
+      - name
+      - description
+      - template_type
+      - base_template_id
+      - base_template_name
+      - status
+      - needs_resolution
+      - is_incomplete
+      - direct_descendant_count
+      - current_version_id
+      - created_at
+      - created_by
+      - updated_at
+      - updated_by
+      title: AllocationTemplateSummary
+    PreviewAllocationTemplatePublishResponse:
+      type: object
+      properties:
+        auto_update:
+          description: Descendants that will auto-publish a propagated version
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+        needs_resolution:
+          description: Descendants that will be flagged needs-resolution
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+        conflicts:
+          description: Validation conflicts in the submitted payload; non-empty means the publish would fail with 400
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateConflict'
+        assigned_incomplete:
+          description: Linked templates assigned to accounts that would be left with unset weights. If any are listed, the publish would be refused.
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+      required:
+      - auto_update
+      - needs_resolution
+      - conflicts
+      - assigned_incomplete
+      title: PreviewAllocationTemplatePublishResponse
+    AllocationTemplateList:
+      type: object
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+      required:
+      - templates
+      title: AllocationTemplateList
+    AllocationTemplateVersion:
+      description: An immutable published snapshot's metadata
+      type: object
+      properties:
+        id:
+          description: The ID of the version
+          type: string
+        template_id:
+          description: The ID of the template
+          type: string
+        version:
+          description: Monotonic version number per template
+          type: integer
+        origin:
+          description: 'How the version came to be: an explicit publish, an upstream-triggered propagation, or a restore'
+          type: string
+          enum:
+          - user_publish
+          - propagation
+          - restore
+        published_by:
+          description: The user the publish is attributed to. Propagated versions are attributed to the upstream editor's publish.
+          allOf:
+          - $ref: '#/components/schemas/User'
+        published_at:
+          type: string
+          format: date-time
+        base_version_id:
+          description: The base version this snapshot was resolved against (linked templates)
+          type:
+          - string
+          - 'null'
+        triggered_by_version_id:
+          description: 'For origin=propagation: the originating upstream publish'
+          type:
+          - string
+          - 'null'
+        restored_from_version_id:
+          description: 'For origin=restore: the version that was restored'
+          type:
+          - string
+          - 'null'
+        change_summary:
+          $ref: '#/components/schemas/AllocationTemplateChangeSummary'
+      required:
+      - id
+      - template_id
+      - version
+      - origin
+      - published_by
+      - published_at
+      - base_version_id
+      - triggered_by_version_id
+      - restored_from_version_id
+      - change_summary
+      title: AllocationTemplateVersion
+    AllocationTemplateVersionDetails:
+      description: A single version with its full materialized snapshot
+      allOf:
+      - $ref: '#/components/schemas/AllocationTemplateVersion'
+      - type: object
+        properties:
+          materialized_config:
+            $ref: '#/components/schemas/AllocationTemplateConfig'
+          overrides:
+            allOf:
+            - $ref: '#/components/schemas/AllocationTemplateOverrides'
+        required:
+        - materialized_config
+      title: AllocationTemplateVersionDetails
+    CreateAllocationTemplateRequest:
+      type: object
+      properties:
+        name:
+          description: The name of the template; unique among the organization's non-archived templates
+          type: string
+          minLength: 1
+        description:
+          description: The description of the template
+          type: string
+        sharing_organization_id:
+          description: The organization that owns the template. Defaults to the authenticated user's organization if not provided.
+          type:
+          - string
+          - 'null'
+        base_template_id:
+          description: 'Create a linked template inheriting from this base. The base is fixed at creation: no re-basing, no detaching.'
+          type:
+          - string
+          - 'null'
+        config:
+          description: The full tree for a standalone template
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateConfig'
+        overrides:
+          description: The override set for a linked template; may be empty
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateOverrides'
+      required:
+      - name
+      title: CreateAllocationTemplateRequest
+    AllocationTemplateConfig:
+      description: A fully materialized template tree. The document root is itself a node.
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/AllocationTemplateNode'
+      required:
+      - root
+      title: AllocationTemplateConfig
+    AllocationTemplateLineage:
+      description: The template's family neighborhood
+      type: object
+      properties:
+        ancestors:
+          description: The ancestor chain ordered family root first, direct base last
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+        children:
+          description: Live templates directly linked to this one
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+      required:
+      - ancestors
+      - children
+      title: AllocationTemplateLineage
+    AllocationTemplateArchiveBlockedError:
+      description: The template could not be archived because it still has live linked children, accounts assigned to it, or both. The lists below name what has to be dealt with first.
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        blocking_templates:
+          description: The live linked children that must be archived first
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSummary'
+        blocking_assignment_count:
+          description: How many accounts are assigned to the template, counted across every organization. All of them must be unassigned before the template can be archived.
+          type: integer
+        blocking_assignments:
+          description: The assigned accounts visible to the caller's organizations. Accounts in other organizations are counted but not listed, so this list can be shorter than the count.
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateAssignmentRef'
+      required:
+      - error
+      - error_type
+      - blocking_templates
+      - blocking_assignment_count
+      - blocking_assignments
+      title: AllocationTemplateArchiveBlockedError
+    AllocationTemplateValidationError:
+      description: Structured publish-validation failure
+      type: object
+      properties:
+        error:
+          type: string
+        error_type:
+          type: string
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateConflict'
+      required:
+      - error
+      - error_type
+      - conflicts
+      title: AllocationTemplateValidationError
+    RestoreAllocationTemplateResponse:
+      type: object
+      properties:
+        published:
+          description: False when the restored configuration conflicts with today's base (nothing was stored)
+          type: boolean
+        version:
+          description: The newly published restore version, when published
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateVersion'
+        conflict_view:
+          description: The conflict view seeding the builder, when not published
+          allOf:
+          - $ref: '#/components/schemas/RestoreAllocationTemplateConflictView'
+      required:
+      - published
+      - version
+      - conflict_view
+      title: RestoreAllocationTemplateResponse
+    PublishAllocationTemplateRequest:
+      type: object
+      properties:
+        current_version_id:
+          description: The version ID the builder session was seeded from; a mismatch fails with 409
+          type: string
+        config:
+          description: The full edited tree (standalone templates)
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateConfig'
+        overrides:
+          description: The edited override set (linked templates)
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateOverrides'
+      required:
+      - current_version_id
+      title: PublishAllocationTemplateRequest
+    AllocationTemplateOverrides:
+      description: 'A linked template''s delta against its base, keyed by stable node id. Field semantics are tri-state and load-bearing: an absent field inherits from the base, an explicit null is an unset/clear override, a value is an override. Per node: relative_weight/min_weight/max_weight plus a strategies map keyed by strategy id with relative_weight/min_weight/max_weight (value overrides), added (child-added entry), and removed (child-removed base entry). Typed loosely so absent and null survive the wire.'
+      type: object
+      additionalProperties: true
+      x-go-type: stdjson.RawMessage
+      x-go-type-import:
+        path: encoding/json
+        name: stdjson
+      title: AllocationTemplateOverrides
+    AllocationTemplateDetails:
+      description: Full template representation for the details page and mutation responses
+      type: object
+      properties:
+        template:
+          $ref: '#/components/schemas/AllocationTemplateSummary'
+        total_descendant_count:
+          description: Number of live direct and transitive linked descendants
+          type: integer
+        strategy_entry_count:
+          description: Number of strategy entries across the published configuration's menus
+          type: integer
+        materialized_config:
+          description: The frozen published snapshot every reader consumes
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateConfig'
+        overrides:
+          description: The published override set; null for standalone templates
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateOverrides'
+        lineage:
+          $ref: '#/components/schemas/AllocationTemplateLineage'
+        conflict_view:
+          description: Present only while the template needs resolution
+          allOf:
+          - $ref: '#/components/schemas/AllocationTemplateConflictView'
+        sleeve_targets:
+          description: The sleeves an account assigned to the published configuration would get, one per funded strategy in tree order, before any account overrides. Null when the configuration has unset weights and cannot be assigned.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/AllocationTemplateSleeveTarget'
+      required:
+      - template
+      - total_descendant_count
+      - strategy_entry_count
+      - materialized_config
+      - overrides
+      - lineage
+      - conflict_view
+      - sleeve_targets
+      title: AllocationTemplateDetails
+    AllocationTemplateChangeSummary:
+      description: 'Structured diff of a version against its predecessor: added_nodes, removed_nodes, renamed_nodes, weight_changes, range_changes, menu_entry_additions, menu_entry_removals, menu_entry_weight_changes, menu_entry_range_changes.'
+      type: object
+      additionalProperties: true
+      x-go-type: stdjson.RawMessage
+      x-go-type-import:
+        path: encoding/json
+        name: stdjson
+      title: AllocationTemplateChangeSummary
+    AllocationTemplateConflict:
+      description: A validation or resolution conflict identifying a failing node (and optionally a menu entry)
+      type: object
+      properties:
+        node_id:
+          description: The ID of the node the conflict is attached to
+          type: string
+        strategy_id:
+          description: The menu entry the conflict is attached to, when applicable
+          type:
+          - string
+          - 'null'
+        code:
+          description: Machine-readable conflict code
+          type: string
+          enum:
+          - sum_mismatch
+          - mixed_unset_group
+          - weight_out_of_bounds
+          - range_violation
+          - empty_leaf_menu
+          - empty_node
+          - unknown_strategy
+          - archived_strategy
+          - override_target_missing
+          - structure_violation
+          - unset_inherited_value
+          - incomplete_weights
+        message:
+          description: Human-readable explanation
+          type: string
+      required:
+      - node_id
+      - strategy_id
+      - code
+      - message
+      title: AllocationTemplateConflict
+    AllocationTemplateAssignmentRef:
+      description: An assignment named as an archive blocker
+      type: object
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/AllocationTemplateAssignmentStatus'
+      required:
+      - id
+      - account_id
+      - status
+      title: AllocationTemplateAssignmentRef
+    RestoreAllocationTemplateRequest:
+      type: object
+      properties:
+        version_id:
+          description: The version to restore
+          type: string
+          minLength: 1
+      required:
+      - version_id
+      title: RestoreAllocationTemplateRequest
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    UpdateAllocationTemplateMetadataRequest:
+      type: object
+      properties:
+        name:
+          description: The new name of the template
+          type: string
+          minLength: 1
+        description:
+          description: The new description of the template
+          type: string
+      title: UpdateAllocationTemplateMetadataRequest
+    AllocationTemplateSleeveTarget:
+      description: One funded strategy entry of the configuration, with its weights multiplied down the tree. Shares are percents of the account's managed value as decimal strings (never numbers).
+      type: object
+      properties:
+        node_id:
+          type: string
+        strategy_id:
+          type: string
+        absolute_target:
+          type: string
+        absolute_min:
+          description: The lowest share the sleeve may drift to; 0 when unconstrained
+          type: string
+        absolute_max:
+          description: The highest share the sleeve may drift to; 100 when unconstrained
+          type: string
+      required:
+      - node_id
+      - strategy_id
+      - absolute_target
+      - absolute_min
+      - absolute_max
+      title: AllocationTemplateSleeveTarget
+    User:
+      type: object
+      properties:
+        display_name:
+          description: The display name of the user
+          type: string
+        id:
+          description: The ID of the user
+          type: string
+      required:
+      - id
+      - display_name
+    AllocationTemplateVersionPage:
+      description: A page of a template's version history, newest first
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateVersion'
+        next_cursor:
+          description: Opaque cursor for the next (older) page. Null when there are no more versions.
+          type:
+          - string
+          - 'null'
+      required:
+      - versions
+      title: AllocationTemplateVersionPage
+    AllocationTemplateConflictView:
+      description: 'The derived conflict state, recomputed on demand: the published overrides re-resolved against the base''s current published version (best effort), with the failing nodes flagged. Seeds the Resolve builder session.'
+      type: object
+      properties:
+        config:
+          $ref: '#/components/schemas/AllocationTemplateConfig'
+        conflicts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AllocationTemplateConflict'
+      required:
+      - config
+      - conflicts
+      title: AllocationTemplateConflictView
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    PublishAllocationTemplateResponse:
+      type: object
+      properties:
+        version:
+          $ref: '#/components/schemas/AllocationTemplateVersion'
+        details:
+          $ref: '#/components/schemas/AllocationTemplateDetails'
+      required:
+      - version
+      - details
+      title: PublishAllocationTemplateResponse
+    AllocationTemplateAssignmentStatus:
+      description: Lifecycle status of a template-to-account assignment. assigning, applying and unassigning mean a write to the account is in flight; reading the assignment by id finishes it.
+      type: string
+      enum:
+      - active
+      - needs_resolution
+      - assigning
+      - applying
+      - unassigning
+      title: AllocationTemplateAssignmentStatus
+  parameters:
+    version_id:
+      name: version_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The ID of the asset allocation template version
+    template_id:
+      name: template_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The ID of the asset allocation template
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/archiveallocationtemplate.md
+  - https://docs.moment.com/reference/createallocationtemplate.md
+  - https://docs.moment.com/reference/createallocationtemplateassignment.md
+  - https://docs.moment.com/reference/createmodel.md
+  - https://docs.moment.com/reference/deletemodel.md
+  - https://docs.moment.com/reference/getallocationtemplate.md
+  - https://docs.moment.com/reference/getallocationtemplateassignment.md
+  - https://docs.moment.com/reference/getallocationtemplateversion.md
+  - https://docs.moment.com/reference/getmodel.md
+  - https://docs.moment.com/reference/getmodelhistory.md
+  - https://docs.moment.com/reference/listallocationtemplateassignments.md
+  - https://docs.moment.com/reference/listallocationtemplates.md
+  - https://docs.moment.com/reference/listallocationtemplateversions.md
+  - https://docs.moment.com/reference/listmodels.md
+  - https://docs.moment.com/reference/previewallocationtemplateassignment.md
+  - https://docs.moment.com/reference/previewallocationtemplatepublish.md
+  - https://docs.moment.com/reference/previewmodel.md
+  - https://docs.moment.com/reference/publishallocationtemplate.md
+  - https://docs.moment.com/reference/restoreallocationtemplate.md
+  - https://docs.moment.com/reference/unarchiveallocationtemplate.md
+  - https://docs.moment.com/reference/unassignallocationtemplateassignment.md
+  - https://docs.moment.com/reference/updateallocationtemplateassignment.md
+  - https://docs.moment.com/reference/updateallocationtemplatemetadata.md
+  - https://docs.moment.com/reference/updatemodel.md
+  merge:
+    pages: 24
+    deduped: 319
+    conflicts_kept_first: 0

@@ -1,0 +1,69 @@
+openapi: 3.2.0
+info:
+  title: Refdata Service System API
+  version: 1.0.0
+  description: API for accessing reference data internally.
+tags:
+- name: System
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the health status of the service
+      operationId: getHealth
+      tags:
+      - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - ok
+      required:
+      - status
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getequitybyid-1.md
+  - https://docs.moment.com/reference/getequitybyid.md
+  - https://docs.moment.com/reference/getequitysnapshot-1.md
+  - https://docs.moment.com/reference/getequitysnapshot.md
+  - https://docs.moment.com/reference/getfixedincomebyid-1.md
+  - https://docs.moment.com/reference/getfixedincomebyid.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot-1.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot.md
+  - https://docs.moment.com/reference/getfundbyid-1.md
+  - https://docs.moment.com/reference/getfundbyid.md
+  - https://docs.moment.com/reference/getfundholdings-1.md
+  - https://docs.moment.com/reference/getfundholdings.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot-1.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot.md
+  - https://docs.moment.com/reference/getfundsnapshot-1.md
+  - https://docs.moment.com/reference/getfundsnapshot.md
+  - https://docs.moment.com/reference/gethealth-3.md
+  - https://docs.moment.com/reference/gethealth.md
+  - https://docs.moment.com/reference/getsecuritybyid-1.md
+  - https://docs.moment.com/reference/getsecuritybyid.md
+  - https://docs.moment.com/reference/getsecuritysnapshot-1.md
+  - https://docs.moment.com/reference/getsecuritysnapshot.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics-1.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics.md
+  - https://docs.moment.com/reference/postsecurityresolve.md
+  merge:
+    pages: 25
+    deduped: 67
+    conflicts_kept_first: 17

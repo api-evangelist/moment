@@ -1,6 +1,6 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  title: Analytics API
+  title: Analytics Bond Calculator API
   description: Access Moment's analytical capabilities to understand US fixed income data, through the REST API.
   version: 1.0.0
   contact:
@@ -12,6 +12,8 @@ servers:
 - url: https://paper.moment-api.com
 security:
 - bearerAuth: []
+tags:
+- name: Bond Calculator
 paths:
   /v1/analytics/portfolio-stats/:
     post:
@@ -192,41 +194,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/YieldGrid'
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
   schemas:
-    InstrumentID:
-      type: string
-      title: Instrument ID
-      description: Instrument CUSIP or ISIN
-      example: US594918AD65
-    MarkupPriceYield:
-      type: object
-      title: Price and yield
-      description: Price and yield including markups.
-      properties:
-        price:
-          type: number
-          description: Price including markups, represented as a percentage of par.
-        yield_to_worst:
-          type: number
-          description: Yield to worst including markups, when available.
-          nullable: true
-    Yields:
-      type: object
-      title: Yields
-      description: Yield to worst and yield to maturity.
-      properties:
-        yield_to_worst:
-          type: number
-          description: Yield to worst, when available.
-          nullable: true
-        yield_to_maturity:
-          type: number
-          description: Yield to maturity, when available.
-          nullable: true
     YieldGrid:
       type: object
       title: Yield grid
@@ -246,8 +214,9 @@ components:
           type: array
           description: Yield to worst for each price, when available.
           items:
-            type: number
-            nullable: true
+            type:
+            - number
+            - 'null'
       example:
         price:
         - 95
@@ -282,15 +251,77 @@ components:
         - 4.450205
         - 4.065481
         - 4.065408
+    holding:
+      type: object
+      title: Holding
+      description: An individual holding. Cash is specified using an `instrument_id` of `CASH`.
+      properties:
+        instrument_id:
+          $ref: '#/components/schemas/InstrumentID'
+        size:
+          $ref: '#/components/schemas/PositionSize'
+    CashFlowEvent:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+        type:
+          type: string
+          enum:
+          - coupon
+          - principal
+    MarkupPriceYield:
+      type: object
+      title: Price and yield
+      description: Price and yield including markups.
+      properties:
+        price:
+          type: number
+          description: Price including markups, represented as a percentage of par.
+        yield_to_worst:
+          type:
+          - number
+          - 'null'
+          description: Yield to worst including markups, when available.
+    CurrentHoldings:
+      type: array
+      title: Current Holdings
+      description: The portfolio contents, including cash. Cash is specified using an `instrument_id` of `CASH`.
+      items:
+        $ref: '#/components/schemas/holding'
+    InstrumentID:
+      type: string
+      title: Instrument ID
+      description: Instrument CUSIP or ISIN
+      example: US594918AD65
+    Yields:
+      type: object
+      title: Yields
+      description: Yield to worst and yield to maturity.
+      properties:
+        yield_to_worst:
+          type:
+          - number
+          - 'null'
+          description: Yield to worst, when available.
+        yield_to_maturity:
+          type:
+          - number
+          - 'null'
+          description: Yield to maturity, when available.
     PortfolioStats:
       type: object
       title: Portfolio Statistics
       description: Aggregate statistics for a portfolio, including the yield to worst and yield to maturity for the portfolio.
       properties:
         yield_to_worst:
-          type: object
+          type:
+          - object
+          - 'null'
           description: Yield to worst statistics for the portfolio, when available.
-          nullable: true
           properties:
             min:
               type: number
@@ -305,9 +336,10 @@ components:
             max: 5.1
             avg: 5
         yield_to_maturity:
-          type: object
+          type:
+          - object
+          - 'null'
           description: Yield to maturity statistics for the portfolio, when available.
-          nullable: true
           properties:
             min:
               type: number
@@ -322,27 +354,32 @@ components:
             max: 5.1
             avg: 5
         sp_rating:
-          type: object
+          type:
+          - object
+          - 'null'
           description: The S&P rating statistics for the portfolio, when available.
-          nullable: true
           properties:
             min:
-              type: string
-              nullable: true
+              type:
+              - string
+              - 'null'
             max:
-              type: string
-              nullable: true
+              type:
+              - string
+              - 'null'
             avg:
-              type: string
-              nullable: true
+              type:
+              - string
+              - 'null'
           example:
             min: BBB
             max: AA
             avg: A
         coupon:
-          type: object
+          type:
+          - object
+          - 'null'
           description: The coupon statistics for the portfolio, when available.
-          nullable: true
           properties:
             min:
               type: number
@@ -355,9 +392,10 @@ components:
             max: 9
             avg: 3.75
         duration:
-          type: object
+          type:
+          - object
+          - 'null'
           description: The (modified) duration statistics for the portfolio, when available.
-          nullable: true
           properties:
             min:
               type: number
@@ -370,9 +408,10 @@ components:
             max: 5
             avg: 3
         maturity_years:
-          type: object
+          type:
+          - object
+          - 'null'
           description: The time to maturity statistics (in years) for the portfolio, when available.
-          nullable: true
           properties:
             min:
               type: number
@@ -439,34 +478,6 @@ components:
               - date: '2025-03-01'
                 amount: 10000
                 type: principal
-    CashFlowEvent:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        amount:
-          type: number
-        type:
-          type: string
-          enum:
-          - coupon
-          - principal
-    CurrentHoldings:
-      type: array
-      title: Current Holdings
-      description: The portfolio contents, including cash. Cash is specified using an `instrument_id` of `CASH`.
-      items:
-        $ref: '#/components/schemas/holding'
-    holding:
-      type: object
-      title: Holding
-      description: An individual holding. Cash is specified using an `instrument_id` of `CASH`.
-      properties:
-        instrument_id:
-          $ref: '#/components/schemas/InstrumentID'
-        size:
-          $ref: '#/components/schemas/PositionSize'
     PositionSize:
       type: object
       title: Size
@@ -483,8 +494,10 @@ components:
       required:
       - value
       - type
-tags:
-- name: Bond Calculator
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
 x-provenance:
   method: searched
   source: https://docs.moment.com/reference

@@ -1,0 +1,448 @@
+openapi: 3.2.0
+info:
+  title: Orders Allocations API
+  description: 'Moment''s Orders API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Orders API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Allocations
+paths:
+  /v1/trading/allocation/{id}/:
+    delete:
+      tags:
+      - Allocations
+      summary: Cancel an Allocation
+      description: Attempts to cancel an open Allocation. If the allocation is no longer cancelable, a subsequent allocation cancel reject event will be sent to the client via the Real-Time Orders API.
+      operationId: deleteAllocation
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AllocationID'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/trading/order/{id}/allocate/:
+    post:
+      tags:
+      - Allocations
+      summary: Allocate an Order
+      description: Allocates a block order to one or more customer accounts.
+      operationId: allocateOrderByOrderID
+      parameters:
+      - name: id
+        in: path
+        description: Order ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOrderAllocationRequest'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  allocation_id:
+                    $ref: '#/components/schemas/AllocationID'
+                required:
+                - allocation_id
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    OrderSize:
+      type: object
+      title: Amount
+      description: 'The Amount of an order with a specified `type` indicating how the amount is represented.
+
+        - **Par:** Represents the order size in face value (e.g., a corporate bond with a $1,000 face value).
+
+        - **Notional:** Represents the order size in notional dollar value.
+
+        - **Shares:** Represents the order size in number of shares (for equities).'
+      properties:
+        value:
+          type: number
+          example: 10000
+          x-go-type: float64
+        type:
+          type: string
+          enum:
+          - par
+          - notional
+          - shares
+          default: par
+          x-enumNames:
+          - SizeTypePar
+          - SizeTypeNotional
+          - SizeTypeShares
+      required:
+      - value
+      - type
+    BookingType:
+      type: string
+      title: BookingType
+      description: The booking type for the account.
+      enum:
+      - cash
+      - margin
+      x-enumNames:
+      - BookingTypeCash
+      - BookingTypeMargin
+    AllocationRequest:
+      title: Allocation Request
+      type: object
+      required:
+      - strategy
+      - client_allocation_id
+      - account_allocations
+      properties:
+        strategy:
+          type: string
+          enum:
+          - fifo_without_averaging
+          - fifo_with_averaging
+          - pro_rata_with_averaging
+          description: 'Strategy for allocation. Determines how the block''s filled quantity is distributed across requested accounts.
+
+            - `fifo_without_averaging`: allocates on a first-in, first-out basis without averaging; preserves individual trade prices per allocation.
+
+            - `fifo_with_averaging`: allocates first-in, first-out and applies the block''s average fill price to each allocation.
+
+            - `pro_rata_with_averaging`: allocates pro-rata across requested accounts and applies the block''s average fill price. Typically used for equity and ETF block orders.
+
+
+            **RIA accounts must use `fifo_without_averaging`.** The averaging
+
+            strategies (`fifo_with_averaging`, `pro_rata_with_averaging`) require a
+
+            principal/averaging trading account to average executions before they are
+
+            booked to client accounts. RIAs trade in an agency capacity and must report
+
+            the actual street-execution prices and quantities to their custodian (e.g.
+
+            Schwab), so each allocation has to match a real executed trade. Because there
+
+            is no averaging account to absorb the difference, averaged allocation is not
+
+            available to RIAs — only the non-averaging FIFO strategy, which preserves the
+
+            true per-trade execution prices, is supported.
+
+            '
+        client_allocation_id:
+          type: string
+          description: Client-provided ID for the allocation
+          x-go-name: ClientAllocationID
+        account_allocations:
+          type: array
+          description: Account allocations for an individual order
+          items:
+            $ref: '#/components/schemas/AllocationAccountRequest'
+    PostOrderAllocationRequest:
+      type: object
+      properties:
+        allocations:
+          $ref: '#/components/schemas/AllocationRequest'
+        client_order_id:
+          $ref: '#/components/schemas/ClientOrderID'
+        isin:
+          description: ISIN of the instrument being allocated. Its asset class is resolved from refdata and selects the booking configuration.
+          type: string
+          title: ISIN
+        risk_group_id:
+          $ref: '#/components/schemas/RiskGroupID'
+      required:
+      - client_order_id
+      - risk_group_id
+      - allocations
+      - isin
+      title: PostOrderAllocationRequest
+    CustodianID:
+      type: string
+      description: The Moment-provided ID of the custodian for the order. Custodians must be enabled per risk group.
+      example: 01JBFPWZQV2D0D7M2P851G6AGM
+      title: Custodian ID
+      x-go-type-skip-optional-pointer: true
+      x-go-name: CustodianID
+    LotInstruction:
+      title: Lot Instruction
+      type: object
+      description: 'Identifies a specific tax lot so the booking gateway can emit lot-level
+
+        VSP instructions to custodians. Buy-side flows leave it unset; when set,
+
+        all three fields are populated from the same lot record.
+
+        '
+      properties:
+        custodian_tax_lot_id:
+          description: The tax lot ID assigned by the custodian.
+          type: string
+          x-go-type-skip-optional-pointer: true
+        lot_trade_date:
+          description: Trade date of the tax lot, YYYYMMDD.
+          type: integer
+          format: int32
+          x-go-type-skip-optional-pointer: true
+        lot_purchase_price:
+          description: Per-unit purchase price of the tax lot, decimal string.
+          type: string
+          x-go-type-skip-optional-pointer: true
+    ClientOrderID:
+      type: string
+      title: Client Order ID
+      description: Client-provided unique ID for the order; for example, to cross-reference with an internal system. Must be unique within the trading day, otherwise duplicate orders will be rejected during pre-trade checks.
+    InvestmentAdvisorRepresentative:
+      title: Investment Advisor Representative
+      type: object
+      description: 'The representative credited with this account''s participation in the
+
+        order. Accounts in one block order can name different representatives.
+
+        A Moment user is sent as moment_user_id; name and email resolve from
+
+        the user directory when read. A person with no Moment login is sent
+
+        by name, with email when known. When both are set, moment_user_id is
+
+        always preferred.
+
+        '
+      properties:
+        moment_user_id:
+          description: The Moment user who is the representative.
+          type: string
+          x-go-type-skip-optional-pointer: true
+          x-go-name: MomentUserID
+        name:
+          description: The representative's display name.
+          type: string
+          x-go-type-skip-optional-pointer: true
+        email:
+          description: The representative's email.
+          type: string
+          x-go-type-skip-optional-pointer: true
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    AllocationAccountRequest:
+      title: Allocation Account Request
+      type: object
+      description: 'The account allocation request specifies the amount of the order to allocate to a specific account.
+
+        Note that requested_amount values must be a multiple of the par size of the bond.'
+      required:
+      - client_account_allocation_id
+      - account_id
+      - requested_amount
+      properties:
+        client_account_allocation_id:
+          type: string
+          description: Client-provided unique ID for the account allocation; for example, to cross-reference with an internal system. Values must be unique within the trading day.
+          x-go-name: ClientAccountAllocationID
+        account_id:
+          type: string
+          description: Unique ID of user account
+          example: 5f7b9c9f-7b9c-9f7b-9c9f-7b9c9f7b9c9f
+          x-go-name: AccountID
+        requested_amount:
+          $ref: '#/components/schemas/OrderSize'
+        account_configuration:
+          $ref: '#/components/schemas/AccountConfiguration'
+        moment_sleeve_id:
+          type: string
+          description: The Moment internal ID of the sleeve to allocate the order to.
+          x-go-name: MomentSleeveID
+        order_received_at:
+          type: string
+          format: date-time
+          description: When the end client confirmed the order for this account.
+        order_received_by:
+          description: Who took that confirmation, by Moment user reference or by name.
+          allOf:
+          - $ref: '#/components/schemas/InvestmentAdvisorRepresentative'
+    RiskGroupID:
+      description: The risk group ID to use for this order. If not specified, the default risk group for the organization will be used. The risk group must belong to the organization specified by ib_id. Orders for which the risk group does not belong to the specified organization will be rejected with "invalid risk group id."
+      type: string
+    AllocationID:
+      description: Unique, Moment-generated ID for the allocation.
+      type: string
+      example: 01JBFQQB1Z00Q4KWR7MY4V6M4W
+      title: Allocation ID
+    AccountConfiguration:
+      title: Account Configuration
+      type: object
+      description: Account configuration for the allocation
+      properties:
+        prime_brokerage_enabled:
+          type: boolean
+          description: Whether the prime brokerage is enabled for the account.
+          x-go-type-skip-optional-pointer: true
+        household_id:
+          type: string
+          description: The ID of the household for the account.
+          x-go-type-skip-optional-pointer: true
+          x-go-name: HouseholdID
+        manager_id:
+          type: string
+          description: 'The accounts-service platform advisor for the account: an
+
+            account group, not a person. The person credited with the trade
+
+            is iar.
+
+            '
+          x-go-type-skip-optional-pointer: true
+          x-go-name: ManagerID
+        custodian_advisor_id:
+          description: 'The custodian''s own identifier for the manager_id account group at
+
+            this custodian: the rep code. Stored as sent.
+
+            '
+          type: string
+          x-go-type-skip-optional-pointer: true
+          x-go-name: CustodianAdvisorID
+        custodian_id:
+          $ref: '#/components/schemas/CustodianID'
+        booking_type:
+          allOf:
+          - $ref: '#/components/schemas/BookingType'
+          x-go-type-skip-optional-pointer: true
+        custodian_tax_lot_id:
+          description: The tax lot ID assigned by the custodian. Deprecated, use lot_instruction.custodian_tax_lot_id instead.
+          type: string
+          deprecated: true
+        is_discretionary:
+          description: Whether the introducing broker exercised discretion on behalf of the end client on this particular order.
+          type: boolean
+        is_solicited:
+          description: Whether the order was solicited. Must be unset if the order is discretionary.
+          type: boolean
+        is_natural_person:
+          description: 'Whether the account is held by a natural person rather than a
+
+            legal entity. Omit when the holder cannot be classified, as a
+
+            trust or an estate may not be. An attestation control can be
+
+            limited to the accounts this is true of.
+
+            '
+          type: boolean
+        lot_instruction:
+          $ref: '#/components/schemas/LotInstruction'
+        iar:
+          allOf:
+          - $ref: '#/components/schemas/InvestmentAdvisorRepresentative'
+          x-go-name: IAR
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/allocateorderbyorderid.md
+  - https://docs.moment.com/reference/approveorderbyorderid-1.md
+  - https://docs.moment.com/reference/bulkordersubmission.md
+  - https://docs.moment.com/reference/cancelexecutionorder-1.md
+  - https://docs.moment.com/reference/createbatchlistrfqwithautoex.md
+  - https://docs.moment.com/reference/createexecutionorderautoexrfq.md
+  - https://docs.moment.com/reference/createexecutionordercustodianmanual.md
+  - https://docs.moment.com/reference/createexecutionorderexternaltrade-1.md
+  - https://docs.moment.com/reference/createexecutionorderlobmanual.md
+  - https://docs.moment.com/reference/createexecutionorderlobsor-1.md
+  - https://docs.moment.com/reference/createexecutionordermanualrfq-1.md
+  - https://docs.moment.com/reference/createrfq-1.md
+  - https://docs.moment.com/reference/deleteallocation-2.md
+  - https://docs.moment.com/reference/deletebookingconfigurationbyid.md
+  - https://docs.moment.com/reference/deleteorderbyorderid-1.md
+  - https://docs.moment.com/reference/deleterfq-1.md
+  - https://docs.moment.com/reference/getallorders-1.md
+  - https://docs.moment.com/reference/getevents-1.md
+  - https://docs.moment.com/reference/getorderbyorderid-1.md
+  - https://docs.moment.com/reference/postorder-1.md
+  - https://docs.moment.com/reference/rejectorderbyorderid-1.md
+  - https://docs.moment.com/reference/reportexternaltrade-1.md
+  merge:
+    pages: 22
+    deduped: 363
+    conflicts_kept_first: 0

@@ -1,0 +1,102 @@
+openapi: 3.2.0
+info:
+  title: Quotes Trade Price API
+  description: 'Moment''s Quotes API is a modern platform for algorithmic fixed income trading.
+
+    For complete documentation on the Quotes API and to obtain your keys, visit:
+
+    Moment API Documentation.
+
+    Once you have your keys, go to the environments tab to quickly get started.'
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Trade Price
+paths:
+  /v1/trading/trade-price/{instrument_id}/:
+    get:
+      tags:
+      - Trade Price
+      summary: Trade Price
+      description: 'The Trade Price API returns the principal, the accrued interest,
+
+        the total fees (as a result of the risk group), and the total trade costs
+
+        for a specified instrument, trade size, price, and risk group.
+
+
+        If the specified bond does not exist in our universe, you
+
+        will receive a `not_found` error.'
+      operationId: getTradePrice
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: trade_size
+        in: query
+        description: The trade size of an order in face value. For example, most corporate bonds have a face value of $1000, so a trade_size of $3000 indicates a trade for 3 bonds.
+        required: true
+        schema:
+          type: number
+      - name: price
+        in: query
+        description: The price is represented as a percentage of par. For a typical $1,000 par value bond, a price of $90 values the bond at $900.
+        required: true
+        schema:
+          type: number
+      - name: risk_group_id
+        in: query
+        description: The risk group ID to use for this quote. A risk group is required for fees to be accurately reflected in the return.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  principal:
+                    description: The principal amount of the trade, specified in the issuing currency.
+                    type: number
+                  accrued_interest:
+                    description: The cumulative amount of accrued interest for the trade, specified in the issuing currency.
+                    type: number
+                    example: 0
+                  total_fees:
+                    description: The total fees for the trade, specified in the issuing currency.
+                    type: number
+components:
+  parameters:
+    instrument_id:
+      name: instrument_id
+      in: path
+      required: true
+      description: Instrument CUSIP or ISIN
+      schema:
+        type: string
+        example: US91915WAB81
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getfractionaluniverse-1.md
+  - https://docs.moment.com/reference/getfullorderbook-1.md
+  - https://docs.moment.com/reference/gettopoforderbook-1.md
+  - https://docs.moment.com/reference/gettradeprice-1.md
+  - https://docs.moment.com/reference/gettradingcalendar-1.md
+  - https://docs.moment.com/reference/getunifiedmarket-1.md
+  - https://docs.moment.com/reference/hydratequotes-1.md
+  merge:
+    pages: 7
+    deduped: 4
+    conflicts_kept_first: 0

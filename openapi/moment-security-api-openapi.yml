@@ -1,0 +1,909 @@
+openapi: 3.2.0
+info:
+  title: Refdata Service Security API
+  version: 1.0.0
+  description: API for accessing reference data internally.
+tags:
+- name: Security
+paths:
+  /v1/security/resolve:
+    post:
+      summary: Resolve Securities in Bulk
+      description: 'Resolves a batch of identifiers (ISIN, CUSIP, symbol) and returns one
+
+        result per identifier, keyed by the identifier exactly as sent.
+
+
+        Each identifier is looked up the same way GET /v1/security/{id} looks up
+
+        one: identifiers are matched verbatim, so a lowercase symbol is
+
+        not_found. Asset-type caches are consulted in the order given by
+
+        resolution_order (or the default order when omitted), and asset types
+
+        not listed are not searched.'
+      operationId: postSecurityResolve
+      tags:
+      - Security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityResolveRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityResolveResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/security/snapshot:
+    get:
+      summary: Get Security Snapshot
+      description: 'Returns security records across all asset classes as NDJSON.
+
+        Use the filter parameter to narrow results and the fields parameter to
+
+        select which fields are returned.
+
+
+        When the filter targets the cache key field (isin) with an "in" operator,
+
+        the server performs direct cache lookups instead of scanning all records.
+
+        Additional filters in the same request are applied to the narrowed set.'
+      operationId: getSecuritySnapshot
+      tags:
+      - Security
+      parameters:
+      - $ref: '#/components/parameters/SnapshotFields'
+      - $ref: '#/components/parameters/SnapshotFilter'
+      responses:
+        '200':
+          description: Successful response (NDJSON stream)
+          content:
+            application/x-ndjson:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Equity'
+                - $ref: '#/components/schemas/FixedIncome'
+                - $ref: '#/components/schemas/Fund'
+        '400':
+          description: Invalid filter expression
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/security/{id}:
+    get:
+      summary: Get Security by identifier
+      description: 'Returns a single security record by ISIN across all asset classes.
+
+        If the identifier is not an ISIN, the service attempts to auto-detect
+
+        the symbol type and resolve it to the underlying ISIN.'
+      operationId: getSecurityByID
+      tags:
+      - Security
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Security identifier. ISINs are looked up directly; other formats
+
+          (e.g., CUSIP) are auto-detected and resolved.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/Equity'
+                - $ref: '#/components/schemas/FixedIncome'
+                - $ref: '#/components/schemas/Fund'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Equity:
+      type: object
+      properties:
+        isin:
+          type:
+          - string
+          - 'null'
+        cusip:
+          type:
+          - string
+          - 'null'
+        issuer:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        symbol:
+          type:
+          - string
+          - 'null'
+        cfi_code:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        inactive_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        active:
+          type:
+          - boolean
+          - 'null'
+        asset_subtype:
+          type:
+          - string
+          - 'null'
+        asset_type:
+          type:
+          - string
+          - 'null'
+    FixedIncome:
+      type: object
+      properties:
+        isin:
+          type:
+          - string
+          - 'null'
+        cusip:
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        sector:
+          type:
+          - string
+          - 'null'
+        bond_type:
+          type:
+          - string
+          - 'null'
+        issue_size:
+          type:
+          - number
+          - 'null'
+          format: double
+        issue_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        issue_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        maturity_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        sp_rating:
+          type:
+          - string
+          - 'null'
+        duration:
+          type:
+          - number
+          - 'null'
+          format: double
+        coupon:
+          type:
+          - number
+          - 'null'
+          format: double
+        coupon_frequency:
+          type:
+          - string
+          - 'null'
+        next_coupon_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        callable:
+          type:
+          - boolean
+          - 'null'
+        call_type:
+          type:
+          - string
+          - 'null'
+        next_call_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        next_call_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        convertible:
+          type:
+          - boolean
+          - 'null'
+        par_value:
+          type:
+          - number
+          - 'null'
+          format: double
+        insured:
+          type:
+          - boolean
+          - 'null'
+        accrued_interest:
+          type:
+          - number
+          - 'null'
+          format: double
+        status:
+          type:
+          - string
+          - 'null'
+        municipal_state:
+          type:
+          - string
+          - 'null'
+        municipal_type:
+          type:
+          - string
+          - 'null'
+        purpose:
+          type:
+          - string
+          - 'null'
+        municipal_taxable_federal:
+          type:
+          - boolean
+          - 'null'
+        bank_qualified:
+          type:
+          - boolean
+          - 'null'
+        treasury_subtype:
+          type:
+          - string
+          - 'null'
+        ticker:
+          type:
+          - string
+          - 'null'
+        coupon_type:
+          type:
+          - string
+          - 'null'
+        description_short:
+          type:
+          - string
+          - 'null'
+        sp_rating_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        sinking_fund:
+          type:
+          - boolean
+          - 'null'
+        call_notification_min:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        call_notification_max:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        call_notification_convention:
+          type:
+          - string
+          - 'null'
+        call_frequency:
+          type:
+          - string
+          - 'null'
+        is_144a:
+          type:
+          - boolean
+          - 'null'
+        reg_s:
+          type:
+          - boolean
+          - 'null'
+        private_placement:
+          type:
+          - boolean
+          - 'null'
+        daycount:
+          type:
+          - string
+          - 'null'
+        first_coupon_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        last_coupon_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        perpetual:
+          type:
+          - boolean
+          - 'null'
+        fdic_insured:
+          type:
+          - boolean
+          - 'null'
+        country_issue:
+          type:
+          - string
+          - 'null'
+        country_domicile:
+          type:
+          - string
+          - 'null'
+        sp_creditwatch:
+          type:
+          - string
+          - 'null'
+        sp_outlook:
+          type:
+          - string
+          - 'null'
+        sp_creditwatch_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        sp_outlook_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        close_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        close_ytw:
+          type:
+          - number
+          - 'null'
+          format: double
+        close_price_asof:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        liquidity_micro_buy:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_micro_sell:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_micro_aggregate:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_retail_buy:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_retail_sell:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_retail_aggregate:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_institutional_buy:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_institutional_sell:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        liquidity_institutional_aggregate:
+          type:
+          - integer
+          - 'null'
+          format: int64
+        issue_minimum:
+          type:
+          - number
+          - 'null'
+          format: double
+        seniority:
+          type:
+          - string
+          - 'null'
+        bond_warrant:
+          type:
+          - boolean
+          - 'null'
+        puttable:
+          type:
+          - boolean
+          - 'null'
+        dated_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        settlement_convention:
+          type:
+          - string
+          - 'null'
+        trace_eligible:
+          type:
+          - boolean
+          - 'null'
+        continuously_callable_flag:
+          type:
+          - boolean
+          - 'null'
+        security_code:
+          type:
+          - string
+          - 'null'
+        use_of_proceeds:
+          type:
+          - string
+          - 'null'
+        has_extraordinary_call:
+          type:
+          - boolean
+          - 'null'
+        is_amt_applicable:
+          type:
+          - boolean
+          - 'null'
+        is_state_tax_applicable:
+          type:
+          - boolean
+          - 'null'
+        odd_first_coupon:
+          type:
+          - string
+          - 'null'
+        odd_last_coupon:
+          type:
+          - string
+          - 'null'
+        is_structured_product:
+          type:
+          - boolean
+          - 'null'
+        muni_sector:
+          type:
+          - string
+          - 'null'
+        close_ytm:
+          type:
+          - number
+          - 'null'
+          format: double
+        accrued_interest_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        original_issue_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        original_issue_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        original_issue_size:
+          type:
+          - number
+          - 'null'
+          format: double
+        workout_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        treasury_benchmark:
+          type:
+          - string
+          - 'null'
+        duration_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        naics_sector:
+          type:
+          - string
+          - 'null'
+        naics_subsector:
+          type:
+          - string
+          - 'null'
+        principal_factor:
+          type:
+          - number
+          - 'null'
+          format: double
+        convexity:
+          type:
+          - number
+          - 'null'
+          format: double
+        moodys_rating:
+          type:
+          - string
+          - 'null'
+        moodys_rating_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        coupon_subtype:
+          type:
+          - string
+          - 'null'
+        is_pre_refunded:
+          type:
+          - boolean
+          - 'null'
+        amount_outstanding:
+          type:
+          - number
+          - 'null'
+          format: double
+        amount_outstanding_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        next_sink_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        issuer:
+          type:
+          - string
+          - 'null'
+        asset_subtype:
+          type:
+          - string
+          - 'null'
+        asset_type:
+          type:
+          - string
+          - 'null'
+    SecurityResolveRequest:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          maxItems: 1000
+          items:
+            type: string
+          description: 'Identifiers to resolve (ISIN, CUSIP, or symbol). Duplicates collapse
+
+            into a single result.'
+        fields:
+          type: array
+          items:
+            type: string
+          description: Fields to include in each resolved record. All fields when omitted.
+        resolution_order:
+          type: array
+          items:
+            type: string
+            enum:
+            - equity
+            - fixed_income
+            - fund
+          description: 'Asset types to search, in priority order. Asset types not listed are
+
+            not searched. Empty or missing uses the default order:
+
+            equity, fixed_income, fund. Unknown values return 400.'
+      required:
+      - identifiers
+    SecurityResolveResponse:
+      type: object
+      properties:
+        results:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SecurityResolveResult'
+          description: Map of identifier, exactly as sent, to its result
+      required:
+      - results
+    Fund:
+      type: object
+      properties:
+        isin:
+          type:
+          - string
+          - 'null'
+        cusip:
+          type:
+          - string
+          - 'null'
+        issuer:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        currency:
+          type:
+          - string
+          - 'null'
+        symbol:
+          type:
+          - string
+          - 'null'
+        country_of_sales_code:
+          type:
+          - string
+          - 'null'
+        country_of_domicile_code:
+          type:
+          - string
+          - 'null'
+        exchange_name:
+          type:
+          - string
+          - 'null'
+        exchange:
+          type:
+          - string
+          - 'null'
+        inactive_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        share_class:
+          type:
+          - string
+          - 'null'
+        inception_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        vendor_category:
+          type:
+          - string
+          - 'null'
+        index_fund:
+          type:
+          - boolean
+          - 'null'
+        fund_of_funds:
+          type:
+          - boolean
+          - 'null'
+        exchange_traded_note:
+          type:
+          - boolean
+          - 'null'
+        leveraged_fund:
+          type:
+          - boolean
+          - 'null'
+        no_load_fund:
+          type:
+          - boolean
+          - 'null'
+        closed_to_new_investors:
+          type:
+          - boolean
+          - 'null'
+        closed_to_all_investors:
+          type:
+          - boolean
+          - 'null'
+        price_to_earnings:
+          type:
+          - number
+          - 'null'
+          format: double
+        annual_report_gross_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        annual_report_net_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        prospectus_gross_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        prospectus_net_expense_ratio:
+          type:
+          - number
+          - 'null'
+          format: double
+        actual_12b1_fee:
+          type:
+          - number
+          - 'null'
+          format: double
+        actual_management_fee:
+          type:
+          - number
+          - 'null'
+          format: double
+        asset_subtype:
+          type:
+          - string
+          - 'null'
+        asset_type:
+          type:
+          - string
+          - 'null'
+        active:
+          type:
+          - boolean
+          - 'null'
+        close_price:
+          type:
+          - number
+          - 'null'
+          format: double
+        close_price_asof:
+          type:
+          - string
+          - 'null'
+          format: date
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+    SecurityResolveResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - resolved
+          - not_found
+        record:
+          description: 'Present only when status is resolved. Projected to the requested
+
+            fields when the request supplies them.'
+          oneOf:
+          - $ref: '#/components/schemas/Equity'
+          - $ref: '#/components/schemas/FixedIncome'
+          - $ref: '#/components/schemas/Fund'
+      required:
+      - status
+  parameters:
+    SnapshotFilter:
+      name: filter
+      in: query
+      required: false
+      description: 'JSON filter expression. Supported operators: equal_to, not_equal_to,
+
+        greater_than, greater_than_or_equal_to, less_than, less_than_or_equal_to,
+
+        in, not_in, is_null, includes, not_includes, starts_with, ends_with.
+
+        Logical combinators: and, or, not.'
+      schema:
+        type: string
+      example: '{"isin":{"in":["US0378331005","US5949181045"]}}'
+    SnapshotFields:
+      name: fields
+      in: query
+      required: false
+      description: Comma-separated list of fields to include in the response
+      schema:
+        type: string
+      example: isin,cusip,issuer
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/getequitybyid-1.md
+  - https://docs.moment.com/reference/getequitybyid.md
+  - https://docs.moment.com/reference/getequitysnapshot-1.md
+  - https://docs.moment.com/reference/getequitysnapshot.md
+  - https://docs.moment.com/reference/getfixedincomebyid-1.md
+  - https://docs.moment.com/reference/getfixedincomebyid.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot-1.md
+  - https://docs.moment.com/reference/getfixedincomesnapshot.md
+  - https://docs.moment.com/reference/getfundbyid-1.md
+  - https://docs.moment.com/reference/getfundbyid.md
+  - https://docs.moment.com/reference/getfundholdings-1.md
+  - https://docs.moment.com/reference/getfundholdings.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot-1.md
+  - https://docs.moment.com/reference/getfundholdingssnapshot.md
+  - https://docs.moment.com/reference/getfundsnapshot-1.md
+  - https://docs.moment.com/reference/getfundsnapshot.md
+  - https://docs.moment.com/reference/gethealth-3.md
+  - https://docs.moment.com/reference/gethealth.md
+  - https://docs.moment.com/reference/getsecuritybyid-1.md
+  - https://docs.moment.com/reference/getsecuritybyid.md
+  - https://docs.moment.com/reference/getsecuritysnapshot-1.md
+  - https://docs.moment.com/reference/getsecuritysnapshot.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics-1.md
+  - https://docs.moment.com/reference/postfixedincomeanalytics.md
+  - https://docs.moment.com/reference/postsecurityresolve.md
+  merge:
+    pages: 25
+    deduped: 67
+    conflicts_kept_first: 17

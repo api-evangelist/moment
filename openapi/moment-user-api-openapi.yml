@@ -1,0 +1,679 @@
+openapi: 3.2.0
+info:
+  title: Account Management Extended User API
+  version: 1.0.0
+  description: Account Management Extended API for managing account metadata and cash raise operations.
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: User
+paths:
+  /v1/account/organizations/{organization_id}/users/account-counts/:
+    post:
+      tags:
+      - User
+      summary: Get account counts for a list of users
+      operationId: getAccountCounts
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. Supports multiple users. Example: {"user1":["org1","org2"],"user2":["org3"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"],"user_def_456":["org3"]}'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - user_ids
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCounts'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/advisor-codes/:
+    post:
+      tags:
+      - User
+      summary: Get advisor codes for a list of users
+      operationId: getAdvisorCodesBatch
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+              - user_ids
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvisorCodesBatch'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/access/:
+    get:
+      tags:
+      - User
+      summary: Get user organization account access
+      description: Check if a user has organization-wide access
+      operationId: getUserOrgAccountAccess
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrgWideAccess'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/accounts/:
+    get:
+      tags:
+      - User
+      summary: Get accounts for a user
+      operationId: getAccountsForUser
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. For single-user endpoints, the map must contain exactly one user. Example: {"user_id":["org1","org2"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"]}'
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAccounts'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/advisor-codes/:
+    get:
+      tags:
+      - User
+      summary: Get advisor codes for a user
+      operationId: getAdvisorCodes
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdvisorCodesPerUser'
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/manual-accounts/:
+    get:
+      tags:
+      - User
+      summary: Get manual account overrides for a user
+      operationId: getManualAccountOverrides
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManualAccountOverrides'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - User
+      summary: Create a manual account override
+      operationId: createManualAccountOverride
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/ManualAccountOverrides'
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Manual account overrides created
+                required:
+                - message
+        '400':
+          description: Invalid request body or parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/organizations/{organization_id}/users/{user_id}/organization-account-statuses/:
+    get:
+      tags:
+      - User
+      summary: Get organization account statuses for a user
+      operationId: getOrganizationAccountStatusesForUser
+      parameters:
+      - name: organization_id
+        in: path
+        description: Organization ID
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+      - name: Moment-Target-User-Managed-Organizations
+        in: header
+        description: 'JSON-encoded map of user_id to managed organization IDs. For single-user endpoints, the map must contain exactly one user. Example: {"user_id":["org1","org2"]}'
+        required: false
+        schema:
+          type: string
+          example: '{"user_abc_123":["org1","org2"]}'
+      - name: page
+        in: query
+        description: Page number (1-based)
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - name: limit
+        in: query
+        description: Number of items per page
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      - name: search
+        in: query
+        description: Search term for account name
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationAccountWithStatuses'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    OrganizationAccountWithStatuses:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationAccountWithStatus'
+      required:
+      - accounts
+    UserAccounts:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAccount'
+      required:
+      - accounts
+    AdvisorCodesBatch:
+      type: object
+      properties:
+        advisor_codes:
+          description: Map of user_id to their advisor codes
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AdvisorCodesPerUser'
+      required:
+      - advisor_codes
+    ManualAccountOverride:
+      type: object
+      properties:
+        account_id:
+          description: The account ID.
+          type: string
+        status:
+          description: The status of the override.
+          type: string
+          enum:
+          - allow
+          - deny
+          - inherit
+      required:
+      - account_id
+      - status
+    UserAccount:
+      type: object
+      properties:
+        account_name:
+          description: The name of the account.
+          type: string
+        advisor_codes:
+          description: The advisor codes associated with the account.
+          type: array
+          items:
+            type: string
+        custodian:
+          description: The custodian of the account.
+          type: string
+      required:
+      - custodian
+      - account_name
+      - advisor_codes
+    OrganizationAccountWithStatus:
+      allOf:
+      - $ref: '#/components/schemas/OrganizationAccount'
+      - type: object
+        properties:
+          status:
+            description: The status of the account
+            type: string
+            enum:
+            - allow
+            - deny
+            - inherit
+        required:
+        - status
+    AdvisorCodesPerUser:
+      type: object
+      properties:
+        advisor_codes:
+          $ref: '#/components/schemas/AdvisorCodes'
+        user_id:
+          description: The user ID.
+          type: string
+      required:
+      - user_id
+      - advisor_codes
+    OrganizationAccount:
+      type: object
+      properties:
+        advisor_codes:
+          description: List of advisor codes associated with the account
+          type: array
+          items:
+            type: string
+        custodian:
+          description: Name of the custodian holding the account
+          type: string
+        moment_account_id:
+          description: Moment's unique identifier for the account
+          type: string
+        name:
+          description: Name associated with the account
+          type: string
+      required:
+      - moment_account_id
+      - custodian
+      - advisor_codes
+      - name
+    AdvisorCodes:
+      description: Advisor codes mapped by custodian ID (e.g., cust_fidelity, cust_schwab, cust_pershing)
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: string
+        description: Array of advisor codes for this custodian
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    UserOrgWideAccess:
+      type: object
+      properties:
+        has_org_wide_access:
+          description: Indicates whether the user has organization-wide access
+          type: boolean
+      required:
+      - has_org_wide_access
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    AccountCounts:
+      type: object
+      properties:
+        counts:
+          description: Map of user_id to integer count
+          type: object
+          additionalProperties:
+            type: integer
+      example:
+        counts:
+          user_abc_123: 42
+          user_def_456: 15
+          user_ghi_789: 112
+      required:
+      - counts
+    ManualAccountOverrides:
+      type: object
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManualAccountOverride'
+      required:
+      - overrides
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/cancelcashraise.md
+  - https://docs.moment.com/reference/completecashraise.md
+  - https://docs.moment.com/reference/createcashraise.md
+  - https://docs.moment.com/reference/createmanualaccountoverride.md
+  - https://docs.moment.com/reference/getaccountcounts.md
+  - https://docs.moment.com/reference/getaccountsforuser.md
+  - https://docs.moment.com/reference/getadvisoraccounts.md
+  - https://docs.moment.com/reference/getadvisorcodes.md
+  - https://docs.moment.com/reference/getadvisorcodesbatch.md
+  - https://docs.moment.com/reference/getadvisorusers.md
+  - https://docs.moment.com/reference/getcashraisebyid.md
+  - https://docs.moment.com/reference/getcashraises.md
+  - https://docs.moment.com/reference/getmanualaccountoverrides.md
+  - https://docs.moment.com/reference/getorganizationaccounts.md
+  - https://docs.moment.com/reference/getorganizationaccountstatusesforuser.md
+  - https://docs.moment.com/reference/getorganizationadvisorcodes.md
+  - https://docs.moment.com/reference/getprojectedcash.md
+  - https://docs.moment.com/reference/getuserorgaccountaccess.md
+  - https://docs.moment.com/reference/resolvecashraises.md
+  - https://docs.moment.com/reference/updateaccountmetadata.md
+  - https://docs.moment.com/reference/updatecashraise.md
+  merge:
+    pages: 21
+    deduped: 56
+    conflicts_kept_first: 0

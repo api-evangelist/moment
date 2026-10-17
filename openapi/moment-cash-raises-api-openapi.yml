@@ -1,0 +1,659 @@
+openapi: 3.2.0
+info:
+  title: Account Management Extended Cash Raises API
+  version: 1.0.0
+  description: Account Management Extended API for managing account metadata and cash raise operations.
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Cash Raises
+paths:
+  /v1/account/{account_id}/cash-raise/:
+    get:
+      tags:
+      - Cash Raises
+      summary: Get all cash raises for an account
+      description: Retrieve all cash raises associated with the specified account, including historical records.
+      operationId: getCashRaises
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Account not found or no access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    post:
+      tags:
+      - Cash Raises
+      summary: Create a new cash raise
+      description: Submit a cash raise request for a particular account.
+      operationId: createCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requested_amount:
+                  description: The size of the cash raise. Provide exactly one of requested_amount or liquidation_request; sending both, or neither, is rejected with a 400.
+                  $ref: '#/components/schemas/CentAmount'
+                target_date:
+                  description: The date by which the requested quantity of cash should be available for withdrawal.
+                  type: string
+                  format: date
+                annotation:
+                  description: A note about the request.
+                  type:
+                  - string
+                  - 'null'
+                effective_at:
+                  description: The planned activation date of the cash raise. Must not be in the past. Defaults to today when omitted.
+                  type:
+                  - string
+                  - 'null'
+                  format: date
+                liquidation_request:
+                  description: When true, the cash raise liquidates all available cash in the account rather than raising a fixed requested amount. Provide exactly one of requested_amount or liquidation_request; sending both, or neither, is rejected with a 400. Cash raises already open do not block it; they rank ahead of it and are paid first, and those not yet activated stay unactivated until the liquidation is resolved. While it is open, any new cash raise is refused — see the 412 response. Defaults to false.
+                  type: boolean
+                activation_lead_days:
+                  description: Plans activation the given number of business days before target_date, stamping the planned activation date as effective_at (the "Activate N days before due date" field, shared with recurring schedules). Mutually exclusive with effective_at. A plan whose date has already arrived activates on creation.
+                  type:
+                  - integer
+                  - 'null'
+                  minimum: 0
+                  maximum: 60
+              required:
+              - target_date
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '412':
+          description: 'The account is not in a state that can take this cash raise. `error_type` names which precondition failed:
+
+
+            * `open_liquidation`: the account has an open liquidation, which claims all of its cash. Cancel it before creating another cash raise — a second liquidation included.
+
+            * `no_funding_sleeve`, `sleeve_unresolved`, `market_values_unavailable`, `no_sellable_sleeves`: the account''s sleeve setup or pricing cannot support the raise.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/cash-raise/{cash_raise_id}/:
+    patch:
+      tags:
+      - Cash Raises
+      summary: Update a cash raise
+      description: Update a cash raise. Completed, canceled, and liquidation cash raises cannot be modified.
+      operationId: updateCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requested_amount:
+                  description: The new size of the cash raise.
+                  $ref: '#/components/schemas/CentAmount'
+                target_date:
+                  description: 'The date by which the requested quantity of cash should be
+
+                    available for withdrawal. On a raise with a planned
+
+                    activation date (a schedule-generated instance or an
+
+                    activation-lead one-off), moving target_date re-anchors
+
+                    the plan to keep the same business-day lead; a plan that
+
+                    has already arrived activates immediately.
+
+                    '
+                  type: string
+                  format: date
+                annotation:
+                  description: A note about the request.
+                  type:
+                  - string
+                  - 'null'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request - bad input, non-pending cash raise, or missing user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '412':
+          description: 'The account has no funding sleeve (`no_funding_sleeve`). A raise
+
+            drawing from several sleeves at once restates its split on an amount
+
+            edit, which adds two: live market values were unreadable
+
+            (`market_values_unavailable`) and the account holds no sellable
+
+            managed sleeve (`no_sellable_sleeves`). The account has an open
+
+            liquidation (`open_liquidation`): an amount edit is refused until
+
+            the liquidation completes or is canceled.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    delete:
+      tags:
+      - Cash Raises
+      summary: Cancel a cash raise
+      description: Cancel an existing cash raise. Cash raises that have already been completed or canceled cannot be canceled again.
+      operationId: cancelCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Cash raise cannot be canceled or missing user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+    get:
+      tags:
+      - Cash Raises
+      summary: Get a cash raise by ID
+      description: Retrieve a single cash raise by its ID, scoped to the specified account.
+      operationId: getCashRaiseById
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no organizations or no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/account/{account_id}/cash-raise/{cash_raise_id}/complete/:
+    post:
+      tags:
+      - Cash Raises
+      summary: Mark a cash raise as complete
+      description: Mark a cash raise as successfully completed. Only pending cash raises can be completed.
+      operationId: completeCashRaise
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      - name: cash_raise_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashRaise'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '404':
+          description: Cash raise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+  /v1/cash-raise/resolve:
+    post:
+      tags:
+      - Cash Raises
+      summary: Resolve active cash raises after custodian withdrawals
+      description: 'Marks every active, non-liquidation cash raise on each requested account
+
+        as completed after the custodian has already withdrawn the cash. The
+
+        operation does not book another cash withdrawal.
+
+
+        The request is one atomic action page of at most 500 accounts. Accounts
+
+        without an active fixed-amount raise are left unchanged, as are
+
+        liquidation raises and unactivated sleeve-scoped raises.'
+      operationId: resolveCashRaises
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashRaiseResolveRequest'
+        required: true
+      responses:
+        '204':
+          description: Every requested account was processed; eligible cash raises were resolved
+        '400':
+          description: Invalid request body or an empty account_ids list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: One or more accounts are outside the caller's organization scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '500':
+          description: Internal error; refresh account state before retrying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    CentAmount:
+      type: number
+      format: double
+      multipleOf: 0.01
+      title: CentAmount
+      description: A decimal monetary amount exactly representable in cents.
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    Decimal:
+      type: number
+      format: double
+      title: Decimal
+      x-go-type: decimal.Decimal
+      x-go-type-import:
+        path: github.com/shopspring/decimal
+        name: decimal
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+    CashRaiseResolveRequest:
+      type: object
+      properties:
+        account_ids:
+          description: Account IDs whose active cash raises should be resolved. Duplicate IDs are processed once.
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: string
+      required:
+      - account_ids
+    CashRaise:
+      type: object
+      properties:
+        annotation:
+          description: Optional annotation or note about the cash raise request.
+          type:
+          - string
+          - 'null'
+        cancel_reason:
+          description: 'The machine-set reason a canceled raise was canceled. Null on a user/manual cancel and on non-canceled raises.
+
+            * superseded_by_edit: replaced by an instance regenerated after a schedule edit.
+
+            * detached_to_one_off: replaced by the standalone one-off created by a "this one" edit.
+
+            * reconciled_orphan: canceled by reconciliation as an un-activated instance off its schedule''s cadence.
+
+            * schedule_deleted: canceled because its owning schedule was deleted.
+
+            * claimed_by_predecessor: a placeholder held by a schedule created by a "this and future" edit, for an occurrence whose raise still belongs to the schedule it replaced. Never funds.'
+          type:
+          - string
+          - 'null'
+          enum:
+          - superseded_by_edit
+          - detached_to_one_off
+          - reconciled_orphan
+          - schedule_deleted
+          - claimed_by_predecessor
+        completed_at:
+          description: The time at which the cash was withdrawn or the cash raise was canceled.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        completed_by:
+          description: The user who marked the cash raise as complete or canceled.
+          type:
+          - string
+          - 'null'
+        activated_at:
+          description: The date and time at which the cash raise's activation executed and its reservation was created. Null until then.
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          description: The date and time when the cash raise was created.
+          type: string
+          format: date-time
+        created_by:
+          description: The advisor who created the cash raise request.
+          type: string
+        effective_at:
+          description: The planned or actual activation date of the cash raise. Null when un-activated with no planned date.
+          type:
+          - string
+          - 'null'
+          format: date
+        id:
+          description: The unique identifier of the cash raise.
+          type: string
+        liquidation_request:
+          description: When true, the cash raise liquidates all available cash in the account rather than raising a fixed requested amount.
+          type: boolean
+        occurrence_date:
+          description: The nominal cadence date of a schedule-generated raise, set together with schedule_id. Null on one-offs.
+          type:
+          - string
+          - 'null'
+          format: date
+        raised_amount:
+          description: The amount of cash that has been withdrawn. This will be zero until the cash raise is complete.
+          $ref: '#/components/schemas/Decimal'
+        request_type:
+          description: 'How the raise was created.
+
+            * ONE_TIME: a manual one-off raise.
+
+            * RECURRING: an instance generated by a recurring schedule.
+
+            * LIQUIDATION: a raise that liquidates all available cash (liquidation_request is true).'
+          type: string
+          enum:
+          - ONE_TIME
+          - RECURRING
+          - LIQUIDATION
+        requested_amount:
+          description: The amount of cash requested to be raised. 0 for liquidation raises (liquidation_request is true) — a liquidation has no fixed target.
+          $ref: '#/components/schemas/Decimal'
+        schedule_id:
+          description: The recurring schedule that generated this raise. Null on a manual one-off.
+          type:
+          - string
+          - 'null'
+        settled_cash:
+          description: The amount of cash that is currently reserved for the cash raise. For complete and canceled cash raises, this will be zero.
+          $ref: '#/components/schemas/Decimal'
+        status:
+          description: 'The current status of the cash raise.
+
+            * pending: The cash raise is active and in progress.
+
+            * ready_to_withdraw: The entire requested amount of cash is available for withdrawal in the account.
+
+            * cash_withdrawn: The cash has been withdrawn from the account.
+
+            * past_due: The cash raise is still pending (not enough cash is available yet) and its target date is in the past. A raise with enough cash available is reported as ready_to_withdraw even after its target date has passed.
+
+            * canceled: The cash raise has been canceled.
+
+            * pending_activation: The cash raise has not been activated yet, so no cash has been reserved or moved for it. Sleeve-scoped (DoD) accounts only.
+
+            * not_ready: The cash raise is activated but its cash is not available yet — either the account has a funding violation, or earlier-due raises still claim the available cash. Sleeve-scoped (DoD) accounts only.
+
+            * future: The cash raise has a planned activation date in the future and has not been activated. Sleeve-scoped (DoD) accounts only.'
+          type: string
+          enum:
+          - pending
+          - ready_to_withdraw
+          - cash_withdrawn
+          - past_due
+          - canceled
+          - pending_activation
+          - not_ready
+          - future
+        target_date:
+          description: The target date by which the cash should be raised.
+          type: string
+          format: date
+        unsettled_cash:
+          description: The amount of unsettled cash in the account. For complete and canceled cash raises, this will be zero.
+          $ref: '#/components/schemas/Decimal'
+        updated_at:
+          description: The date and time when the cash raise was last updated.
+          type: string
+          format: date-time
+      required:
+      - id
+      - requested_amount
+      - settled_cash
+      - unsettled_cash
+      - raised_amount
+      - status
+      - target_date
+      - created_at
+      - updated_at
+      - created_by
+      - liquidation_request
+      - request_type
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/cancelcashraise.md
+  - https://docs.moment.com/reference/completecashraise.md
+  - https://docs.moment.com/reference/createcashraise.md
+  - https://docs.moment.com/reference/createmanualaccountoverride.md
+  - https://docs.moment.com/reference/getaccountcounts.md
+  - https://docs.moment.com/reference/getaccountsforuser.md
+  - https://docs.moment.com/reference/getadvisoraccounts.md
+  - https://docs.moment.com/reference/getadvisorcodes.md
+  - https://docs.moment.com/reference/getadvisorcodesbatch.md
+  - https://docs.moment.com/reference/getadvisorusers.md
+  - https://docs.moment.com/reference/getcashraisebyid.md
+  - https://docs.moment.com/reference/getcashraises.md
+  - https://docs.moment.com/reference/getmanualaccountoverrides.md
+  - https://docs.moment.com/reference/getorganizationaccounts.md
+  - https://docs.moment.com/reference/getorganizationaccountstatusesforuser.md
+  - https://docs.moment.com/reference/getorganizationadvisorcodes.md
+  - https://docs.moment.com/reference/getprojectedcash.md
+  - https://docs.moment.com/reference/getuserorgaccountaccess.md
+  - https://docs.moment.com/reference/resolvecashraises.md
+  - https://docs.moment.com/reference/updateaccountmetadata.md
+  - https://docs.moment.com/reference/updatecashraise.md
+  merge:
+    pages: 21
+    deduped: 56
+    conflicts_kept_first: 0

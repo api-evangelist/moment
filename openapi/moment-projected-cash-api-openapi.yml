@@ -1,0 +1,360 @@
+openapi: 3.2.0
+info:
+  title: Account Management Extended Projected Cash API
+  version: 1.0.0
+  description: Account Management Extended API for managing account metadata and cash raise operations.
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Projected Cash
+paths:
+  /v1/account/{account_id}/projected-cash/:
+    get:
+      tags:
+      - Projected Cash
+      summary: Get projected cash for an account
+      description: 'Projects an account''s cash forward over upcoming dates, starting from the
+
+        settled cash balance and applying every known future cash event in date
+
+        order. Answers "will cash be available on date X".
+
+
+        The timeline combines five kinds of event:
+
+
+        - **Live holds** — cash already reserved against the account (open orders,
+
+        cash raises), dated today.
+
+        - **Committed cash raises**: raises that will be funded but are not
+
+        reserved yet, including every instance a recurring schedule has
+
+        generated, each dated on the day it will be activated. A raise moves
+
+        from this kind to a live hold on that date without changing the
+
+        projected total. Only present for organizations where committed
+
+        cash-raise projection is enabled; contact Moment to have it enabled.
+
+        Where it is off, a raise reaches the timeline only once it is
+
+        activated, and every other kind of row is unaffected.
+
+        - **Unsettled trades** — each executed-but-unsettled trade appears
+
+        **twice**: a `pending_buy` / `pending_sell` row on its trade date that
+
+        lands in the unsettled bucket, and a `buy` / `sell` row on its
+
+        settlement date that moves the same amount from unsettled into settled.
+
+        The second row does not change `running_total`.
+
+        - **Fixed-income cashflows** — `coupon` and `maturity` rows for bonds held
+
+        in the account.
+
+        - **Dividends** — `dividend` rows, for organizations where dividend
+
+        projection is enabled. Contact Moment to have it enabled.
+
+
+        Each row carries the running `unsettled` and `settled` bucket balances
+
+        after that event is applied; `running_total` is always their sum and is the
+
+        projected total cash as of that row''s date.
+
+
+        **Projection window.** Coupon, maturity, and dividend rows extend roughly
+
+        180 days forward, and a recurring cash raise''s instances roughly 365 days
+
+        forward. A schedule running past that has occurrences it has not
+
+        generated yet, so they do not appear. Holds and unsettled trades are
+
+        always complete. Absence of a row beyond those windows does not mean no
+
+        event is due.
+
+
+        **Best-effort cashflows.** Coupon, maturity, and dividend rows come from an
+
+        upstream service. If that service is unavailable the endpoint still returns
+
+        `200` with the holds and trade rows, and the cashflow rows are simply
+
+        absent — the response does not currently distinguish "no cashflows due"
+
+        from "cashflows could not be retrieved". Holds and unsettled trades are
+
+        always complete and are unaffected.
+
+
+        An account with no cash and no activity returns `200` with a zero
+
+        `settled_cash` and an empty `projections` list, not a `404`.'
+      operationId: getProjectedCash
+      parameters:
+      - name: account_id
+        in: path
+        description: Account ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectedCashResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+        '403':
+          description: Forbidden - no access to account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+components:
+  schemas:
+    ProjectedCashProjection:
+      type: object
+      description: A single cash event on the projected-cash timeline.
+      properties:
+        type:
+          description: "The kind of cash event:\n\n- `pending`: committed cash whose instrument and side are not\n  known. Either a live hold (for example an activated cash raise),\n  or, only for organizations where committed cash-raise projection\n  is enabled, a cash raise that is committed but not yet activated,\n  dated on the day its hold will be placed. Both carry\n  `holder_type: cash_raise`; a client that treats them alike sees\n  the same cash reduction before and after activation.\n- `pending_buy` / `pending_sell` — an executed-but-unsettled trade on\n  its trade date, or a live order hold. The amount lands in the\n  unsettled bucket.\n- `buy` / `sell` — the settled leg of the same trade on its settlement\n  date, moving the amount from unsettled into settled. Does not change\n  `running_total`.\n- `coupon` — a bond coupon payment.\n- `maturity` — a bond principal repayment.\n- `dividend` — a dividend payment. Only present for organizations\n  where dividend projection is enabled.\n"
+          type: string
+          enum:
+          - pending
+          - pending_buy
+          - pending_sell
+          - buy
+          - sell
+          - coupon
+          - dividend
+          - maturity
+        reason:
+          description: 'Human-readable description of the event, intended for display. Where
+
+            the security is known this is its description (for example
+
+            `T 4.5% 05/12/31` for a bond, `AAPL` for an equity). Free text — do
+
+            not parse it; use `type`, `holder_type`, and `instrument_id` to
+
+            classify a row.
+
+            '
+          type: string
+          example: T 4.5% 05/12/31
+        instrument_id:
+          description: "The security this event relates to, when known. Always check for null\nbefore using it:\n\n- Null on holds that do not identify an instrument.\n- Usually populated on coupon, maturity, and dividend rows, but null\n  when the upstream cashflow data carries no per-instrument\n  attribution. The row's date and amount are still accurate; only the\n  security is unattributed.\n"
+          type:
+          - string
+          - 'null'
+        side:
+          description: 'Trade direction on trade-derived rows. Null on instrumentless commitments and on
+
+            coupon, maturity, and dividend rows — which is the majority of rows.
+
+            '
+          type:
+          - string
+          - 'null'
+          enum:
+          - BUY
+          - SELL
+          - null
+        holder_type:
+          description: 'Present only on rows where something holds or has committed the
+
+            cash. Null on every other row; use this to distinguish commitments
+
+            from pending trade legs.
+
+
+            - `order` / `allocation` — a buying-power hold keyed by order or allocation.
+
+            - `cash_raise`: a cash raise before or after activation.
+
+            - `sleeve_realignment` — a sleeve realignment funding its target sleeves.
+
+            '
+          type:
+          - string
+          - 'null'
+          example: order
+          enum:
+          - order
+          - allocation
+          - cash_raise
+          - sleeve_realignment
+          - null
+        holder_id:
+          description: Identifier of the entity responsible for a commitment. Null on every other row.
+          type:
+          - string
+          - 'null'
+        date:
+          description: 'The date this event lands on the timeline, `YYYY-MM-DD`. Live holds
+
+            are dated today. A cash raise awaiting activation is dated on the
+
+            day it is scheduled to activate, which can be months out for a
+
+            recurring schedule. A raise with no scheduled activation, such as one
+
+            waiting on a manual activation, is dated on its due date instead,
+
+            the only day it commits to. Either date, once past, lands on today.
+
+            Trade legs are dated on their trade and settlement dates; cashflows
+
+            on their payment date.
+
+            '
+          type: string
+          format: date
+        amount:
+          description: The signed amount of this event. Negative reduces cash.
+          $ref: '#/components/schemas/DecimalString'
+        unsettled:
+          description: Running unsettled-cash balance after this event is applied.
+          $ref: '#/components/schemas/DecimalString'
+        settled:
+          description: Running settled-cash balance after this event is applied, starting from `settled_cash`.
+          $ref: '#/components/schemas/DecimalString'
+        running_total:
+          description: 'Projected total cash as of this row''s date. Always the sum of
+
+            `unsettled` and `settled`.
+
+            '
+          $ref: '#/components/schemas/DecimalString'
+      required:
+      - type
+      - reason
+      - instrument_id
+      - side
+      - holder_type
+      - holder_id
+      - date
+      - amount
+      - unsettled
+      - settled
+      - running_total
+    ProjectedCashResponse:
+      type: object
+      description: An account's settled cash baseline plus its projected cash timeline.
+      properties:
+        settled_cash:
+          description: The account's current settled cash balance, the baseline the projection starts from.
+          $ref: '#/components/schemas/DecimalString'
+        currency_code:
+          description: ISO 4217 currency code for every amount in the response.
+          type: string
+          example: USD
+        projections:
+          description: 'Cash events in date order. Empty for an account with no holds, no
+
+            committed cash raises, no unsettled trades, and no upcoming
+
+            cashflows.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectedCashProjection'
+      required:
+      - settled_cash
+      - currency_code
+      - projections
+    DecimalString:
+      type: string
+      title: DecimalString
+      description: An exact decimal amount, serialized as a string to preserve precision.
+      example: '12500.00'
+    ErrorType:
+      type: string
+      description: High-level error category for programmatic error handling.
+      enum:
+      - invalid_request
+      - not_found
+      - server_error
+      - unauthorized
+      - rate_limited
+      - forbidden
+      - closed
+      - not_implemented
+      - resource_conflict
+      x-enum-varnames:
+      - ErrorTypeInvalidRequest
+      - ErrorTypeNotFound
+      - ErrorTypeServerError
+      - ErrorTypeUnauthorized
+      - ErrorTypeRateLimited
+      - ErrorTypeForbidden
+      - ErrorTypeNeedsMarketState
+      - ErrorTypeNotImplemented
+      - ErrorTypeResourceConflict
+    APIError:
+      type: object
+      description: Standard error response format returned by all API endpoints.
+      properties:
+        error:
+          type: string
+          description: Human-readable error message describing what went wrong.
+        error_details:
+          description: Additional structured information about the error.
+          x-go-type: any
+          x-go-type-skip-optional-pointer: true
+          x-oapi-codegen-extra-tags:
+            exhaustruct: optional
+        error_type:
+          $ref: '#/components/schemas/ErrorType'
+      required:
+      - error
+      - error_type
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/cancelcashraise.md
+  - https://docs.moment.com/reference/completecashraise.md
+  - https://docs.moment.com/reference/createcashraise.md
+  - https://docs.moment.com/reference/createmanualaccountoverride.md
+  - https://docs.moment.com/reference/getaccountcounts.md
+  - https://docs.moment.com/reference/getaccountsforuser.md
+  - https://docs.moment.com/reference/getadvisoraccounts.md
+  - https://docs.moment.com/reference/getadvisorcodes.md
+  - https://docs.moment.com/reference/getadvisorcodesbatch.md
+  - https://docs.moment.com/reference/getadvisorusers.md
+  - https://docs.moment.com/reference/getcashraisebyid.md
+  - https://docs.moment.com/reference/getcashraises.md
+  - https://docs.moment.com/reference/getmanualaccountoverrides.md
+  - https://docs.moment.com/reference/getorganizationaccounts.md
+  - https://docs.moment.com/reference/getorganizationaccountstatusesforuser.md
+  - https://docs.moment.com/reference/getorganizationadvisorcodes.md
+  - https://docs.moment.com/reference/getprojectedcash.md
+  - https://docs.moment.com/reference/getuserorgaccountaccess.md
+  - https://docs.moment.com/reference/resolvecashraises.md
+  - https://docs.moment.com/reference/updateaccountmetadata.md
+  - https://docs.moment.com/reference/updatecashraise.md
+  merge:
+    pages: 21
+    deduped: 56
+    conflicts_kept_first: 0

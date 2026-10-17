@@ -1,0 +1,939 @@
+openapi: 3.2.0
+info:
+  title: Moment Market Data API
+  version: 1.0.0
+  contact:
+    name: Moment Support
+    email: support@withmoment.com
+    url: https://withmoment.com/support
+  description: 'Operations tagged Market Data across 2 of this provider''s published API definitions: moment-data-api-openapi.yml, moment-live-inventory-api-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://live.moment-api.com
+- url: https://paper.moment-api.com
+tags:
+- name: Market Data
+paths:
+  /v1/data/instrument/{instrument_id}/price/:
+    get:
+      tags:
+      - Market Data
+      summary: Historical Prices
+      parameters:
+      - $ref: '#/components/parameters/instrument_id'
+      - name: frequency
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - 1day
+          - 15min
+          - 1min
+          default: 1day
+        description: "Frequency of price observations. Each frequency has a pre-defined maximum time range. Currently supported frequencies and ranges are:\n\n- **1day**:\n  EOD close prices.\n\n  Maximum supported time range: daily price history since 2018.\n\n- **15min**:\n  15 minute interval prices.\n\n  Maximum supported time range: 15 days.\n\n- **1min**:\n  1 minute tick prices.\n\n  Maximum supported time range: 1 day."
+      - name: start
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: '2023-07-31'
+        description: Filter data equal to or after this time in YYYY-MM-DD format.
+      - name: end
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+          example: '2021-08-04'
+        description: Filter data equal to or before this time in YYYY-MM-DD format.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricesResponse'
+      operationId: getPrices
+      description: 'The Price Chart API returns aggregate data for a given bond identifier over a specified time period. This should be queried on demand to provide users with a chart of prices for a given bond.
+
+
+        ### Usage Information
+
+
+        If the specified bond exists in our universe, you will receive a response with all available price data for the specified time frame. If there is no price data for the specified bond in the given time period, the response will contain an empty `data` array.
+
+
+        If the specified bond does not exist in our universe or is inactive, you will receive an `invalid_request` error.
+
+
+        The start and end days define a time range for retrieval. For example, to receive data for August 5, 2023, you would set `start=2023-08-05` and `end=2023-08-06`. This will _not_ return data for August 6, 2023.
+
+
+        ### Return Value Information
+
+
+        Returned results are sorted by price timestamp in ascending order.
+
+
+        Note that in rare cases, there may not be a price for every window. E.g., there may be prices for 12:00, 12:15, and 12:45, but not 12:30. If you are showing prices to end users and want to show a continuous dataset, you can carry forward the prices from the previous time window. E.g., if the 12:15 price was $80, you would use $80 for the 12:30 price as well.
+
+
+        The timestamp we return is a timestamp for the _start_ of an interval with the selected frequency. For example, if we return a timestamp of `2023-08-05T14:30:00Z`, then we are returning the aggregate price for the interval from `2023-08-05T14:30:00Z` to `2023-08-05T14:45:00Z`.'
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/marks/:
+    get:
+      tags:
+      - Market Data
+      summary: Last Price
+      description: 'The marks endpoint can be used to retrieve the most recently observed price for each ISIN in a collection of ISINs (up to 100 maximum). It is intended to be used to mark a portfolio''s current value.
+
+        The response will contain a list of mark objects, ordered by ISIN ascending, corresponding to the requested list.
+
+        Each mark object will either contain the mark details or an error message if the mark cannot be retrieved (not found, not tradable, not priced).
+
+        If the request is malformed, the endpoint will fail and return an error message.'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Mark'
+      operationId: getMarks
+      parameters:
+      - description: A comma-separated list of instruments to get marks for, capped at 100 ISINs/CUSIPs.
+        required: true
+        in: query
+        name: instruments
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/maturity-bucket/percentile/:
+    get:
+      tags:
+      - Market Data
+      summary: Maturity Bucket Percentiles
+      description: 'The maturity bucket percentiles endpoint groups bond inventory by maturity
+
+        buckets and calculates yield to worst percentiles for each bucket.
+
+
+        This endpoint accepts the same filtering parameters as the inventory endpoint
+
+        to filter bonds, then groups them by maturity ranges and returns ask and bid
+
+        yield to worst (YTW) values at the specified percentile for each bucket.
+
+
+        Bucket Selection:
+
+        - Use ''bucket_selection'' parameter to choose between ''maturity_date'' or ''workout_date'' for grouping
+
+        - Use ''buckets'' parameter to filter for specific maturity buckets only
+
+
+        Available maturity buckets:
+
+        - 1-3 mo
+
+        - 3-6 mo
+
+        - 6-9 mo
+
+        - 9-12 mo
+
+        - 1-1.5 yr
+
+        - 1.5-2.5 yr
+
+        - 2.5-3.5 yr
+
+        - 3.5-4.5 yr
+
+        - 4.5-5.5 yr
+
+        - 5.5-6.5 yr
+
+        - 6.5-7.5 yr
+
+        - 7.5-8.5 yr
+
+        - 8.5-9.5 yr
+
+        - 9.5-10.5 yr
+
+        - 10.5-11.5 yr
+
+        - 11.5-12.5 yr
+
+        - 12.5-13.5 yr
+
+        - 13.5-14.5 yr
+
+        - 14.5-15.5 yr
+
+        - 15.5-16.5 yr
+
+        - 16.5-17.5 yr
+
+        - 17.5-18.5 yr
+
+        - 18.5-19.5 yr
+
+        - 19.5-20.5 yr
+
+        - 20.5-21.5 yr
+
+        - 21.5-22.5 yr
+
+        - 22.5-23.5 yr
+
+        - 23.5-24.5 yr
+
+        - 24.5-25.5 yr
+
+        - 25.5-26.5 yr
+
+        - 26.5-27.5 yr
+
+        - 27.5-28.5 yr
+
+        - 28.5-29.5 yr
+
+        - 29.5+ yr'
+      operationId: getMaturityBucketPercentiles
+      parameters:
+      - $ref: '#/components/parameters/inventory_filters'
+      - name: percentile
+        in: query
+        description: The percentile value to calculate for each maturity bucket (0-100)
+        required: true
+        schema:
+          type: number
+          maximum: 100
+          minimum: 0
+        example: 75
+      - name: bucket_selection
+        in: query
+        description: 'The date field to use for maturity bucket selection. Defaults to ''maturity_date''.
+
+          - ''maturity_date'': Group bonds by their maturity date
+
+          - ''workout_date'': Group bonds by their workout date (call adjusted maturity date)'
+        schema:
+          type: string
+          default: maturity_date
+          enum:
+          - maturity_date
+          - workout_date
+      - name: buckets
+        in: query
+        description: 'Comma-separated list of specific maturity buckets to include in the response.
+
+          If not specified, all buckets with data will be returned.
+
+          Available buckets: 1-3 mo, 3-6 mo, 6-9 mo, 9-12 mo, 1-1.5 yr, 1.5-2.5 yr, 2.5-3.5 yr, 3.5-4.5 yr, 4.5-5.5 yr, 5.5-6.5 yr, 6.5-7.5 yr, 7.5-8.5 yr, 8.5-9.5 yr, 9.5-10.5 yr, 10.5-11.5 yr, 11.5-12.5 yr, 12.5-13.5 yr, 13.5-14.5 yr, 14.5-15.5 yr, 15.5-16.5 yr, 16.5-17.5 yr, 17.5-18.5 yr, 18.5-19.5 yr, 19.5-20.5 yr, 20.5-21.5 yr, 21.5-22.5 yr, 22.5-23.5 yr, 23.5-24.5 yr, 24.5-25.5 yr, 25.5-26.5 yr, 26.5-27.5 yr, 27.5-28.5 yr, 28.5-29.5 yr, 29.5+ yr'
+        schema:
+          type: string
+        example: 1.5-2.5 yr,2.5-3.5 yr,3.5-4.5 yr
+      - name: risk_group_id
+        in: query
+        description: 'The risk group ID to filter for tradable inventory. If left null,
+
+          and a single risk group exists for the organization, it will be
+
+          used as the default risk group. If left null, and more than one
+
+          risk group exists, the request will fail.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaturityBucketResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+  /v1/data/maturity-bucket/percentile/batch/:
+    post:
+      tags:
+      - Market Data
+      summary: Batched Maturity Bucket Percentiles
+      description: 'Computes several maturity-bucket percentile series in a single request.
+
+        Each series is identical in semantics to a `GET
+
+        /v1/data/maturity-bucket/percentile/` call: the shared `percentile`,
+
+        `bucket_selection`, `buckets`, and `risk_group_id` fields apply to every
+
+        series, and each series supplies its own `filters` object.
+
+
+        Use this instead of firing one request per filter set — the series run
+
+        concurrently server-side and share the request''s caches.
+
+
+        The response keys each series'' result by the `key` the request supplied.
+
+        Errors are all-or-nothing: if any series fails, the whole request fails
+
+        with the status the single-series endpoint would have returned.'
+      operationId: postMaturityBucketPercentilesBatch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaturityBucketPercentileBatchRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaturityBucketPercentileBatchResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/paths/~1v1~1data~1inventory~1/get/responses/400/content/application~1json/schema'
+    servers:
+    - url: https://live.moment-api.com
+    - url: https://paper.moment-api.com
+components:
+  schemas:
+    isin:
+      type: string
+      title: ISIN
+      description: The International Securities Identification Number (ISIN) is a 12-digit alphanumeric code that uniquely identifies a specific security.
+      example: US594918AD66
+      minLength: 12
+      maxLength: 12
+    MarkDetails:
+      type:
+      - object
+      - 'null'
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp of the most recent pricing estimate in RFC-3339 format with nanosecond precision.
+          format: date-time
+        price:
+          type: number
+          description: Price estimation for the current instrument as a percentage of par.
+        dirty_price:
+          type: number
+          description: The "dirty price" for an instrument. Defined as price + accrued interest as a percentage of par.
+        accrued_interest:
+          type: number
+          description: Accrued interest for the instrument represented as dollar-per-bond at par value.
+        yield_to_worst:
+          type:
+          - number
+          - 'null'
+          description: The instrument's worst possible yield, which is the minimum of the yield to maturity and all yield to call values.
+        yield_to_maturity:
+          type:
+          - number
+          - 'null'
+          description: The yield to maturity is the annual rate of return that a bond has assuming it is held to maturity and does not default.
+    Price:
+      title: Price
+      type: object
+      description: 'The prices API returns aggregate data for the requested security.
+
+        '
+      properties:
+        timestamp:
+          type: string
+          description: Timestamp in RFC-3339 format with nanosecond precision.
+          format: date-time
+        price:
+          type: number
+          description: Evaluated price for market mid.
+        yield_to_worst:
+          type:
+          - number
+          - 'null'
+          description: Evaluated yield to worst for market mid.
+        yield_to_maturity:
+          type:
+          - number
+          - 'null'
+          description: Evaluated yield to maturity for market mid.
+      required:
+      - timestamp
+      - price
+      - yield_to_worst
+    cusip:
+      type:
+      - string
+      - 'null'
+      title: CUSIP
+      description: 'The CUSIP is a nine-digit numeric or nine-character alphanumeric code that identifies a North American financial security.
+
+
+        Note: Available to licensed users only.
+
+        The Committee on Uniform Securities Identification Procedures (CUSIP) identifier for all stocks and registered bonds.
+
+        CUSIPs are unique security identifiers managed by The CUSIP Service Bureau.'
+      example: H00402625
+      minLength: 9
+      maxLength: 9
+    PricesResponse:
+      description: ''
+      type: object
+      title: PricesResponse
+      properties:
+        count:
+          type: integer
+          description: The total number of price observations found that match the query.
+        next:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the next page of results (if any exist). Null if no more pages.
+        prev:
+          type:
+          - string
+          - 'null'
+          format: URL
+          description: The URL to the previous page of results (if any exist). Null if no earlier pages.
+        data:
+          type: array
+          uniqueItems: true
+          description: The array of price data
+          items:
+            $ref: '#/components/schemas/Price'
+      required:
+      - isin
+      - cusip
+      - data
+    Mark:
+      title: Mark
+      type: object
+      description: 'The mark for a given security, containing the most recent observed price for an instrument, used for marking a portfolios current value.
+
+        If the mark can be retrieved, the details field will be populated with the mark details and the error field will be null.
+
+        If the mark cannot be retrieved, the error field will be populated with an error message and the details field will be null.'
+      properties:
+        isin:
+          $ref: '#/components/schemas/isin'
+        cusip:
+          $ref: '#/components/schemas/cusip'
+        details:
+          $ref: '#/components/schemas/MarkDetails'
+        error:
+          type:
+          - string
+          - 'null'
+          description: An error message if the mark cannot be retrieved (not found, not tradable, not priced), null otherwise.
+          example: null
+      required:
+      - isin
+      - timestamp
+      - details
+      - error
+    MaturityBucketResponse:
+      type: object
+      properties:
+        bey_conversion_applied:
+          description: 'Indicates whether bond equivalent yield (BEY) normalization was applied.
+
+            When true, Treasury bills (identified by treasury_subtype=''bill'') have had
+
+            their discount yields converted to BEY for comparability with other bond types.
+
+            '
+          type: boolean
+          example: true
+        bucket_selection:
+          description: The date field used for maturity bucket selection
+          type: string
+          example: maturity_date
+          enum:
+          - maturity_date
+          - workout_date
+        count:
+          description: The total number of instruments included across all buckets
+          type: integer
+        data:
+          description: Array of maturity buckets with their corresponding percentile YTW values
+          type: array
+          items:
+            $ref: '#/components/schemas/MaturityBucketData'
+        percentile:
+          description: The percentile that was calculated
+          type: number
+          example: 75
+      title: MaturityBucketResponse
+    MaturityBucketPercentileBatchRequest:
+      type: object
+      properties:
+        bucket_selection:
+          description: 'The date field to use for maturity bucket selection, applied to every
+
+            series. Defaults to ''maturity_date''.
+
+            - ''maturity_date'': Group bonds by their maturity date
+
+            - ''workout_date'': Group bonds by their workout date (call adjusted maturity date)'
+          type: string
+          default: maturity_date
+          enum:
+          - maturity_date
+          - workout_date
+        buckets:
+          description: 'Comma-separated list of specific maturity buckets to include in every
+
+            series. If not specified, all buckets with data will be returned.
+
+            Available buckets: 1-3 mo, 3-6 mo, 6-9 mo, 9-12 mo, 1-1.5 yr, 1.5-2.5 yr, 2.5-3.5 yr, 3.5-4.5 yr, 4.5-5.5 yr, 5.5-6.5 yr, 6.5-7.5 yr, 7.5-8.5 yr, 8.5-9.5 yr, 9.5-10.5 yr, 10.5-11.5 yr, 11.5-12.5 yr, 12.5-13.5 yr, 13.5-14.5 yr, 14.5-15.5 yr, 15.5-16.5 yr, 16.5-17.5 yr, 17.5-18.5 yr, 18.5-19.5 yr, 19.5-20.5 yr, 20.5-21.5 yr, 21.5-22.5 yr, 22.5-23.5 yr, 23.5-24.5 yr, 24.5-25.5 yr, 25.5-26.5 yr, 26.5-27.5 yr, 27.5-28.5 yr, 28.5-29.5 yr, 29.5+ yr'
+          type: string
+          example: 1.5-2.5 yr,2.5-3.5 yr,3.5-4.5 yr
+        percentile:
+          description: 'The percentile value to calculate for each maturity bucket (0-100),
+
+            applied to every series. Required: omitting it, or sending an
+
+            explicit null, is rejected with a 400. The schema marks it nullable
+
+            only so code generation can tell an omitted value apart from 0,
+
+            which is itself a valid percentile.'
+          type:
+          - number
+          - 'null'
+          example: 90
+          maximum: 100
+          minimum: 0
+        risk_group_id:
+          description: 'The risk group ID to filter for tradable inventory, applied to every
+
+            series. If left null, and a single risk group exists for the
+
+            organization, it will be used as the default risk group. If left
+
+            null, and more than one risk group exists, the request will fail.'
+          type: string
+        series:
+          description: 'The series to compute. Each entry supplies its own filters and a key
+
+            the result is returned under. Keys must be non-empty and unique.'
+          type: array
+          items:
+            $ref: '#/components/schemas/MaturityBucketPercentileBatchSeries'
+          maxItems: 16
+          minItems: 1
+      required:
+      - percentile
+      - series
+      title: MaturityBucketPercentileBatchRequest
+    MaturityBucketPercentileBatchSeries:
+      type: object
+      properties:
+        filters:
+          description: 'The filters selecting this series'' instruments, as a JSON object whose keys are
+
+            fields to filter on or operators. Send the object itself, not a JSON-encoded
+
+            string.
+
+            Example: {"cusip": {"in": ["035240AQ3"]}, "maturity_date": {"lt": "2030-01-01"}}'
+          $ref: '#/components/schemas/InventoryFilter'
+        key:
+          description: The key this series' result is returned under. Must be non-empty and unique within the request.
+          type: string
+          example: corporate_aa_plus
+          maxLength: 64
+          minLength: 1
+      required:
+      - key
+      - filters
+      title: MaturityBucketPercentileBatchSeries
+    InventoryFilter:
+      description: 'In a filter object, each key is either a field to filter on or an operator.
+
+        Each value is either a filter condition object or, in the case of certain
+
+        operators, an array of filter objects.
+
+
+        Some of the fields which can be filtered on are explicitly defined on this schema.
+
+        Any of the other fields in the reference data model can be used as an
+
+        InventoryFilter key.'
+      type: object
+      properties:
+        and:
+          description: Filter operator key with array value of filter objects to be combined with AND.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryFilter'
+        country_issue:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        country_of_risk:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        coupon:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        currency:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        cusip:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        description:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        emerging_status:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        isin:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        issue_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        issuer:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_institutional_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_micro_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_aggregate:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_buy:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        liquidity_retail_sell:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        lowest_rating:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        maturity_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        min_trade_market_value:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        naics_sector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        naics_subsector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        not:
+          description: Filter operator key with a filter object to be negated.
+          $ref: '#/components/schemas/InventoryFilter'
+        objective_score:
+          description: 'Filter on the computed objective score. Requires an
+
+            `objective_function` in the request — the score is computed from
+
+            it per bond. Supports only the numeric comparison operators
+
+            (equal_to, not_equal_to, greater_than, greater_than_or_equal_to,
+
+            less_than, less_than_or_equal_to) and is_null, with numeric
+
+            values. Combine with `sort_by: ["objective_score.desc"]` to rank
+
+            and threshold in one query.'
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        or:
+          description: Filter operator key with array value of filter objects to be combined with OR.
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryFilter'
+        pre_fee_price:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        pre_fee_yield_to_maturity:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        pre_fee_yield_to_worst:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        price:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        sector:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        sp_rating:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        treasury_benchmark:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        type:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        workout_date:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        yield_to_maturity:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+        yield_to_worst:
+          $ref: '#/components/schemas/InventoryFilterCondition'
+      example:
+        best_bid_yield:
+          greater_than: 6.5
+        maturity_date:
+          less_than: '2030-01-01'
+          greater_than: '2026-01-01'
+        sp_rating:
+          greater_than: BBB
+        issuer:
+          includes: Apple
+        liquidity_institutional_buy:
+          in:
+          - 3
+          - 4
+          - 5
+        or:
+        - description:
+            starts_with: app
+        - description:
+            starts_with: united
+      additionalProperties:
+        $ref: '#/components/schemas/InventoryFilterCondition'
+    InventoryFilterCondition:
+      type: object
+      properties:
+        ends_with:
+          description: String to end with in the filter.
+          type: string
+        equal_to:
+          description: Exact value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        greater_than:
+          description: Greater than value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        greater_than_or_equal_to:
+          description: Greater than or equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        in:
+          description: Array of values for the filter.
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: number
+        in_filter_list:
+          description: Filter by values from a named filter list. The value is the filter list ID (e.g., "list_01ABC123").
+          type: string
+        includes:
+          description: String to include in the filter.
+          type: string
+        is_null:
+          description: Boolean to filter for null / not-null values.
+          type: boolean
+        less_than:
+          description: Less than value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        less_than_or_equal_to:
+          description: Less than or equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        not_equal_to:
+          description: Not equal to value for the filter.
+          oneOf:
+          - type: string
+          - type: number
+        not_in:
+          description: Array of values not to include in the filter.
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: number
+        not_in_filter_list:
+          description: Exclude values that are in a named filter list. The value is the filter list ID (e.g., "list_01ABC123").
+          type: string
+        not_includes:
+          description: String not to include in the filter.
+          type: string
+        starts_with:
+          description: String to start with in the filter.
+          type: string
+    MaturityBucketPercentileBatchResponse:
+      type: object
+      properties:
+        bucket_selection:
+          description: The date field used for maturity bucket selection
+          type: string
+          example: maturity_date
+          enum:
+          - maturity_date
+          - workout_date
+        percentile:
+          description: The percentile that was calculated
+          type: number
+          example: 90
+        series:
+          description: The computed series, keyed by the key supplied in the request
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MaturityBucketPercentileBatchSeriesResult'
+      title: MaturityBucketPercentileBatchResponse
+    MaturityBucketPercentileBatchSeriesResult:
+      type: object
+      properties:
+        count:
+          description: The total number of instruments included across all buckets in this series
+          type: integer
+        data:
+          description: Array of maturity buckets with their corresponding percentile YTW values
+          type: array
+          items:
+            $ref: '#/components/schemas/MaturityBucketData'
+      title: MaturityBucketPercentileBatchSeriesResult
+    MaturityBucketData:
+      type: object
+      properties:
+        ask_ytw_percentile:
+          description: The ask yield to worst at the specified percentile for this bucket
+          type:
+          - number
+          - 'null'
+          example: 4.25
+        bid_ytw_percentile:
+          description: The bid yield to worst at the specified percentile for this bucket
+          type:
+          - number
+          - 'null'
+          example: 4.15
+        bucket:
+          description: The maturity bucket range
+          type: string
+          example: 3.5-4.5 yr
+          enum:
+          - 1-3 mo
+          - 3-6 mo
+          - 6-9 mo
+          - 9-12 mo
+          - 1-1.5 yr
+          - 1.5-2.5 yr
+          - 2.5-3.5 yr
+          - 3.5-4.5 yr
+          - 4.5-5.5 yr
+          - 5.5-6.5 yr
+          - 6.5-7.5 yr
+          - 7.5-8.5 yr
+          - 8.5-9.5 yr
+          - 9.5-10.5 yr
+          - 10.5-11.5 yr
+          - 11.5-12.5 yr
+          - 12.5-13.5 yr
+          - 13.5-14.5 yr
+          - 14.5-15.5 yr
+          - 15.5-16.5 yr
+          - 16.5-17.5 yr
+          - 17.5-18.5 yr
+          - 18.5-19.5 yr
+          - 19.5-20.5 yr
+          - 20.5-21.5 yr
+          - 21.5-22.5 yr
+          - 22.5-23.5 yr
+          - 23.5-24.5 yr
+          - 24.5-25.5 yr
+          - 25.5-26.5 yr
+          - 26.5-27.5 yr
+          - 27.5-28.5 yr
+          - 28.5-29.5 yr
+          - 29.5+ yr
+        instrument_count:
+          description: Number of instruments in this maturity bucket
+          type: integer
+          example: 45
+      title: MaturityBucketData
+  parameters:
+    instrument_id:
+      name: instrument_id
+      in: path
+      required: true
+      description: Instrument CUSIP or ISIN
+      schema:
+        type: string
+        example: US91915WAB81
+    inventory_filters:
+      name: filters
+      description: "The filters for live inventory are in the format of a JSON object. In a\nfilter object, each key is either a field to filter on or an operator.\nEach value is either a filter condition object or, in the case of\ncertain operators, an array of filter objects.\n\nA filter condition object can contain the following fields:\n\n* equal_to: Exact value for the filter.\n* not_equal_to: Not equal to value for the filter.\n* greater_than: Greater than value for the filter.\n* greater_than_or_equal_to: Greater than or equal to value for the filter.\n* less_than: Less than value for the filter.\n* less_than_or_equal_to: Less than or equal to value for the filter.\n* in: Array of values for the filter.\n* not_in: Array of values not to include in the filter.\n* is_null: Boolean to filter for null / not-null values.\n* includes: String to include in the filter.\n* not_includes: String not to include in the filter.\n* starts_with: String to start with in the filter.\n* ends_with: String to end with in the filter.\n\nThe fields that can be filtered on are:\n\n* price\n* yield_to_maturity\n* yield_to_worst\n* isin\n* cusip\n* issuer\n* sector\n* description\n* type\n* issue_date\n* maturity_date\n* workout_date\n* treasury_benchmark\n* sp_rating\n* lowest_rating\n* lowest_rating_rank\n* coupon\n* currency\n* country_issue\n* country_of_risk\n* emerging_status\n* liquidity_micro_buy\n* liquidity_micro_sell\n* liquidity_micro_aggregate\n* liquidity_retail_buy\n* liquidity_retail_sell\n* liquidity_retail_aggregate\n* liquidity_institutional_buy\n* liquidity_institutional_sell\n* liquidity_institutional_aggregate\n* Any of the other fields in the reference data model.\n\nThe operators that can be used are:\n* and: Array of filter objects to be combined with an AND operator.\n* not: Filter object to be negated.\n* or: Array of filter objects to be combined with an OR operator.\n\nFor example, a sample filter object might look like this:\n\n```json\n{\n  \"yield_to_worst\": {\n    \"greater_than\": 6.5\n  },\n  \"price\": {\n    \"less_than\": 100\n  },\n  \"maturity_date\": {\n    \"less_than\": \"2030-01-01\",\n    \"greater_than\": \"2026-01-01\"\n  },\n  \"sp_rating\": {\n    \"greater_than\": \"BBB\"\n  },\n  \"issuer\": {\n    \"includes\": \"Apple\"\n  },\n  \"liquidity_institutional_buy\": {\n    \"in\": [3, 4, 5]\n  },\n  \"or\": [\n    {\n      \"description\": {\n        \"starts_with\": \"app\"\n      }\n    },\n    {\n      \"description\": {\n        \"starts_with\": \"united\"\n      }\n    }\n  ]\n}\n```\n\nThis must be encoded as a JSON string in the query parameter."
+      in: query
+      required: true
+      schema:
+        type: string
+      example: "{\n  \"yield_to_worst\": {\n    \"greater_than\": 6.5\n  },\n  \"price\": {\n    \"less_than\": 100\n  },\n  \"maturity_date\": {\n    \"less_than\": \"2030-01-01\",\n    \"greater_than\": \"2026-01-01\"\n  },\n  \"sp_rating\": {\n    \"greater_than\": \"BBB\"\n  },\n  \"issuer\": {\n    \"includes\": \"Apple\"\n  },\n  \"liquidity_institutional_buy\": {\n    \"in\": [3, 4, 5]\n  }\n}\n"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+x-refined-from:
+- moment-data-api-openapi.yml
+- moment-live-inventory-api-openapi.yml
+x-provenance:
+  method: searched
+  source: https://docs.moment.com/reference
+  harvested: '2026-10-14'
+  tool: harvest-readme-openapi.py
+  note: Assembled verbatim from the OpenAPI definition ReadMe embeds in each operation page of the provider's developer portal; paths and components merged by API title, nothing authored.
+  assembled_from:
+  - https://docs.moment.com/reference/addfixipallowlist.md
+  - https://docs.moment.com/reference/getfixipallowlist.md
+  - https://docs.moment.com/reference/removefixipallowlist.md
+  - https://docs.moment.com/reference/updateorganizationipallowlist.md
+  merge:
+    pages: 4
+    deduped: 7
+    conflicts_kept_first: 0
